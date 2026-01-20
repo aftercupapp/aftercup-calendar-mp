@@ -3,7 +3,7 @@ let events = [];
     let currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0);
     let currentMiniCalDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-    let currentPopupCalDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1); // Renamed from MobileMiniCalDate
+    let currentPopupCalDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
     let selectedColor = '#FFFFFF';
     let currentEditId = null;
     let currentBulkEditInfo = null;
@@ -12,7 +12,6 @@ let events = [];
     let installPopupOverlay; 
     let autoSyncEnabled = JSON.parse(localStorage.getItem('autoSyncEnabled')) ?? true;
 
-    // Added to prevent ReferenceError if these were missing from the original snippet
     let isMobileMiniCalVisible = false;
     function toggleMobileMiniCalendar() {}
 
@@ -60,8 +59,7 @@ let events = [];
     function closePopupAndGoBack() {
         const activePopupId = getActivePopupId();
         if (activePopupId) {
-            hidePopups(); // Explicitly call hide for direct closes
-            // Also mimic history back if we pushed state
+            hidePopups();
             if(window.history.state && window.history.state.popup) {
                 history.back();
             }
@@ -144,16 +142,16 @@ let events = [];
         noteContentDiv.addEventListener('keydown', (e) => {
             if (e.ctrlKey || e.metaKey) {
                 const key = e.key.toLowerCase();
-                if (e.shiftKey && key === 'x') { // Ctrl+Shift+X for Strikethrough
+                if (e.shiftKey && key === 'x') {
                     e.preventDefault();
                     document.execCommand('strikethrough');
-                } else if (key === 'b') { // Ctrl+B
+                } else if (key === 'b') {
                     e.preventDefault();
                     document.execCommand('bold');
-                } else if (key === 'i') { // Ctrl+I
+                } else if (key === 'i') {
                     e.preventDefault();
                     document.execCommand('italic');
-                } else if (key === 'u') { // Ctrl+U
+                } else if (key === 'u') {
                     e.preventDefault();
                     document.execCommand('underline');
                 }
@@ -193,11 +191,6 @@ let events = [];
         const userEvents = JSON.parse(localStorage.getItem('events')) || [];
         let fetchedEvents = [];
         try {
-            // Mock fetch for local demo if file not present
-            // const response = await fetch('/events-update.json');
-            // if (response.ok) {
-            //     fetchedEvents = await response.json();
-            // }
         } catch (error) {
             console.error(error);
         }
@@ -211,7 +204,7 @@ let events = [];
 
         updateCalendar();
         setupMiniCalendarNav();
-        setupPopupCalendarNav(); // New popup navigation setup
+        setupPopupCalendarNav();
         document.getElementById('restore-file-input').addEventListener('change', handleRestoreFile);
         initShiftPlannerElements();
 
@@ -221,7 +214,7 @@ let events = [];
             tick.className = 'material-icons-outlined tick-icon';
             tick.textContent = 'check';
             tick.style.color = getContrastColor(colorDiv.style.backgroundColor);
-            tick.style.display = 'none'; // Hidden by default, shown via CSS selected class if needed
+            tick.style.display = 'none';
             colorDiv.appendChild(tick);
         });
 
@@ -371,7 +364,6 @@ let events = [];
         const monthYearEl = document.getElementById('mini-month-year');
         if (!grid || !monthYearEl || window.innerWidth < 769) {
             if (grid && window.innerWidth < 769) grid.innerHTML = '';
-            // Allow rendering even if hidden for layout readiness
         }
         const visibleEvents = getVisibleEvents();
         grid.innerHTML = '';
@@ -475,7 +467,6 @@ let events = [];
     }
 
     function showDatePopup() {
-        // Consolidated Date + Navigation Popup
         hidePopups(true);
         const overlay = document.getElementById('overlay');
         overlay.style.zIndex = '1005';
@@ -485,7 +476,6 @@ let events = [];
         popup.classList.add('active');
         popup.scrollTop = 0;
         
-        // Initialize Calendar Grid in Popup
         currentPopupCalDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
         renderPopupCalendar();
 
@@ -568,7 +558,6 @@ let events = [];
         const popup = document.getElementById('pocket-popup');
         popup.classList.add('active');
         
-        // Lazy load the iframe only when opened for the first time
         const iframe = document.getElementById('pocket-iframe');
         if (iframe && !iframe.getAttribute('src')) {
             iframe.setAttribute('src', 'https://aftercup-2017.neocities.org/pocket');
@@ -600,7 +589,6 @@ let events = [];
 
         weatherInfoEl.innerHTML = '<p>Checking weather...</p>';
 
-        // Modified filter to exclude 'note' type events
         const todaysEvents = getVisibleEvents().filter(e => e.date === todayDateString && e.type !== 'note').sort((a, b) => (a.time || "23:59").localeCompare(b.time || "23:59"));
         const aftercupPosts = todaysEvents.filter(e => e.preAdded && e.link);
         const userAgendaItems = todaysEvents.filter(e => !e.preAdded);
@@ -672,7 +660,6 @@ let events = [];
         const overlay = document.getElementById('overlay');
         
         if (!isShiftPlannerOpen) {
-            // Close everything
             overlay.style.display = 'none';
             if (!isInternalCall) {
                 showActionButtons();
@@ -782,7 +769,6 @@ let events = [];
         eventsContainer.innerHTML = '';
         const currentDateString = getLocalDateString(currentDate);
         const visibleEvents = getVisibleEvents();
-        // Define ranking: High=1 (Top), Average=2, Low=3 (Bottom)
         const importanceRank = { 'high': 1, 'average': 2, 'low': 3 };
 
         const sortedEvents = visibleEvents
@@ -1018,7 +1004,7 @@ let events = [];
         let iterations = 0;
         while (true) {
             iterations++;
-            if (iterations > 500) break; // Safety break to prevent freeze
+            if (iterations > 500) break; 
 
             if (unit === 'day') {
                 currentDate.setDate(currentDate.getDate() + frequency);
@@ -1045,7 +1031,7 @@ let events = [];
                 routineId: routineId, 
                 type: 'routine', 
                 completed: baseEvent.type === 'task' ? false : undefined, 
-                lastModified: Date.now() // Added timestamp for routine instances
+                lastModified: Date.now() 
             });
         }
         return newEvents;
@@ -1103,7 +1089,7 @@ let events = [];
                     importance: eventImportance,
                     place: placeData, 
                     completed: eventType === 'task' ? (originalEvent.type === 'task' ? originalEvent.completed : false) : undefined,
-                    lastModified: Date.now() // Update timestamp
+                    lastModified: Date.now() 
                 };
             }
         } else { 
@@ -1118,7 +1104,7 @@ let events = [];
                 place: placeData, 
                 completed: eventType === 'task' ? false : undefined,
                 preAdded: false,
-                lastModified: Date.now() // Creation timestamp
+                lastModified: Date.now() 
             };
 
             if (eventType === 'routine') {
@@ -1183,7 +1169,7 @@ let events = [];
                     color: newColor,
                     importance: newImportance,
                     place: newPlaceData,
-                    lastModified: Date.now() // Update timestamp for bulk edit
+                    lastModified: Date.now() 
                 };
             }
             return event;
@@ -1297,7 +1283,6 @@ let events = [];
         if (eventToDelete && eventToDelete.routineId) {
             promptForRoutineDelete(eventToDelete);
         } else {
-            // Soft delete logic to allow syncing deletions
             if (eventToDelete) {
                 eventToDelete.deleted = true;
                 eventToDelete.lastModified = Date.now();
@@ -1313,7 +1298,7 @@ let events = [];
         const eventIndex = events.findIndex(ev => ev.id === eventId);
         if (eventIndex > -1) {
             events[eventIndex].completed = !events[eventIndex].completed;
-            events[eventIndex].lastModified = Date.now(); // Update timestamp
+            events[eventIndex].lastModified = Date.now(); 
             saveEvents();
             renderEvents();
         }
@@ -1323,7 +1308,6 @@ let events = [];
         currentDate = new Date();
         currentDate.setHours(0, 0, 0, 0);
         updateCalendar();
-        // Removed history.back() as navigation shouldn't always trigger it unless in a popup
     }
 
     function gotoDate() {
@@ -1362,7 +1346,7 @@ let events = [];
             const divBgColor = normalizeColor(div.style.backgroundColor || ''); 
             
             if (divBgColor && divBgColor === normalizedSelectedColor) { 
-                div.style.border = `2px solid var(--text-color)`; // Changed to use var
+                div.style.border = `2px solid var(--text-color)`; 
                 div.style.transform = 'scale(1.15)';
                 div.classList.add('selected'); 
             } else {
@@ -1391,7 +1375,6 @@ let events = [];
     }
 
     function saveEvents(skipSync = false) {
-        // Save all user events including soft-deleted ones for sync purposes
         const userEvents = events.filter(event => !event.preAdded);
         localStorage.setItem('events', JSON.stringify(userEvents));
         
@@ -1409,7 +1392,7 @@ let events = [];
     }
 
     function getVisibleEvents() {
-        let allEvents = events.filter(e => !e.deleted); // Filter out soft-deleted events
+        let allEvents = events.filter(e => !e.deleted); 
         
         if (showPreAddedEvents) {
             return allEvents;
@@ -1480,7 +1463,6 @@ let events = [];
                     
                     let fetchedEvents = [];
                     try {
-                       // Mock
                     } catch(e) {}
 
                     events = mergeEvents(fetchedEvents, restoredUserEvents);
@@ -1590,7 +1572,6 @@ let events = [];
     function openShiftPlanner() {
         hidePopups(true);
         document.getElementById('shift-planner-popup-main').style.display = 'flex';
-        // Fix: Explicitly show overlay
         document.getElementById('overlay').style.display = 'block';
         document.getElementById('overlay').style.zIndex = '1005';
         
@@ -1721,7 +1702,6 @@ let events = [];
     async function saveSummaryNotificationSettings() {
         const newTimes = [...new Set(Array.from(document.querySelectorAll('.summary-notification-time-input')).map(i => i.value).filter(Boolean))].sort();
 
-        // Check if Notifications API exists
         if (!("Notification" in window)) {
              alert("This browser does not support desktop notification");
              localStorage.setItem(DAILY_SUMMARY_TIMES_KEY, JSON.stringify(newTimes));
@@ -1980,7 +1960,6 @@ let events = [];
     }
 
     function showAccountPopup() {
-        // if (isMobileMiniCalVisible) toggleMobileMiniCalendar(); // REMOVE THIS
         hidePopups(true);
         
         const popup = document.getElementById('account-popup');
@@ -2125,7 +2104,6 @@ let events = [];
         };
 
         if (syncPrefs.events) {
-            // Send all user events including deleted ones
             backup.events = events.filter(e => !e.preAdded);
         }
         
@@ -2157,21 +2135,17 @@ let events = [];
             
             const eventMap = new Map();
             
-            // Load local events into map
             localUserEvents.forEach(evt => eventMap.set(evt.id, evt));
             
-            // Merge with cloud events using timestamp priority
             cloudEvents.forEach(cloudEvt => {
                 const localEvt = eventMap.get(cloudEvt.id);
                 if (localEvt) {
-                    // If cloud version is newer (higher timestamp), overwrite local
                     const localTime = localEvt.lastModified || 0;
                     const cloudTime = cloudEvt.lastModified || 0;
                     if (cloudTime > localTime) {
                         eventMap.set(cloudEvt.id, cloudEvt);
                     }
                 } else {
-                    // Event exists in cloud but not locally: add it (might be a new event or a deletion from another device)
                     eventMap.set(cloudEvt.id, cloudEvt);
                 }
             });
@@ -2181,7 +2155,6 @@ let events = [];
             
             let fetchedEvents = [];
             try {
-                // Mock
             } catch (e) {}
             events = mergeEvents(fetchedEvents, mergedUserEvents);
             updateCalendar();
@@ -2278,7 +2251,6 @@ let events = [];
     }
 
     function showPastEventsPopup() {
-        // Hide other standard popups
         const popups = document.querySelectorAll('.popup:not(#past-events-popup), .search-popup');
         popups.forEach(p => p.classList.remove('active'));
 
@@ -2292,11 +2264,9 @@ let events = [];
         history.pushState({ popup: 'past-events-popup' }, '', null);
         hideActionButtons();
         
-        // Show loader, hide container
         document.getElementById('past-events-loader').style.display = 'block';
         document.getElementById('past-events-container').style.display = 'none';
 
-        // Use setTimeout to allow the UI to update (show loader) before the heavy rendering logic runs
         setTimeout(() => {
             renderPastEvents();
         }, 50);
@@ -2310,11 +2280,9 @@ let events = [];
 
         const todayStr = getLocalDateString(new Date());
         
-        // Filter for events strictly before today
         const pastEvents = getVisibleEvents()
             .filter(event => event.date < todayStr)
             .sort((a, b) => {
-                // Sort by date descending (newest past event first)
                 if (a.date > b.date) return -1;
                 if (a.date < b.date) return 1;
                 return (a.time || "23:59").localeCompare(b.time || "23:59");
@@ -2331,7 +2299,6 @@ let events = [];
                 card.style.display = 'flex';
                 card.style.gap = '10px';
                 
-                // Handle custom colors
                 if (event.color && event.color !== '#FFFFFF' && event.color !== '#000000') {
                       card.style.setProperty('background-color', event.color, 'important');
                       card.style.color = getContrastColor(event.color);
@@ -2351,11 +2318,9 @@ let events = [];
                     currentDate = new Date(event.date.split('-').map(Number)[0], event.date.split('-').map(Number)[1] - 1, event.date.split('-').map(Number)[2]);
                     updateCalendar();
                     
-                    // Close the past popup
                     const popup = document.getElementById('past-events-popup');
                     popup.classList.remove('active');
                     
-                    // Logic to handle navigation back
                     if (isMobileMiniCalVisible) {
                         toggleMobileMiniCalendar();
                     } else {
@@ -2368,7 +2333,6 @@ let events = [];
             });
         }
 
-        // Hide loader and show content
         loader.style.display = 'none';
         container.style.display = 'block';
     }
