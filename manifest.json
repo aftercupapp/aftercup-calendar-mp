@@ -1,0 +1,40 @@
+{
+ "name": "Aftercup Calendar",
+  "short_name": "Aftercup Calendar",
+  "description": "Calendar from Aftercup",
+  "id": "/",
+  "start_url": "/",
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "minimal-ui",
+    "browser"
+  ],
+  "background_color": "#000000",
+  "theme_color": "#ffffff",
+  "orientation": "any",
+  "lang": "en-US",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": [
+    "health",
+    "productivity"
+  ],
+  "iarc_rating_id": "",
+  "prefer_related_applications": false,
+  "launch_handler": {
+    "client_mode": "navigate"
+  }
+}
