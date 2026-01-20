@@ -556,15 +556,55 @@
         @keyframes slideInRight { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes slideInLeft { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         
-        #new-note-content {
+        /* Note Editor Styles */
+        #note-input-container {
             border: 2px solid var(--border-color);
+            margin-bottom: 15px;
+            background: var(--bg-color);
+        }
+
+        .note-toolbar {
+            display: flex;
+            gap: 5px;
+            padding: 5px;
+            border-bottom: 2px solid var(--border-color);
+            background: var(--secondary-bg);
+        }
+
+        .format-btn {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid transparent;
+            background: transparent;
+            color: var(--text-color);
+            cursor: pointer;
+        }
+
+        .format-btn:hover {
+            border-color: var(--border-color);
+            background: var(--bg-color);
+        }
+
+        .format-btn .material-icons-outlined {
+            font-size: 20px;
+        }
+
+        #new-note-content {
+            border: none;
             min-height: 100px;
             padding: 10px;
-            margin-bottom: 15px;
+            margin-bottom: 0;
             outline: none;
+            background: var(--bg-color);
+            color: var(--text-color);
         }
+        
         #new-note-content:focus {
-            background-color: var(--secondary-bg);
+            background-color: var(--bg-color);
         }
 
         .sp-select-overlay {
@@ -680,8 +720,13 @@
         <input type="text" id="new-event-input" class="popup-input-style" placeholder="Title">
         
         <div id="note-input-container" style="display:none; flex-direction:column;">
+            <div class="note-toolbar">
+                <button type="button" class="format-btn" onclick="document.execCommand('bold', false, null)" title="Bold"><span class="material-icons-outlined">format_bold</span></button>
+                <button type="button" class="format-btn" onclick="document.execCommand('italic', false, null)" title="Italic"><span class="material-icons-outlined">format_italic</span></button>
+                <button type="button" class="format-btn" onclick="document.execCommand('underline', false, null)" title="Underline"><span class="material-icons-outlined">format_underlined</span></button>
+                <button type="button" class="format-btn" onclick="document.execCommand('strikethrough', false, null)" title="Strikethrough"><span class="material-icons-outlined">strikethrough_s</span></button>
+            </div>
             <div id="new-note-content" contenteditable="true" placeholder="Type your note here..."></div>
-            <div style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 10px;">Ctrl+B (Bold), Ctrl+I (Italic), Ctrl+U (Underline)</div>
         </div>
 
         <input type="time" id="event-time" class="popup-input-style">
