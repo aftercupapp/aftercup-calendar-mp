@@ -1,5 +1,4 @@
-// --- Logic Provided by User ---
-    let events = [];
+let events = [];
     let dreams = [];
     let currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0);
@@ -197,7 +196,7 @@
             // Mock fetch for local demo if file not present
             // const response = await fetch('/events-update.json');
             // if (response.ok) {
-            //    fetchedEvents = await response.json();
+            //     fetchedEvents = await response.json();
             // }
         } catch (error) {
             console.error(error);
@@ -2334,8 +2333,8 @@
                 
                 // Handle custom colors
                 if (event.color && event.color !== '#FFFFFF' && event.color !== '#000000') {
-                     card.style.setProperty('background-color', event.color, 'important');
-                     card.style.color = getContrastColor(event.color);
+                      card.style.setProperty('background-color', event.color, 'important');
+                      card.style.color = getContrastColor(event.color);
                 }
 
                 const [y, m, d] = event.date.split('-');
