@@ -944,7 +944,11 @@
     <style>
         #install-popup-overlay.shown { transform: translateY(0); }
     </style>
-
+    <script>
+      if (typeof navigator.serviceWorker !== 'undefined') {
+        navigator.serviceWorker.register('sw.js')
+      }
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
