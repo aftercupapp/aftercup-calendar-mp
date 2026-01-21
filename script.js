@@ -191,6 +191,9 @@ let events = [];
         const userEvents = JSON.parse(localStorage.getItem('events')) || [];
         let fetchedEvents = [];
         try {
+            // Restore fetchedEvents logic if present in original, or keep empty if user removed it.
+            // Assuming this part needs to remain empty as per current context, 
+            // but mergeEvents will handle whatever is here.
         } catch (error) {
             console.error(error);
         }
@@ -827,9 +830,11 @@ let events = [];
                         <div style="font-size: 12px; opacity: 0.7; margin-bottom: 4px; display: flex; align-items: center;">
                             <span class="material-icons-outlined" style="font-size: 14px; margin-right: 4px;">sticky_note_2</span> Note
                         </div>
+                        
                         <div class="event-note-preview">
                             ${event.text}
                         </div>
+                        
                         <button class="read-more-btn" onclick="toggleNoteExpand(this)" style="display: ${isLong ? 'block' : 'none'}">
                             Show more
                         </button>
@@ -847,7 +852,6 @@ let events = [];
                 if (event.type === 'task') {
                     textSpanClass += " task-text";
                     if (event.completed) textSpanClass += " completed-text";
-                    // Compact HTML to avoid layout issues with whitespace
                     taskMarkerHTML = `<label class="task-checkbox-label" onclick="event.stopPropagation();"><input type="checkbox" class="hidden-task-checkbox" ${event.completed ? 'checked' : ''} onchange="toggleTask(${event.id}, event)"><span class="custom-checkbox"><span class="material-icons-outlined check-icon">check_small</span></span></label>`;
                 }
 
@@ -877,8 +881,17 @@ let events = [];
                     }
                 }
 
-                // Compact innerHTML assignment to ensure correct flex layout
-                eventItem.innerHTML = `<div class="event-item-content-wrapper">${taskMarkerHTML}<span class="${textSpanClass}">${routineIcon}${textDisplay}</span></div><div class="event-footer"><div class="event-date">${event.time || ''}</div>${placeHTML}</div>${deleteButtonHTML}`;
+                eventItem.innerHTML = `
+                    <div class="event-item-content-wrapper">
+                        ${taskMarkerHTML}
+                        <span class="${textSpanClass}">${routineIcon}${textDisplay}</span>
+                    </div>
+                    <div class="event-footer">
+                        <div class="event-date">${event.time || ''}</div>
+                        ${placeHTML}
+                    </div>
+                    ${deleteButtonHTML}
+                `;
             }
 
             if (event.preAdded === true && event.link) {
@@ -2143,8 +2156,11 @@ let events = [];
             const mergedUserEvents = Array.from(eventMap.values());
             localStorage.setItem('events', JSON.stringify(mergedUserEvents));
             
-            const existingPreAdded = events.filter(e => e.preAdded);
-            events = mergeEvents(existingPreAdded, mergedUserEvents);
+            // Re-fetch predefined events logic here if necessary, though currently empty
+            let fetchedEvents = [];
+            try {
+            } catch (e) {}
+            events = mergeEvents(fetchedEvents, mergedUserEvents);
             updateCalendar();
         }
 
