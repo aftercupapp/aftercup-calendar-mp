@@ -19,7 +19,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
                     android:scheme="https"
-                    android:host="https://aftercupapp.github.io/aftercup-calendar-mp/" 
+                    android:host="https://minimal-calendar.space/" 
                     android:pathPrefix="/" />
             </intent-filter>
         </activity>
