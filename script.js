@@ -195,24 +195,20 @@ let events = [];
         const userEvents = JSON.parse(localStorage.getItem('events')) || [];
         let fetchedEvents = [];
         try {
-            // Keep fetching logic if needed, currently empty for local defaults
         } catch (error) {
             console.error(error);
         }
         events = mergeEvents(fetchedEvents, userEvents);
         dreams = JSON.parse(localStorage.getItem('dreams')) || [];
 
-        saveEvents(true);
-
-        dailyNotificationTimes = JSON.parse(localStorage.getItem(DAILY_SUMMARY_TIMES_KEY)) || [];
-        await scheduleAutomaticNotifications();
-
+        // --- RENDER UI IMMEDIATELY ---
+        // Moved updateCalendar and UI setup here to ensure "Today" is visible 
+        // before waiting for async operations like notifications.
         updateCalendar();
         setupMiniCalendarNav();
         setupPopupCalendarNav();
-        document.getElementById('restore-file-input').addEventListener('change', handleRestoreFile);
         initShiftPlannerElements();
-
+        
         const colorPicker = document.getElementById('color-picker');
         colorPicker.querySelectorAll('div').forEach(colorDiv => {
             const tick = document.createElement('span');
@@ -222,8 +218,16 @@ let events = [];
             tick.style.display = 'none';
             colorDiv.appendChild(tick);
         });
-
+        
         setColor(selectedColor);
+        // -----------------------------
+
+        saveEvents(true);
+
+        dailyNotificationTimes = JSON.parse(localStorage.getItem(DAILY_SUMMARY_TIMES_KEY)) || [];
+        await scheduleAutomaticNotifications();
+
+        document.getElementById('restore-file-input').addEventListener('change', handleRestoreFile);
 
         document.getElementById('overlay').addEventListener('click', closePopupAndGoBack);
 
@@ -803,24 +807,16 @@ let events = [];
 
         const sortedEvents = visibleEvents
             .filter(event => {
-                
                 if (event.date === currentDateString) return true;
-                
-                
                 if (event.type === 'event' && event.endDate) {
                     return currentDateString >= event.date && currentDateString <= event.endDate;
                 }
                 return false;
             })
             .sort((a, b) => {
-                
                 const rankA = importanceRank[a.importance] || 2;
                 const rankB = importanceRank[b.importance] || 2;
-                
-                if (rankA !== rankB) {
-                    return rankA - rankB;
-                }
-                
+                if (rankA !== rankB) return rankA - rankB;
                 return (a.time || "23:59").localeCompare(b.time || "23:59");
             });
 
@@ -864,7 +860,6 @@ let events = [];
                 const textContent = tempDiv.textContent || tempDiv.innerText || "";
                 const isLong = textContent.length > 10 || (textContent.match(/\n/g) || []).length > 2;
 
-                
                 const timeString = event.time ? ` • ${event.time}` : '';
 
                 eventItem.innerHTML = `
@@ -887,7 +882,6 @@ let events = [];
             else {
                 let textDisplay = event.text;
                 
-                
                 if (event.shared && textDisplay.startsWith("[Shared] ")) {
                     textDisplay = textDisplay.substring(9);
                 }
@@ -900,16 +894,13 @@ let events = [];
                 if (event.type === 'task') {
                     textSpanClass += " task-text";
                     if (event.completed) textSpanClass += " completed-text";
-                    // Compact HTML to ensure flex layout works correctly
                     taskMarkerHTML = `<label class="task-checkbox-label" onclick="event.stopPropagation();"><input type="checkbox" class="hidden-task-checkbox" ${event.completed ? 'checked' : ''} onchange="toggleTask(${event.id}, event)"><span class="custom-checkbox"><span class="material-icons-outlined check-icon">check_small</span></span></label>`;
                 }
 
                 let iconHTML = '';
-                
                 if (event.type === 'routine' || event.routineId) {
                     iconHTML += '<span class="material-symbols-outlined" style="font-size: 20px; margin-right: 5px; opacity: 0.7; vertical-align: middle;">sync</span>';
                 }
-                
                 if (event.shared) {
                     iconHTML += '<span class="material-icons-outlined" style="font-size: 20px; margin-right: 5px; opacity: 0.7; vertical-align: middle;">share</span>';
                 }
@@ -935,7 +926,6 @@ let events = [];
                     }
                 }
 
-                
                 let timeDisplay = event.time || '';
                 if (event.time && event.endTime) {
                     timeDisplay = `${event.time} - ${event.endTime}`;
@@ -957,7 +947,6 @@ let events = [];
                 eventItem.addEventListener('click', (e) => {
                     if (e.target.closest('a, .delete-btn, .task-checkbox-label, .read-more-btn')) { return; }
                     if (window.getSelection().toString().length > 0) { return; }
-                    
                     populatePopupForEdit(event.id);
                 });
             } else {
@@ -1731,136 +1720,6 @@ let events = [];
 
         loader.style.display = 'none';
         container.style.display = 'block';
-    }
-
-    async function handleShareEvent() {
-        if (!currentUser) {
-            alert("You must be logged in to share events.");
-            return;
-        }
-        if (currentEditId === null) return;
-
-        let baseEvent = events.find(e => e.id === currentEditId);
-        if (!baseEvent) return;
-
-        const recipientEmail = prompt("Enter the email address of the registered user you want to share this event with:");
-        if (!recipientEmail) return;
-
-        if (!recipientEmail.includes('@') || !recipientEmail.includes('.')) {
-            alert("Please enter a valid email address.");
-            return;
-        }
-
-        const shareBtn = document.getElementById('share-event-btn');
-        let originalText = '';
-        if(shareBtn) {
-            originalText = shareBtn.innerHTML;
-            shareBtn.innerHTML = 'Sharing...';
-            shareBtn.disabled = true;
-        }
-
-        try {
-            let eventsToShare = [];
-
-            if (baseEvent.routineId) {
-                eventsToShare = events.filter(e => e.routineId === baseEvent.routineId);
-                
-                if (confirm(`This is a repeating event (${eventsToShare.length} instances). Share all of them?`)) {
-                } else {
-                    eventsToShare = [baseEvent];
-                }
-            } else {
-                eventsToShare = [baseEvent];
-            }
-
-            let successCount = 0;
-
-            for (let eventToShare of eventsToShare) {
-                
-                if (!eventToShare.sharedEventId) {
-                    eventToShare.sharedEventId = generateSharedId();
-                }
-
-                if (!eventToShare.sharedWith) {
-                    eventToShare.sharedWith = [];
-                }
-                if (!eventToShare.sharedWith.includes(recipientEmail)) {
-                    eventToShare.sharedWith.push(recipientEmail);
-                }
-
-                const result = await apiRequest({
-                    action: 'share_event',
-                    sender: currentUser.email,
-                    recipient: recipientEmail,
-                    eventData: eventToShare
-                });
-
-                if (result.status === 'success') {
-                    successCount++;
-                }
-            }
-
-            saveEvents(); 
-
-            if (successCount > 0) {
-                alert(`Successfully shared ${successCount} event(s) with ${recipientEmail}.`);
-            } else {
-                alert("Failed to share event(s). Check console for details.");
-            }
-
-        } catch (error) {
-            console.error("Share error:", error);
-            alert("An error occurred while sharing.");
-        } finally {
-            if(shareBtn) {
-                shareBtn.innerHTML = originalText;
-                shareBtn.disabled = false;
-            }
-        }
-    }
-
-    function upsertSharedEvent(incomingEvent) {
-        let existingIndex = -1;
-        
-        if (incomingEvent.sharedEventId) {
-            existingIndex = events.findIndex(e => e.sharedEventId === incomingEvent.sharedEventId);
-        }
-
-        if (existingIndex === -1) {
-             existingIndex = events.findIndex(e => e.id === incomingEvent.id);
-        }
-
-        if (existingIndex > -1) {
-            const localEvent = events[existingIndex];
-            
-            if ((incomingEvent.lastModified || 0) < (localEvent.lastModified || 0)) {
-                return; 
-            }
-
-            events[existingIndex] = {
-                ...localEvent,      
-                ...incomingEvent,   
-                id: localEvent.id,  
-                sharedEventId: incomingEvent.sharedEventId || localEvent.sharedEventId 
-            };
-            
-            if (incomingEvent.deleted) {
-                 events[existingIndex].deleted = true;
-            }
-
-        } else {
-            if (!incomingEvent.deleted) {
-                const newLocalEvent = {
-                    ...incomingEvent,
-                    id: Date.now() + Math.floor(Math.random() * 10000), 
-                    sharedEventId: incomingEvent.sharedEventId 
-                };
-                events.push(newLocalEvent);
-            }
-        }
-
-        saveEvents();
-        updateCalendar();
     }
 
     async function apiRequest(payload) {
