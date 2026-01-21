@@ -127,6 +127,10 @@ let events = [];
         return [...preAddedEvents, ...userOnlyEvents];
     }
 
+    function generateSharedId() {
+        return 'share_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 9);
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
 
         const todayStr = getLocalDateString(new Date());
@@ -137,27 +141,27 @@ let events = [];
             localStorage.setItem(APP_LAST_RESET_DATE_KEY, todayStr);
         }
 
-    const noteContentDiv = document.getElementById('new-note-content');
-    if (noteContentDiv) {
-        noteContentDiv.addEventListener('keydown', (e) => {
-            if (e.ctrlKey || e.metaKey) {
-                const key = e.key.toLowerCase();
-                if (e.shiftKey && key === 'x') {
-                    e.preventDefault();
-                    document.execCommand('strikethrough');
-                } else if (key === 'b') {
-                    e.preventDefault();
-                    document.execCommand('bold');
-                } else if (key === 'i') {
-                    e.preventDefault();
-                    document.execCommand('italic');
-                } else if (key === 'u') {
-                    e.preventDefault();
-                    document.execCommand('underline');
+        const noteContentDiv = document.getElementById('new-note-content');
+        if (noteContentDiv) {
+            noteContentDiv.addEventListener('keydown', (e) => {
+                if (e.ctrlKey || e.metaKey) {
+                    const key = e.key.toLowerCase();
+                    if (e.shiftKey && key === 'x') {
+                        e.preventDefault();
+                        document.execCommand('strikethrough');
+                    } else if (key === 'b') {
+                        e.preventDefault();
+                        document.execCommand('bold');
+                    } else if (key === 'i') {
+                        e.preventDefault();
+                        document.execCommand('italic');
+                    } else if (key === 'u') {
+                        e.preventDefault();
+                        document.execCommand('underline');
+                    }
                 }
-            }
-        });
-    }
+            });
+        }
 
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.body.className = savedTheme + '-theme';
@@ -191,6 +195,7 @@ let events = [];
         const userEvents = JSON.parse(localStorage.getItem('events')) || [];
         let fetchedEvents = [];
         try {
+            // Keep fetching logic if needed, currently empty for local defaults
         } catch (error) {
             console.error(error);
         }
@@ -247,6 +252,10 @@ let events = [];
                             const addPopup = document.getElementById('add-popup');
                             addPopup.querySelector('h2').textContent = 'New entry';
                             addPopup.querySelector('button[onclick="handleAddOrUpdateEvent()"]').textContent = 'Add';
+                            
+                            // Reset share view
+                            const sharedList = document.getElementById('shared-with-list');
+                            if (sharedList) sharedList.style.display = 'none';
                         }
                         break;
                 }
@@ -302,6 +311,12 @@ let events = [];
         const titleInput = document.getElementById('new-event-input');
         const placeType = document.getElementById('place-type');
         const timeInput = document.getElementById('event-time');
+        
+        // Toggle End Date visibility wrapper if it exists
+        const endDateWrapper = document.getElementById('end-date-wrapper');
+        if (endDateWrapper) {
+            endDateWrapper.style.display = (eventType === 'event') ? 'block' : 'none';
+        }
 
         if (currentEditId !== null && !currentBulkEditInfo && eventType !== 'note') {
             if (routineOptions) routineOptions.style.display = 'none';
@@ -502,6 +517,12 @@ let events = [];
             document.getElementById('event-date').value = getLocalDateString(currentDate);
             document.getElementById('event-time').value = '';
             
+            // Reset End Date/Time if they exist
+            const endDateEl = document.getElementById('event-end-date');
+            if (endDateEl) endDateEl.value = '';
+            const endTimeEl = document.getElementById('event-end-time');
+            if (endTimeEl) endTimeEl.value = '';
+
             document.getElementById('new-event-input').value = '';
             const noteContent = document.getElementById('new-note-content');
             if(noteContent) noteContent.innerHTML = '';
@@ -517,6 +538,14 @@ let events = [];
             document.getElementById('routine-frequency').value = '1';
             document.getElementById('routine-unit').value = 'week';
             document.getElementById('routine-end-date').value = '';
+
+            // Reset Shared View
+            const sharedList = document.getElementById('shared-with-list');
+            if (sharedList) {
+                sharedList.style.display = 'none';
+                const sharedItems = document.getElementById('shared-with-items');
+                if (sharedItems) sharedItems.innerHTML = '';
+            }
         } else {
             if (!currentBulkEditInfo) {
                  addPopup.querySelector('h2').textContent = 'Edit Item';
@@ -774,24 +803,16 @@ let events = [];
 
         const sortedEvents = visibleEvents
             .filter(event => {
-                
                 if (event.date === currentDateString) return true;
-                
-                
                 if (event.type === 'event' && event.endDate) {
                     return currentDateString >= event.date && currentDateString <= event.endDate;
                 }
                 return false;
             })
             .sort((a, b) => {
-                
                 const rankA = importanceRank[a.importance] || 2;
                 const rankB = importanceRank[b.importance] || 2;
-                
-                if (rankA !== rankB) {
-                    return rankA - rankB;
-                }
-                
+                if (rankA !== rankB) return rankA - rankB;
                 return (a.time || "23:59").localeCompare(b.time || "23:59");
             });
 
@@ -835,7 +856,6 @@ let events = [];
                 const textContent = tempDiv.textContent || tempDiv.innerText || "";
                 const isLong = textContent.length > 10 || (textContent.match(/\n/g) || []).length > 2;
 
-                
                 const timeString = event.time ? ` • ${event.time}` : '';
 
                 eventItem.innerHTML = `
@@ -843,21 +863,14 @@ let events = [];
                         <div style="font-size: 12px; opacity: 0.7; margin-bottom: 4px; display: flex; align-items: center;">
                             <span class="material-icons-outlined" style="font-size: 14px; margin-right: 4px;">sticky_note_2</span> Note${timeString}
                         </div>
-                        
-                        <div class="event-note-preview">
-                            ${event.text}
-                        </div>
-                        
-                        <button class="read-more-btn" onclick="toggleNoteExpand(this)" style="display: ${isLong ? 'block' : 'none'}">
-                            Show more
-                        </button>
+                        <div class="event-note-preview">${event.text}</div>
+                        <button class="read-more-btn" onclick="toggleNoteExpand(this)" style="display: ${isLong ? 'block' : 'none'}">Show more</button>
                     </div>
                     ${deleteButtonHTML}
                 `;
             } 
             else {
                 let textDisplay = event.text;
-                
                 
                 if (event.shared && textDisplay.startsWith("[Shared] ")) {
                     textDisplay = textDisplay.substring(9);
@@ -871,22 +884,14 @@ let events = [];
                 if (event.type === 'task') {
                     textSpanClass += " task-text";
                     if (event.completed) textSpanClass += " completed-text";
-                    taskMarkerHTML = `
-                        <label class="task-checkbox-label" onclick="event.stopPropagation();">
-                            <input type="checkbox" class="hidden-task-checkbox" ${event.completed ? 'checked' : ''} onchange="toggleTask(${event.id}, event)">
-                            <span class="custom-checkbox">
-                                <span class="material-icons-outlined check-icon">check_small</span>
-                            </span>
-                        </label>
-                    `;
+                    // Compact HTML to ensure flex layout works correctly
+                    taskMarkerHTML = `<label class="task-checkbox-label" onclick="event.stopPropagation();"><input type="checkbox" class="hidden-task-checkbox" ${event.completed ? 'checked' : ''} onchange="toggleTask(${event.id}, event)"><span class="custom-checkbox"><span class="material-icons-outlined check-icon">check_small</span></span></label>`;
                 }
 
                 let iconHTML = '';
-                
                 if (event.type === 'routine' || event.routineId) {
                     iconHTML += '<span class="material-symbols-outlined" style="font-size: 20px; margin-right: 5px; opacity: 0.7; vertical-align: middle;">sync</span>';
                 }
-                
                 if (event.shared) {
                     iconHTML += '<span class="material-icons-outlined" style="font-size: 20px; margin-right: 5px; opacity: 0.7; vertical-align: middle;">share</span>';
                 }
@@ -912,7 +917,6 @@ let events = [];
                     }
                 }
 
-                
                 let timeDisplay = event.time || '';
                 if (event.time && event.endTime) {
                     timeDisplay = `${event.time} - ${event.endTime}`;
@@ -920,17 +924,8 @@ let events = [];
                      timeDisplay = `Ends at ${event.endTime}`;
                 }
 
-                eventItem.innerHTML = `
-                    <div class="event-item-content-wrapper">
-                        ${taskMarkerHTML}
-                        <span class="${textSpanClass}">${iconHTML}${textDisplay}</span>
-                    </div>
-                    <div class="event-footer">
-                        <div class="event-date">${timeDisplay}</div>
-                        ${placeHTML}
-                    </div>
-                    ${deleteButtonHTML}
-                `;
+                // Compact innerHTML assignment to ensure correct flex layout
+                eventItem.innerHTML = `<div class="event-item-content-wrapper">${taskMarkerHTML}<span class="${textSpanClass}">${iconHTML}${textDisplay}</span></div><div class="event-footer"><div class="event-date">${timeDisplay}</div>${placeHTML}</div>${deleteButtonHTML}`;
             }
 
             if (event.preAdded === true && event.link) {
@@ -943,7 +938,6 @@ let events = [];
                 eventItem.addEventListener('click', (e) => {
                     if (e.target.closest('a, .delete-btn, .task-checkbox-label, .read-more-btn')) { return; }
                     if (window.getSelection().toString().length > 0) { return; }
-                    
                     populatePopupForEdit(event.id);
                 });
             } else {
@@ -1020,7 +1014,11 @@ let events = [];
                       } 
                 }
 
-                eventEl.innerHTML = `<span class="event-text">${event.text}</span> <span class="event-time" style="float:right; opacity:0.7;">${event.time || ''}</span>`;
+                let textDisplay = event.text;
+                if (event.shared && textDisplay.startsWith("[Shared] ")) {
+                    textDisplay = textDisplay.substring(9);
+                }
+                eventEl.innerHTML = `<span class="event-text">${textDisplay}</span> <span class="event-time" style="float:right; opacity:0.7;">${event.time || ''}</span>`;
                 dateGroup.appendChild(eventEl);
             });
 
@@ -1118,6 +1116,8 @@ let events = [];
             return; 
         }
         
+        let updatedEventForSync = null;
+
         if (currentEditId !== null) {
             const eventIndex = events.findIndex(event => event.id === currentEditId);
             if (eventIndex > -1) {
@@ -1126,6 +1126,8 @@ let events = [];
                     alert("Predefined events cannot be edited.");
                     return;
                 }
+                const existingSharedId = originalEvent.sharedEventId || null;
+
                 events[eventIndex] = { ...originalEvent,
                     type: eventType,
                     date: eventDateInput,
@@ -1135,14 +1137,17 @@ let events = [];
                     text: eventText, 
                     color: eventColor,
                     importance: eventImportance,
-                    place: placeData, 
+                    place: placeData,
+                    sharedEventId: existingSharedId,
                     completed: eventType === 'task' ? (originalEvent.type === 'task' ? originalEvent.completed : false) : undefined,
                     lastModified: Date.now() 
                 };
+                updatedEventForSync = events[eventIndex];
             }
         } else { 
             const baseEvent = {
                 id: Date.now(),
+                sharedEventId: null,
                 type: eventType,
                 date: eventDateInput,
                 endDate: (eventType === 'event') ? eventEndDateInput : null,
@@ -1181,6 +1186,21 @@ let events = [];
         updateCalendar();
         saveEvents();
         scheduleAutomaticNotifications();
+
+        if (updatedEventForSync && updatedEventForSync.sharedWith && updatedEventForSync.sharedWith.length > 0 && currentUser) {
+            if (!updatedEventForSync.sharedEventId) {
+                 updatedEventForSync.sharedEventId = generateSharedId();
+                 saveEvents();
+            }
+            updatedEventForSync.sharedWith.forEach(recipient => {
+                apiRequest({
+                    action: 'share_event',
+                    sender: currentUser.email,
+                    recipient: recipient,
+                    eventData: updatedEventForSync
+                }).catch(err => console.error("Auto-sync failed for " + recipient, err));
+            });
+        }
     }
 
     function promptForRoutineEdit(eventToEdit) {
@@ -1212,19 +1232,29 @@ let events = [];
         if (!currentBulkEditInfo) return;
 
         const { routineId, startDate } = currentBulkEditInfo;
+        const eventsToSync = [];
 
         events = events.map(event => {
             if (event.routineId === routineId && event.date >= startDate) {
                 if (event.preAdded) return event;
-                return {
+                
+                const sId = event.sharedEventId || (event.sharedWith && event.sharedWith.length > 0 ? generateSharedId() : null);
+
+                const updated = {
                     ...event,
                     time: newTime,
                     text: newText,
                     color: newColor,
                     importance: newImportance,
                     place: newPlaceData,
+                    sharedEventId: sId,
                     lastModified: Date.now() 
                 };
+
+                if (updated.sharedWith && updated.sharedWith.length > 0) {
+                    eventsToSync.push(updated);
+                }
+                return updated;
             }
             return event;
         });
@@ -1235,6 +1265,19 @@ let events = [];
         history.back();
         updateCalendar();
         saveEvents();
+
+        if (eventsToSync.length > 0 && currentUser) {
+            eventsToSync.forEach(evt => {
+                evt.sharedWith.forEach(recipient => {
+                    apiRequest({
+                        action: 'share_event',
+                        sender: currentUser.email,
+                        recipient: recipient,
+                        eventData: evt
+                    }).catch(err => console.error(`Failed to auto-sync edit for ${evt.date}`, err));
+                });
+            });
+        }
     }
 
     function populatePopupForEdit(eventId) {
@@ -1260,6 +1303,13 @@ let events = [];
         
         const eventEndTimeInputEl = document.getElementById('event-end-time');
         if(eventEndTimeInputEl) eventEndTimeInputEl.value = eventToEdit.endTime || '';
+
+        // Handle Share Button Logic if it exists in DOM (though not in current HTML, kept for compatibility)
+        const shareBtn = document.getElementById('share-event-btn');
+        if (shareBtn) {
+            const canShare = (eventToEdit.type === 'event' || eventToEdit.type === 'note') && currentUser;
+            shareBtn.style.display = canShare ? 'block' : 'none';
+        }
 
         document.getElementById('event-time').value = eventToEdit.time || '';
         
@@ -1298,6 +1348,24 @@ let events = [];
             placePhysicalInput.value = '';
         }
 
+        // Shared With List Population
+        const sharedListDiv = document.getElementById('shared-with-list');
+        const sharedItemsDiv = document.getElementById('shared-with-items');
+        if (sharedListDiv && sharedItemsDiv) {
+            sharedItemsDiv.innerHTML = '';
+            if (eventToEdit.sharedWith && eventToEdit.sharedWith.length > 0) {
+                sharedListDiv.style.display = 'block';
+                eventToEdit.sharedWith.forEach(email => {
+                    const chip = document.createElement('div');
+                    chip.className = 'shared-user-chip';
+                    chip.innerHTML = `<span class="material-icons-outlined">person</span><span>${email}</span>`;
+                    sharedItemsDiv.appendChild(chip);
+                });
+            } else {
+                sharedListDiv.style.display = 'none';
+            }
+        }
+
         setColor(eventToEdit.color || '#FFFFFF');
         toggleAddPopupFields();
     }
@@ -1318,15 +1386,19 @@ let events = [];
         const eventToDelete = events.find(event => event.id === eventId);
         if (!eventToDelete) return;
 
+        const eventsToSync = [];
+
         if (scope === 'single') {
             eventToDelete.deleted = true;
             eventToDelete.lastModified = Date.now();
+            if (eventToDelete.sharedWith && eventToDelete.sharedWith.length > 0) eventsToSync.push(eventToDelete);
         } else if (scope === 'future') {
             const { routineId, date } = eventToDelete;
             events.forEach(event => {
                 if (event.routineId === routineId && event.date >= date) {
                     event.deleted = true;
                     event.lastModified = Date.now();
+                    if (event.sharedWith && event.sharedWith.length > 0) eventsToSync.push(event);
                 }
             });
         }
@@ -1334,6 +1406,20 @@ let events = [];
         updateCalendar();
         saveEvents();
         scheduleAutomaticNotifications();
+
+        if (eventsToSync.length > 0 && currentUser) {
+            eventsToSync.forEach(evt => {
+                const cleanEventData = { ...evt };
+                evt.sharedWith.forEach(recipient => {
+                    apiRequest({
+                        action: 'share_event',
+                        sender: currentUser.email,
+                        recipient: recipient,
+                        eventData: cleanEventData
+                    });
+                });
+            });
+        }
     }
 
     function deleteEvent(eventId, e) {
@@ -1354,6 +1440,18 @@ let events = [];
                 updateCalendar();
                 saveEvents();
                 scheduleAutomaticNotifications();
+
+                if (eventToDelete.sharedWith && eventToDelete.sharedWith.length > 0 && currentUser) {
+                    const cleanEventData = { ...eventToDelete };
+                    eventToDelete.sharedWith.forEach(recipient => {
+                        apiRequest({
+                            action: 'share_event',
+                            sender: currentUser.email,
+                            recipient: recipient,
+                            eventData: cleanEventData 
+                        });
+                    });
+                }
             }
         }
     }
@@ -2150,9 +2248,40 @@ let events = [];
     }
 
     function handleLogout() {
+        if (!confirm("Are you sure you want to log out? This will remove all account data (Events, Dreams, Shifts) from this device.")) {
+            return;
+        }
+
+        localStorage.removeItem('events');
+        localStorage.removeItem('dreams');
+        localStorage.removeItem('shifts');
+        
+        localStorage.removeItem('dailySummaryNotificationTimes');
+        localStorage.removeItem(LAST_NOTIFIED_TIMES_KEY);
+        localStorage.removeItem('syncPrefs_events');
+        localStorage.removeItem('syncPrefs_dreams');
+        localStorage.removeItem('syncPrefs_shifts');
+        localStorage.removeItem('syncPrefs_settings');
+        localStorage.removeItem('autoSyncEnabled');
+
         currentUser = null;
         localStorage.removeItem('currentUser');
+        dreams = [];
+        dailyNotificationTimes = [];
+
+        let fetchedEvents = [];
+        events = mergeEvents(fetchedEvents, []);
+
         updateAccountUI();
+        updateCalendar(); 
+        
+        if (typeof renderDreams === 'function') renderDreams();
+        if (typeof spRenderCalendar === 'function') spRenderCalendar();
+        if (typeof populateSummaryNotificationTimeInputs === 'function') populateSummaryNotificationTimeInputs();
+
+        scheduleAutomaticNotifications();
+
+        updateSyncStatus('Logged out');
     }
 
     function forceSync() {
@@ -2195,30 +2324,41 @@ let events = [];
             const localUserEvents = JSON.parse(localStorage.getItem('events')) || [];
             const cloudEvents = backup.events;
             
-            const eventMap = new Map();
-            
-            localUserEvents.forEach(evt => eventMap.set(evt.id, evt));
-            
+            let mergedEvents = [...localUserEvents];
+
             cloudEvents.forEach(cloudEvt => {
-                const localEvt = eventMap.get(cloudEvt.id);
-                if (localEvt) {
+                let matchIndex = -1;
+
+                if (cloudEvt.sharedEventId) {
+                    matchIndex = mergedEvents.findIndex(e => e.sharedEventId === cloudEvt.sharedEventId);
+                }
+
+                if (matchIndex === -1) {
+                    matchIndex = mergedEvents.findIndex(e => e.id === cloudEvt.id);
+                }
+
+                if (matchIndex > -1) {
+                    const localEvt = mergedEvents[matchIndex];
                     const localTime = localEvt.lastModified || 0;
                     const cloudTime = cloudEvt.lastModified || 0;
+
                     if (cloudTime > localTime) {
-                        eventMap.set(cloudEvt.id, cloudEvt);
+                        mergedEvents[matchIndex] = {
+                            ...localEvt,
+                            ...cloudEvt,
+                            id: localEvt.id, 
+                            sharedEventId: cloudEvt.sharedEventId 
+                        };
                     }
                 } else {
-                    eventMap.set(cloudEvt.id, cloudEvt);
+                    mergedEvents.push(cloudEvt);
                 }
             });
             
-            const mergedUserEvents = Array.from(eventMap.values());
-            localStorage.setItem('events', JSON.stringify(mergedUserEvents));
+            localStorage.setItem('events', JSON.stringify(mergedEvents));
             
             let fetchedEvents = [];
-            try {
-            } catch (e) {}
-            events = mergeEvents(fetchedEvents, mergedUserEvents);
+            events = mergeEvents(fetchedEvents, mergedEvents);
             updateCalendar();
         }
 
@@ -2397,6 +2537,136 @@ let events = [];
 
         loader.style.display = 'none';
         container.style.display = 'block';
+    }
+
+    async function handleShareEvent() {
+        if (!currentUser) {
+            alert("You must be logged in to share events.");
+            return;
+        }
+        if (currentEditId === null) return;
+
+        let baseEvent = events.find(e => e.id === currentEditId);
+        if (!baseEvent) return;
+
+        const recipientEmail = prompt("Enter the email address of the registered user you want to share this event with:");
+        if (!recipientEmail) return;
+
+        if (!recipientEmail.includes('@') || !recipientEmail.includes('.')) {
+            alert("Please enter a valid email address.");
+            return;
+        }
+
+        const shareBtn = document.getElementById('share-event-btn');
+        let originalText = '';
+        if(shareBtn) {
+            originalText = shareBtn.innerHTML;
+            shareBtn.innerHTML = 'Sharing...';
+            shareBtn.disabled = true;
+        }
+
+        try {
+            let eventsToShare = [];
+
+            if (baseEvent.routineId) {
+                eventsToShare = events.filter(e => e.routineId === baseEvent.routineId);
+                
+                if (confirm(`This is a repeating event (${eventsToShare.length} instances). Share all of them?`)) {
+                } else {
+                    eventsToShare = [baseEvent];
+                }
+            } else {
+                eventsToShare = [baseEvent];
+            }
+
+            let successCount = 0;
+
+            for (let eventToShare of eventsToShare) {
+                
+                if (!eventToShare.sharedEventId) {
+                    eventToShare.sharedEventId = generateSharedId();
+                }
+
+                if (!eventToShare.sharedWith) {
+                    eventToShare.sharedWith = [];
+                }
+                if (!eventToShare.sharedWith.includes(recipientEmail)) {
+                    eventToShare.sharedWith.push(recipientEmail);
+                }
+
+                const result = await apiRequest({
+                    action: 'share_event',
+                    sender: currentUser.email,
+                    recipient: recipientEmail,
+                    eventData: eventToShare
+                });
+
+                if (result.status === 'success') {
+                    successCount++;
+                }
+            }
+
+            saveEvents(); 
+
+            if (successCount > 0) {
+                alert(`Successfully shared ${successCount} event(s) with ${recipientEmail}.`);
+            } else {
+                alert("Failed to share event(s). Check console for details.");
+            }
+
+        } catch (error) {
+            console.error("Share error:", error);
+            alert("An error occurred while sharing.");
+        } finally {
+            if(shareBtn) {
+                shareBtn.innerHTML = originalText;
+                shareBtn.disabled = false;
+            }
+        }
+    }
+
+    function upsertSharedEvent(incomingEvent) {
+        let existingIndex = -1;
+        
+        if (incomingEvent.sharedEventId) {
+            existingIndex = events.findIndex(e => e.sharedEventId === incomingEvent.sharedEventId);
+        }
+
+        if (existingIndex === -1) {
+             existingIndex = events.findIndex(e => e.id === incomingEvent.id);
+        }
+
+        if (existingIndex > -1) {
+            const localEvent = events[existingIndex];
+            
+            if ((incomingEvent.lastModified || 0) < (localEvent.lastModified || 0)) {
+                return; 
+            }
+
+            events[existingIndex] = {
+                ...localEvent,      
+                ...incomingEvent,   
+                id: localEvent.id,  
+                sharedEventId: incomingEvent.sharedEventId || localEvent.sharedEventId 
+            };
+            
+            if (incomingEvent.deleted) {
+                 events[existingIndex].deleted = true;
+            }
+
+        } else {
+            if (!incomingEvent.deleted) {
+                const newLocalEvent = {
+                    ...incomingEvent,
+                    id: Date.now() + Math.floor(Math.random() * 10000), 
+                    sharedEventId: incomingEvent.sharedEventId 
+                };
+                events.push(newLocalEvent);
+            }
+        }
+
+        saveEvents();
+        updateCalendar();
     }
 
     async function apiRequest(payload) {
