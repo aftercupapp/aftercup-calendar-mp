@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.aftercup.calendarmp",
+        "sha256_cert_fingerprints": ["85:05:5B:B3:2A:E6:4F:82:F4:95:47:27:D1:56:35:E2:02:D3:96:E2:0F:DA:E8:15:8C:2C:59:8E:4B:D3:E9:5E"]
+      }
+    }]
