@@ -279,16 +279,16 @@
 
         .event-item-content-wrapper {
             display: flex;
-            align-items: flex-start; 
+            align-items: flex-start; /* Aligns checkbox with top of text if text wraps */
             width: 100%;
         }
         
+        /* Updated event-text to match optimized layout */
         .event-text {
             word-break: break-word;
             overflow-wrap: break-word;
             flex-grow: 1;
-            padding-top: 2px; 
-            min-width: 0; /* Prevents flex overflow */
+            padding-top: 2px; /* Slight offset for optical alignment with checkbox */
         }
 
         .event-note-preview {
@@ -329,17 +329,14 @@
             font-family: var(--font-mono);
         }
         
-        /* Updated Checkbox Styles */
+        /* Optimized Checkbox Styles from Source */
         .task-checkbox-label {
             display: inline-flex;
             align-items: center;
-            justify-content: center;
             cursor: pointer;
             margin-right: 12px;
             position: relative;
             user-select: none;
-            flex-shrink: 0;
-            height: 22px; /* Explicit height to match checkbox */
         }
 
         .hidden-task-checkbox {
@@ -347,34 +344,35 @@
             width: 0;
             height: 0;
             position: absolute;
-            pointer-events: none;
         }
 
         .custom-checkbox {
             width: 22px;
             height: 22px;
-            min-width: 22px; /* Prevent crushing */
             border: 2px solid var(--border-color);
-            display: flex; /* Changed from inline-flex to flex for better centering */
+            /* border-radius: 50%; kept square for e-ink aesthetic, user requested method not necessarily circle shape */
+            display: inline-flex;
             align-items: center;
             justify-content: center;
+            /* margin-top: 7px; Removed to center align properly with flex-start wrapper */
             flex-shrink: 0;
-            background: var(--bg-color);
-            overflow: hidden; /* Ensures the tick doesn't visually bleed out */
             transition: background-color 0.2s ease, border-color 0.2s ease;
         }
 
         .custom-checkbox .check-icon {
-            font-size: 16px !important;
             width: 16px !important;
             height: 16px !important;
+            min-width: 16px !important;
+            display: block !important;
+            text-align: center;
             line-height: 16px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            font-size: 16px !important;
             color: var(--text-color);
             opacity: 0;
             transform: scale(0.5);
             transition: opacity 0.2s ease, transform 0.2s ease;
-            display: block;
-            margin: 0;
         }
 
         .hidden-task-checkbox:checked + .custom-checkbox .check-icon {
