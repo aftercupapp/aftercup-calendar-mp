@@ -769,14 +769,29 @@ let events = [];
         eventsContainer.innerHTML = '';
         const currentDateString = getLocalDateString(currentDate);
         const visibleEvents = getVisibleEvents();
+        
         const importanceRank = { 'high': 1, 'average': 2, 'low': 3 };
 
         const sortedEvents = visibleEvents
-            .filter(event => event.date === currentDateString)
+            .filter(event => {
+                
+                if (event.date === currentDateString) return true;
+                
+                
+                if (event.type === 'event' && event.endDate) {
+                    return currentDateString >= event.date && currentDateString <= event.endDate;
+                }
+                return false;
+            })
             .sort((a, b) => {
+                
                 const rankA = importanceRank[a.importance] || 2;
                 const rankB = importanceRank[b.importance] || 2;
-                if (rankA !== rankB) return rankA - rankB;
+                
+                if (rankA !== rankB) {
+                    return rankA - rankB;
+                }
+                
                 return (a.time || "23:59").localeCompare(b.time || "23:59");
             });
 
@@ -820,6 +835,7 @@ let events = [];
                 const textContent = tempDiv.textContent || tempDiv.innerText || "";
                 const isLong = textContent.length > 10 || (textContent.match(/\n/g) || []).length > 2;
 
+                
                 const timeString = event.time ? ` • ${event.time}` : '';
 
                 eventItem.innerHTML = `
@@ -841,6 +857,8 @@ let events = [];
             } 
             else {
                 let textDisplay = event.text;
+                
+                
                 if (event.shared && textDisplay.startsWith("[Shared] ")) {
                     textDisplay = textDisplay.substring(9);
                 }
@@ -863,9 +881,14 @@ let events = [];
                     `;
                 }
 
-                let routineIcon = '';
+                let iconHTML = '';
+                
                 if (event.type === 'routine' || event.routineId) {
-                    routineIcon = '<span class="material-symbols-outlined" style="font-size: 16px; margin-right: 5px; opacity: 0.7; vertical-align: middle;">sync</span>';
+                    iconHTML += '<span class="material-symbols-outlined" style="font-size: 20px; margin-right: 5px; opacity: 0.7; vertical-align: middle;">sync</span>';
+                }
+                
+                if (event.shared) {
+                    iconHTML += '<span class="material-icons-outlined" style="font-size: 20px; margin-right: 5px; opacity: 0.7; vertical-align: middle;">share</span>';
                 }
 
                 let placeHTML = '';
@@ -889,7 +912,7 @@ let events = [];
                     }
                 }
 
-                // Time Display Logic (Start - End)
+                
                 let timeDisplay = event.time || '';
                 if (event.time && event.endTime) {
                     timeDisplay = `${event.time} - ${event.endTime}`;
@@ -900,7 +923,7 @@ let events = [];
                 eventItem.innerHTML = `
                     <div class="event-item-content-wrapper">
                         ${taskMarkerHTML}
-                        <span class="${textSpanClass}">${routineIcon}${textDisplay}</span>
+                        <span class="${textSpanClass}">${iconHTML}${textDisplay}</span>
                     </div>
                     <div class="event-footer">
                         <div class="event-date">${timeDisplay}</div>
@@ -1053,6 +1076,13 @@ let events = [];
         const eventType = document.getElementById('event-type').value;
         const eventDateInput = document.getElementById('event-date').value;
         const eventTime = document.getElementById('event-time').value;
+        
+        const eventEndDateInputEl = document.getElementById('event-end-date');
+        const eventEndDateInput = eventEndDateInputEl ? eventEndDateInputEl.value : null;
+        
+        const eventEndTimeInputEl = document.getElementById('event-end-time');
+        const eventEndTimeInput = eventEndTimeInputEl ? eventEndTimeInputEl.value : null;
+
         const eventColor = selectedColor;
         const eventImportance = document.getElementById('event-importance').value;
 
@@ -1099,7 +1129,9 @@ let events = [];
                 events[eventIndex] = { ...originalEvent,
                     type: eventType,
                     date: eventDateInput,
+                    endDate: (eventType === 'event') ? eventEndDateInput : null,
                     time: eventTime,
+                    endTime: (eventType === 'event') ? eventEndTimeInput : null,
                     text: eventText, 
                     color: eventColor,
                     importance: eventImportance,
@@ -1113,7 +1145,9 @@ let events = [];
                 id: Date.now(),
                 type: eventType,
                 date: eventDateInput,
+                endDate: (eventType === 'event') ? eventEndDateInput : null,
                 time: eventTime,
+                endTime: (eventType === 'event') ? eventEndTimeInput : null,
                 text: eventText, 
                 color: eventColor,
                 importance: eventImportance,
@@ -1136,6 +1170,9 @@ let events = [];
         }
         
         document.getElementById('new-event-input').value = '';
+        if(eventEndDateInputEl) eventEndDateInputEl.value = '';
+        if(eventEndTimeInputEl) eventEndTimeInputEl.value = '';
+        
         const noteDiv = document.getElementById('new-note-content');
         if(noteDiv) noteDiv.innerHTML = '';
 
@@ -1218,6 +1255,12 @@ let events = [];
             showAddPopup();
         }
         
+        const eventEndDateInputEl = document.getElementById('event-end-date');
+        if(eventEndDateInputEl) eventEndDateInputEl.value = eventToEdit.endDate || '';
+        
+        const eventEndTimeInputEl = document.getElementById('event-end-time');
+        if(eventEndTimeInputEl) eventEndTimeInputEl.value = eventToEdit.endTime || '';
+
         document.getElementById('event-time').value = eventToEdit.time || '';
         
         if (eventToEdit.type === 'note') {
