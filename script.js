@@ -827,11 +827,9 @@ let events = [];
                         <div style="font-size: 12px; opacity: 0.7; margin-bottom: 4px; display: flex; align-items: center;">
                             <span class="material-icons-outlined" style="font-size: 14px; margin-right: 4px;">sticky_note_2</span> Note
                         </div>
-                        
                         <div class="event-note-preview">
                             ${event.text}
                         </div>
-                        
                         <button class="read-more-btn" onclick="toggleNoteExpand(this)" style="display: ${isLong ? 'block' : 'none'}">
                             Show more
                         </button>
@@ -849,14 +847,8 @@ let events = [];
                 if (event.type === 'task') {
                     textSpanClass += " task-text";
                     if (event.completed) textSpanClass += " completed-text";
-                    taskMarkerHTML = `
-                        <label class="task-checkbox-label" onclick="event.stopPropagation();">
-                            <input type="checkbox" class="hidden-task-checkbox" ${event.completed ? 'checked' : ''} onchange="toggleTask(${event.id}, event)">
-                            <span class="custom-checkbox">
-                                <span class="material-icons-outlined check-icon">check_small</span>
-                            </span>
-                        </label>
-                    `;
+                    // Compact HTML to avoid layout issues with whitespace
+                    taskMarkerHTML = `<label class="task-checkbox-label" onclick="event.stopPropagation();"><input type="checkbox" class="hidden-task-checkbox" ${event.completed ? 'checked' : ''} onchange="toggleTask(${event.id}, event)"><span class="custom-checkbox"><span class="material-icons-outlined check-icon">check_small</span></span></label>`;
                 }
 
                 let routineIcon = '';
@@ -885,17 +877,8 @@ let events = [];
                     }
                 }
 
-                eventItem.innerHTML = `
-                    <div class="event-item-content-wrapper">
-                        ${taskMarkerHTML}
-                        <span class="${textSpanClass}">${routineIcon}${textDisplay}</span>
-                    </div>
-                    <div class="event-footer">
-                        <div class="event-date">${event.time || ''}</div>
-                        ${placeHTML}
-                    </div>
-                    ${deleteButtonHTML}
-                `;
+                // Compact innerHTML assignment to ensure correct flex layout
+                eventItem.innerHTML = `<div class="event-item-content-wrapper">${taskMarkerHTML}<span class="${textSpanClass}">${routineIcon}${textDisplay}</span></div><div class="event-footer"><div class="event-date">${event.time || ''}</div>${placeHTML}</div>${deleteButtonHTML}`;
             }
 
             if (event.preAdded === true && event.link) {
