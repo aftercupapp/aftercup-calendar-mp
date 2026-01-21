@@ -1080,6 +1080,10 @@ let events = [];
             const eventIndex = events.findIndex(event => event.id === currentEditId);
             if (eventIndex > -1) {
                 const originalEvent = events[eventIndex];
+                if (originalEvent.preAdded) {
+                    alert("Predefined events cannot be edited.");
+                    return;
+                }
                 events[eventIndex] = { ...originalEvent,
                     type: eventType,
                     date: eventDateInput,
@@ -1162,6 +1166,7 @@ let events = [];
 
         events = events.map(event => {
             if (event.routineId === routineId && event.date >= startDate) {
+                if (event.preAdded) return event;
                 return {
                     ...event,
                     time: newTime,
@@ -1280,6 +1285,11 @@ let events = [];
         e.stopPropagation();
         
         const eventToDelete = events.find(event => event.id === eventId);
+        
+        if (eventToDelete && eventToDelete.preAdded) {
+             return;
+        }
+
         if (eventToDelete && eventToDelete.routineId) {
             promptForRoutineDelete(eventToDelete);
         } else {
@@ -1461,11 +1471,8 @@ let events = [];
                         restoredUserEvents = restoredObject;
                     }
                     
-                    let fetchedEvents = [];
-                    try {
-                    } catch(e) {}
-
-                    events = mergeEvents(fetchedEvents, restoredUserEvents);
+                    const existingPreAdded = events.filter(e => e.preAdded);
+                    events = mergeEvents(existingPreAdded, restoredUserEvents);
                     saveEvents();
                     
                     if(restoredObject.dreams) {
@@ -2153,10 +2160,8 @@ let events = [];
             const mergedUserEvents = Array.from(eventMap.values());
             localStorage.setItem('events', JSON.stringify(mergedUserEvents));
             
-            let fetchedEvents = [];
-            try {
-            } catch (e) {}
-            events = mergeEvents(fetchedEvents, mergedUserEvents);
+            const existingPreAdded = events.filter(e => e.preAdded);
+            events = mergeEvents(existingPreAdded, mergedUserEvents);
             updateCalendar();
         }
 
