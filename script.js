@@ -191,9 +191,6 @@ let events = [];
         const userEvents = JSON.parse(localStorage.getItem('events')) || [];
         let fetchedEvents = [];
         try {
-            // Restore fetchedEvents logic if present in original, or keep empty if user removed it.
-            // Assuming this part needs to remain empty as per current context, 
-            // but mergeEvents will handle whatever is here.
         } catch (error) {
             console.error(error);
         }
@@ -777,14 +774,9 @@ let events = [];
         const sortedEvents = visibleEvents
             .filter(event => event.date === currentDateString)
             .sort((a, b) => {
-                
                 const rankA = importanceRank[a.importance] || 2;
                 const rankB = importanceRank[b.importance] || 2;
-                
-                if (rankA !== rankB) {
-                    return rankA - rankB;
-                }
-                
+                if (rankA !== rankB) return rankA - rankB;
                 return (a.time || "23:59").localeCompare(b.time || "23:59");
             });
 
@@ -797,8 +789,11 @@ let events = [];
                     Looks like a perfect day<br>for anything
                 </div>
             `;
+            eventsContainer.style.alignContent = 'center'; 
             return;
         }
+
+        eventsContainer.style.alignContent = 'start';
 
         sortedEvents.forEach(event => {
             const eventItem = document.createElement('div');
@@ -825,10 +820,12 @@ let events = [];
                 const textContent = tempDiv.textContent || tempDiv.innerText || "";
                 const isLong = textContent.length > 10 || (textContent.match(/\n/g) || []).length > 2;
 
+                const timeString = event.time ? ` • ${event.time}` : '';
+
                 eventItem.innerHTML = `
                     <div class="event-item-content-wrapper" style="align-items: flex-start; flex-direction: column; width: calc(100% - 40px);">
                         <div style="font-size: 12px; opacity: 0.7; margin-bottom: 4px; display: flex; align-items: center;">
-                            <span class="material-icons-outlined" style="font-size: 14px; margin-right: 4px;">sticky_note_2</span> Note
+                            <span class="material-icons-outlined" style="font-size: 14px; margin-right: 4px;">sticky_note_2</span> Note${timeString}
                         </div>
                         
                         <div class="event-note-preview">
@@ -844,6 +841,10 @@ let events = [];
             } 
             else {
                 let textDisplay = event.text;
+                if (event.shared && textDisplay.startsWith("[Shared] ")) {
+                    textDisplay = textDisplay.substring(9);
+                }
+
                 const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
                 textDisplay = textDisplay.replace(urlRegex, url => `<a href="${url}" target="_blank" style="color: inherit; text-decoration: underline;" onclick="event.stopPropagation();">${url}</a>`);
 
@@ -852,7 +853,14 @@ let events = [];
                 if (event.type === 'task') {
                     textSpanClass += " task-text";
                     if (event.completed) textSpanClass += " completed-text";
-                    taskMarkerHTML = `<label class="task-checkbox-label" onclick="event.stopPropagation();"><input type="checkbox" class="hidden-task-checkbox" ${event.completed ? 'checked' : ''} onchange="toggleTask(${event.id}, event)"><span class="custom-checkbox"><span class="material-icons-outlined check-icon">check_small</span></span></label>`;
+                    taskMarkerHTML = `
+                        <label class="task-checkbox-label" onclick="event.stopPropagation();">
+                            <input type="checkbox" class="hidden-task-checkbox" ${event.completed ? 'checked' : ''} onchange="toggleTask(${event.id}, event)">
+                            <span class="custom-checkbox">
+                                <span class="material-icons-outlined check-icon">check_small</span>
+                            </span>
+                        </label>
+                    `;
                 }
 
                 let routineIcon = '';
@@ -881,13 +889,21 @@ let events = [];
                     }
                 }
 
+                // Time Display Logic (Start - End)
+                let timeDisplay = event.time || '';
+                if (event.time && event.endTime) {
+                    timeDisplay = `${event.time} - ${event.endTime}`;
+                } else if (!event.time && event.endTime) {
+                     timeDisplay = `Ends at ${event.endTime}`;
+                }
+
                 eventItem.innerHTML = `
                     <div class="event-item-content-wrapper">
                         ${taskMarkerHTML}
                         <span class="${textSpanClass}">${routineIcon}${textDisplay}</span>
                     </div>
                     <div class="event-footer">
-                        <div class="event-date">${event.time || ''}</div>
+                        <div class="event-date">${timeDisplay}</div>
                         ${placeHTML}
                     </div>
                     ${deleteButtonHTML}
@@ -2156,7 +2172,6 @@ let events = [];
             const mergedUserEvents = Array.from(eventMap.values());
             localStorage.setItem('events', JSON.stringify(mergedUserEvents));
             
-            // Re-fetch predefined events logic here if necessary, though currently empty
             let fetchedEvents = [];
             try {
             } catch (e) {}
