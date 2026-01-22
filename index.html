@@ -815,7 +815,7 @@
     </div>
 
     <div id="today-summary-popup" class="popup">
-        <h2>Daily Briefing</h2>
+        <h2>Aftercup Brief</h2>
         <div id="weather-info" style="margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;"></div>
         <div id="today-summary-stats" style="font-weight: bold; margin-bottom: 10px;"></div>
         <div id="today-summary-content-container">
@@ -833,7 +833,7 @@
     </div>
 
     <div id="dreams-popup" class="popup">
-        <h2>Dream Journal</h2>
+        <h2>Dreams</h2>
         <div style="display: flex; gap: 10px; margin-bottom: 15px;">
             <input type="text" id="new-dream-input" class="popup-input-style" placeholder="I dreamt of..." style="flex:2; margin-bottom:0;">
             <input type="number" id="new-dream-year" class="popup-input-style" placeholder="Year" style="flex:1; margin-bottom:0;">
@@ -907,7 +907,7 @@
             <button class="popup-btn" style="margin-top: 10px; background: transparent; color: var(--text-color);" onclick="handleLogout()">Logout</button>
         </div>
 
-        <h3 style="margin-top: 20px;">Data Management</h3>
+        <h3 style="margin-top: 20px;">Data management</h3>
         <button class="popup-btn" style="margin-bottom: 10px;" onclick="backupEventsData()">Download Backup</button>
         <button class="popup-btn" style="margin-bottom: 10px; border-style: dashed;" onclick="triggerRestore()">Restore from File</button>
         <input type="file" id="restore-file-input" style="display:none;" accept=".json">
@@ -928,7 +928,7 @@
     </div>
 
     <div id="past-events-popup" class="popup">
-        <h2>History</h2>
+        <h2>Archive</h2>
         <div id="past-events-loader" style="text-align: center; padding: 20px;">Loading history...</div>
         <div id="past-events-container"></div>
     </div>
