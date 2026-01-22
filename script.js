@@ -189,15 +189,23 @@ let events = [];
         document.getElementById('event-type').addEventListener('change', toggleAddPopupFields);
 
         const userEvents = JSON.parse(localStorage.getItem('events')) || [];
-        let fetchedEvents = [];
-        try {
-        } catch (error) {
-            console.error(error);
-        }
-        events = mergeEvents(fetchedEvents, userEvents);
-        dreams = JSON.parse(localStorage.getItem('dreams')) || [];
+    let fetchedEvents = [];
 
-        saveEvents(true);
+    try {
+        const response = await fetch('events-update.json');
+        if (response.ok) {
+            fetchedEvents = await response.json();
+        } else {
+            console.warn('External events file not found or could not be loaded.');
+        }
+    } catch (error) {
+        console.error('Error fetching external events:', error);
+    }
+
+    events = mergeEvents(fetchedEvents, userEvents);
+    dreams = JSON.parse(localStorage.getItem('dreams')) || [];
+
+    saveEvents(true);
 
         dailyNotificationTimes = JSON.parse(localStorage.getItem(DAILY_SUMMARY_TIMES_KEY)) || [];
         await scheduleAutomaticNotifications();
