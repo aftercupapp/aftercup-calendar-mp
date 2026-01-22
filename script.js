@@ -708,7 +708,7 @@ let events = [];
 
         document.querySelectorAll('.nav-day').forEach(el => el.classList.remove('active-day'));
         const todayForLabels = new Date();
-        today.setHours(0, 0, 0, 0);
+        todayForLabels.setHours(0, 0, 0, 0);
         const yesterdayForLabels = new Date(todayForLabels);
         yesterdayForLabels.setDate(todayForLabels.getDate() - 1);
         const tomorrowForLabels = new Date(todayForLabels);
@@ -2351,5 +2351,3 @@ let events = [];
             throw error;
         }
     }
-
-}
