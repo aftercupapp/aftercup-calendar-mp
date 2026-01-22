@@ -202,6 +202,7 @@
             color: var(--text-color);
             font-weight: 600;
             transition: 0.1s;
+            background: transparent;
         }
 
         .menu-item:active {
@@ -279,16 +280,15 @@
 
         .event-item-content-wrapper {
             display: flex;
-            align-items: flex-start; /* Aligns checkbox with top of text if text wraps */
+            align-items: flex-start; 
             width: 100%;
         }
         
-        /* Updated event-text to match optimized layout */
         .event-text {
             word-break: break-word;
             overflow-wrap: break-word;
             flex-grow: 1;
-            padding-top: 2px; /* Slight offset for optical alignment with checkbox */
+            padding-top: 2px; 
         }
 
         .event-note-preview {
@@ -329,7 +329,6 @@
             font-family: var(--font-mono);
         }
         
-        /* Optimized Checkbox Styles from Source */
         .task-checkbox-label {
             display: inline-flex;
             align-items: center;
@@ -350,11 +349,9 @@
             width: 22px;
             height: 22px;
             border: 2px solid var(--border-color);
-            /* border-radius: 50%; kept square for e-ink aesthetic, user requested method not necessarily circle shape */
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            /* margin-top: 7px; Removed to center align properly with flex-start wrapper */
             flex-shrink: 0;
             transition: background-color 0.2s ease, border-color 0.2s ease;
         }
@@ -559,7 +556,6 @@
         @keyframes slideInRight { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes slideInLeft { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         
-        /* Note Editor Styles */
         #note-input-container {
             border: 2px solid var(--border-color);
             margin-bottom: 15px;
