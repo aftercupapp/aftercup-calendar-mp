@@ -273,8 +273,8 @@
         }
         
         .completed-text {
-            text-decoration: none !important; /* Force no strikethrough */
-            color: #808080; /* Grey text */
+            /* Removed line-through as requested */
+            text-decoration: none;
         }
 
         .event-item-content-wrapper {
@@ -457,11 +457,6 @@
             display: block;
         }
 
-        /* Ensure Account Popup is always on top of Date Popup */
-        #account-popup {
-            z-index: 1030;
-        }
-
         #past-events-popup {
             z-index: 1020;
         }
@@ -639,18 +634,6 @@
             margin-bottom: 5px;
             font-size: 0.9rem;
         }
-        
-        .shared-user-chip {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            background: var(--secondary-bg);
-            padding: 5px 10px;
-            border-radius: 4px;
-            margin-bottom: 5px;
-            font-size: 0.85rem;
-            border: 1px solid var(--border-color);
-        }
     </style>
 </head>
 <body class="light-theme">
@@ -750,15 +733,6 @@
         </div>
 
         <input type="time" id="event-time" class="popup-input-style">
-        
-        <div id="end-date-wrapper" style="display: block;">
-            <label style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 5px; display: block;">End Date (Optional):</label>
-            <div style="display: flex; gap: 10px;">
-                <input type="date" id="event-end-date" class="popup-input-style">
-                <input type="time" id="event-end-time" class="popup-input-style">
-            </div>
-        </div>
-
         <input type="date" id="event-date" class="popup-input-style">
         
         <select id="event-importance" class="popup-input-style">
@@ -793,14 +767,8 @@
             <div class="color-option" style="background-color: #FFFFFF; border: 1px solid #000;" onclick="setColor('#FFFFFF')"></div>
             <div class="color-option" style="background-color: #000000;" onclick="setColor('#000000')"></div>
         </div>
-        
-        <div id="shared-with-list" style="display:none; margin-bottom: 15px;">
-            <label style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 5px; display: block;">Shared with:</label>
-            <div id="shared-with-items" style="display: flex; flex-wrap: wrap; gap: 5px;"></div>
-        </div>
 
         <button class="popup-btn" onclick="handleAddOrUpdateEvent()">Add</button>
-        <button id="share-event-btn" class="popup-btn" style="margin-top: 10px; background: transparent; color: var(--text-color); display: none;" onclick="handleShareEvent()">Share Event</button>
     </div>
 
     <div id="date-popup" class="popup">
