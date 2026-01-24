@@ -1,4 +1,5 @@
 [
+   { "id": 63, "type": "event", "date": "2026-01-24", "time": "15:00", "text": "📰 Connect Specialty Kávézó", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/314", "importance": "average" },
    { "id": 62, "type": "event", "date": "2026-01-19", "time": "12:00", "text": "📰 A tűzön készült tea", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/313", "importance": "average" },
    { "id": 61, "type": "event", "date": "2026-01-17", "time": "12:00", "text": "📰 Bagolyvár CafféBar", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/312", "importance": "average" },
    { "id": 60, "type": "event", "date": "2026-01-16", "time": "21:00", "text": "📰 Határvonal 🚧", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/311", "importance": "average" },
@@ -64,3 +65,4 @@
   { "id": 1, "type": "event", "date": "2025-05-23", "time": "10:00", "text": "📰 A meghajlított kő - Kigyós Sándor emlékkiállítás", "color": "#FFFFFF", "link": "https://aftercup.neocities.org/Posts/233", "importance": "average" }
 
 ]
+
