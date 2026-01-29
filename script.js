@@ -12,7 +12,6 @@ let deferredPrompt;
 let installPopupOverlay;
 let autoSyncEnabled = JSON.parse(localStorage.getItem('autoSyncEnabled')) ?? true;
 
-// Quick Jump Variables
 let quickJumpValue = "";
 let quickJumpTimeout = null;
 
@@ -208,12 +207,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const response = await fetch('events-update.json');
         if (response.ok) {
             fetchedEvents = await response.json();
-        } else {
-            console.warn('External events file not found or could not be loaded.');
         }
-    } catch (error) {
-        console.error('Error fetching external events:', error);
-    }
+    } catch (error) {}
 
     events = mergeEvents(fetchedEvents, userEvents);
     dreams = JSON.parse(localStorage.getItem('dreams')) || [];
@@ -314,7 +309,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         laterBtn.addEventListener('click', hideInstallPopup);
     }
 
-    // QWERTY keyboard actions
     document.addEventListener('keydown', (e) => {
         const activeElement = document.activeElement;
         const isTyping = activeElement.tagName === 'INPUT' ||
@@ -326,7 +320,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const key = e.key;
         const activePopupId = getActivePopupId();
 
-        // Special handling for Back actions
         if (key === 'Backspace' || key === 'Escape') {
             if (activePopupId) {
                 e.preventDefault();
@@ -340,7 +333,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        // Numeric Jump logic
         if (/^[0-9]$/.test(key)) {
             if (!activePopupId || activePopupId === 'quick-jump-popup') {
                 e.preventDefault();
@@ -349,52 +341,51 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        // Disable global shortcuts if typing or a popup is active
         if (activePopupId) return;
 
         const lowerKey = key.toLowerCase();
         switch (lowerKey) {
-            case 't': // Tomorrow
+            case 't':
                 e.preventDefault();
                 switchToRelativeDay(1);
                 break;
-            case 'y': // Yesterday
+            case 'y':
                 e.preventDefault();
                 switchToRelativeDay(-1);
                 break;
-            case 'n': // Now/Today
+            case 'n':
                 e.preventDefault();
                 goToToday();
                 break;
-            case 'a': // Aftercup Brief
+            case 'a':
                 e.preventDefault();
                 showTodaySummaryPopup();
                 break;
-            case 's': // Settings
+            case 's':
                 e.preventDefault();
                 showAccountPopup();
                 break;
-            case 'h': // Shifts
+            case 'h':
                 e.preventDefault();
                 openShiftPlanner();
                 break;
-            case 'p': // Pocket
+            case 'p':
                 e.preventDefault();
                 showPocketPopup();
                 break;
-            case 'd': // Dreams
+            case 'd':
                 e.preventDefault();
                 showDreamsPopup();
                 break;
-            case 'u': // Upcoming
+            case 'u':
                 e.preventDefault();
                 showUpcomingPopup();
                 break;
-            case 'i': // History
+            case 'i':
                 e.preventDefault();
                 showPastEventsPopup();
                 break;
-            case 'c': // Calendar
+            case 'c':
                 e.preventDefault();
                 showDatePopup();
                 break;
@@ -923,14 +914,11 @@ function renderEvents() {
     const sortedEvents = visibleEvents
         .filter(event => event.date === currentDateString)
         .sort((a, b) => {
-
             const rankA = importanceRank[a.importance] || 2;
             const rankB = importanceRank[b.importance] || 2;
-
             if (rankA !== rankB) {
                 return rankA - rankB;
             }
-
             return (a.time || "23:59").localeCompare(b.time || "23:59");
         });
 
@@ -976,11 +964,9 @@ function renderEvents() {
                         <div style="font-size: 12px; opacity: 0.7; margin-bottom: 4px; display: flex; align-items: center;">
                             <span class="material-icons-outlined" style="font-size: 14px; margin-right: 4px;">sticky_note_2</span> Note
                         </div>
-                        
                         <div class="event-note-preview">
                             ${event.text}
                         </div>
-                        
                         <button class="read-more-btn" onclick="toggleNoteExpand(this)" style="display: ${isLong ? 'block' : 'none'}">
                             Show more
                         </button>
@@ -1057,7 +1043,6 @@ function renderEvents() {
             eventItem.addEventListener('click', (e) => {
                 if (e.target.closest('a, .delete-btn, .task-checkbox-label, .read-more-btn')) { return; }
                 if (window.getSelection().toString().length > 0) { return; }
-
                 populatePopupForEdit(event.id);
             });
         } else {
@@ -1078,16 +1063,12 @@ function renderUpcomingEvents() {
     const upcomingEvents = getVisibleEvents()
         .filter(event => event.date >= todayStr)
         .sort((a, b) => {
-
             if (a.date < b.date) return -1;
             if (a.date > b.date) return 1;
-
             const importanceRank = { 'high': 1, 'average': 2, 'low': 3 };
             const rankA = importanceRank[a.importance] || 2;
             const rankB = importanceRank[b.importance] || 2;
-
             if (rankA !== rankB) return rankA - rankB;
-
             return (a.time || "23:59").localeCompare(b.time || "23:59");
         });
 
@@ -1197,7 +1178,6 @@ function handleAddOrUpdateEvent() {
     if (eventType === 'note') {
         const noteDiv = document.getElementById('new-note-content');
         eventText = noteDiv ? noteDiv.innerHTML : '';
-
         const tempDiv = document.createElement("div");
         tempDiv.innerHTML = eventText;
         if (tempDiv.textContent.trim() === '') eventText = '';
@@ -1216,7 +1196,6 @@ function handleAddOrUpdateEvent() {
     }
 
     if (!eventDateInput || !eventText) {
-        console.error(!eventDateInput ? 'Please select a date.' : 'Please enter text.');
         return;
     }
 
@@ -1375,9 +1354,9 @@ function populatePopupForEdit(eventId) {
             placeUrlInput.style.display = 'block';
             placePhysicalInput.style.display = 'none';
         } else if (eventToEdit.place.type === 'physical') {
-            placeValue = eventToEdit.place.value;
             placeUrlInput.style.display = 'none';
             placePhysicalInput.style.display = 'block';
+            placePhysicalInput.value = eventToEdit.place.value;
         }
     } else {
         placeTypeSelect.value = 'none';
@@ -1542,7 +1521,6 @@ function triggerAutoSync() {
 
 function getVisibleEvents() {
     let allEvents = events.filter(e => !e.deleted);
-
     if (showPreAddedEvents) {
         return allEvents;
     }
@@ -1599,7 +1577,6 @@ async function handleRestoreFile(event) {
     reader.onload = async function (e) {
         try {
             const restoredObject = JSON.parse(e.target.result);
-
             if (restoredObject.dataType === "AftercupCalendarFullBackup" || restoredObject.settings) {
                 await applyBackupData(restoredObject);
             } else {
@@ -1609,16 +1586,13 @@ async function handleRestoreFile(event) {
                 } else if (Array.isArray(restoredObject)) {
                     restoredUserEvents = restoredObject;
                 }
-
                 let fetchedEvents = [];
                 try {
                     const response = await fetch('events-update.json');
                     if (response.ok) fetchedEvents = await response.json();
                 } catch (e) { }
-
                 events = mergeEvents(fetchedEvents, restoredUserEvents);
                 saveEvents();
-
                 if (restoredObject.dreams) {
                     dreams = restoredObject.dreams;
                     localStorage.setItem('dreams', JSON.stringify(dreams));
@@ -1628,10 +1602,8 @@ async function handleRestoreFile(event) {
                 }
                 updateCalendar();
             }
-            alert("Data restored successfully.");
         } catch (error) {
-            console.error("Error restoring data: Invalid file.", error);
-            alert("Error restoring data.");
+            console.error("Error restoring data", error);
         } finally {
             event.target.value = '';
         }
@@ -1664,11 +1636,7 @@ function renderDreams() {
     sortedDreams.forEach(dream => {
         const dreamItem = document.createElement('div');
         dreamItem.className = 'dream-item item-glassy';
-
-        const dreamContent = `
-                <strong>${dream.year || 'Future'}:</strong> ${dream.text}
-            `;
-
+        const dreamContent = `<strong>${dream.year || 'Future'}:</strong> ${dream.text}`;
         dreamItem.innerHTML = `
                 <span>${dreamContent}</span>
                 <button class="delete-dream-btn icon-btn" onclick="deleteDream(${dream.id}, event)">
@@ -1678,7 +1646,6 @@ function renderDreams() {
         dreamsList.appendChild(dreamItem);
     });
 }
-
 
 function addDream() {
     const textInput = document.getElementById('new-dream-input');
@@ -1734,9 +1701,7 @@ function openShiftPlanner() {
 
 function closeShiftPlanner() {
     document.getElementById('shift-planner-popup-main').style.display = 'none';
-
     const anyStandardPopupActive = document.querySelector('.popup.active, .search-popup.active');
-
     if (!anyStandardPopupActive) {
         document.getElementById('overlay').style.display = 'none';
         showActionButtons();
@@ -1828,8 +1793,7 @@ function spShowShiftPopup(year, month, day) {
             }
             localStorage.setItem("shifts", JSON.stringify(savedShifts));
             closeSpSelectPopup();
-            spRenderCalendar(); // Redraw grid with new icons
-
+            spRenderCalendar();
             if (currentUser) triggerAutoSync();
         });
     });
@@ -1863,7 +1827,6 @@ async function saveSummaryNotificationSettings() {
     const newTimes = [...new Set(Array.from(document.querySelectorAll('.summary-notification-time-input')).map(i => i.value).filter(Boolean))].sort();
 
     if (!("Notification" in window)) {
-        alert("This browser does not support desktop notification");
         localStorage.setItem(DAILY_SUMMARY_TIMES_KEY, JSON.stringify(newTimes));
         dailyNotificationTimes = newTimes;
         return;
@@ -1871,28 +1834,22 @@ async function saveSummaryNotificationSettings() {
 
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
-        console.warn('Permission was not granted. Settings were saved, but you will not receive notifications.');
         localStorage.setItem(DAILY_SUMMARY_TIMES_KEY, JSON.stringify(newTimes));
         dailyNotificationTimes = newTimes;
         return;
     }
 
     await updateAndScheduleNotifications(newTimes);
-
-    console.log("Notification settings saved!");
     closePopupAndGoBack();
     if (currentUser) triggerAutoSync();
 }
 
 function updateAndScheduleNotifications(times) {
-
     localStorage.setItem(DAILY_SUMMARY_TIMES_KEY, JSON.stringify(times));
     dailyNotificationTimes = times;
-
     localStorage.removeItem(LAST_NOTIFIED_TIMES_KEY);
 
     if (!('serviceWorker' in navigator) || Notification.permission !== 'granted') {
-        console.log("Service Worker not ready or permission not granted. Skipping scheduling.");
         return;
     }
 
@@ -1902,17 +1859,12 @@ function updateAndScheduleNotifications(times) {
                 type: 'schedule-summary-notifications',
                 times: times
             });
-            console.log("Notification schedule sent to Service Worker:", times);
-        } else {
-            console.error("Could not communicate with the background service.");
         }
     });
 }
 
 async function scheduleAutomaticNotifications() {
     if (dailyNotificationTimes && dailyNotificationTimes.length > 0) {
-        console.log("User settings found. Skipping automatic default overwrite.");
-
         if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
             navigator.serviceWorker.controller.postMessage({
                 type: 'schedule-summary-notifications',
@@ -1935,10 +1887,8 @@ async function scheduleAutomaticNotifications() {
         const notifyHours = eventDate.getHours().toString().padStart(2, '0');
         const notifyMinutes = eventDate.getMinutes().toString().padStart(2, '0');
         automaticTime = `${notifyHours}:${notifyMinutes}`;
-        console.log(`First event at ${firstEvent.time}. Scheduling automatic notification for ${automaticTime}`);
     } else {
         automaticTime = "08:00";
-        console.log(`No events for today. Scheduling default daily notification for ${automaticTime}`);
     }
 
     await updateAndScheduleNotifications([automaticTime]);
@@ -1957,8 +1907,6 @@ async function checkForegroundNotifications() {
 
     for (const timeStr of dailyNotificationTimes) {
         if (timeStr === currentTimeStr && lastNotified[timeStr] !== todayDateStr) {
-            console.log(`Foreground notification triggered for ${timeStr}`);
-
             const todaysEvents = getVisibleEvents().filter(e => e.date === todayDateStr);
             const weatherSummary = await getWeatherSummary();
             const body = generateSmarterSummary(todaysEvents, weatherSummary);
@@ -2003,7 +1951,6 @@ function getWeatherSummary() {
                 resolve(` For the weather, expect a ${tempDesc} day with ${description}.`);
 
             } catch (error) {
-                console.error("Failed to fetch weather for summary:", error);
                 resolve("");
             }
         }, () => {
@@ -2089,11 +2036,10 @@ function fetchWeather() {
                     </div>
                 `;
         } catch (error) {
-            console.error('Failed to fetch weather:', error);
             weatherInfoEl.innerHTML = '<p>Could not retrieve weather information.</p>';
         }
     }, () => {
-        weatherInfoEl.innerHTML = '<p>Unable to retrieve location for weather. (Permission denied or timeout)</p>';
+        weatherInfoEl.innerHTML = '<p>Unable to retrieve location for weather.</p>';
     }, { timeout: 10000 });
 }
 
@@ -2121,14 +2067,11 @@ function getWeatherDescription(code) {
 
 function showAccountPopup() {
     hidePopups(true);
-
     const popup = document.getElementById('account-popup');
     document.getElementById('overlay').style.display = 'block';
     document.getElementById('overlay').style.zIndex = '1005';
     popup.classList.add('active');
-
     updateAccountUI();
-
     history.pushState({ popup: 'account-popup' }, '', null);
     hideActionButtons();
 }
@@ -2195,7 +2138,6 @@ function updateSyncStatus(msg, isError = false) {
 async function handleLogin() {
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value.trim();
-
     if (!email || !password) return alert("Please fill in all fields");
 
     updateSyncStatus('Logging in...');
@@ -2205,20 +2147,15 @@ async function handleLogin() {
             currentUser = result.user;
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
             updateAccountUI();
-
             updateSyncStatus('Syncing: Downloading...');
             await performSync('pull');
-
             updateSyncStatus('Syncing: Uploading...');
             await performSync('push');
-
             updateSyncStatus('Sync Complete (Merged)');
         } else {
-            alert(result.message);
             updateSyncStatus('Login failed', true);
         }
     } catch (e) {
-        console.error(e);
         updateSyncStatus('Connection Error', true);
     }
 }
@@ -2227,7 +2164,6 @@ async function handleRegister() {
     const email = document.getElementById('reg-email').value.trim();
     const username = document.getElementById('reg-username').value.trim();
     const password = document.getElementById('reg-password').value.trim();
-
     if (!email || !password || !username) return alert("Please fill in all fields");
 
     updateSyncStatus('Creating account...');
@@ -2239,7 +2175,6 @@ async function handleRegister() {
             updateAccountUI();
             performSync('push');
         } else {
-            alert(result.message);
             updateSyncStatus('Registration failed', true);
         }
     } catch (e) {
@@ -2250,14 +2185,11 @@ async function handleRegister() {
 function handleLogout() {
     currentUser = null;
     localStorage.removeItem('currentUser');
-
-    // Clear user-created local data
     events = events.filter(e => e.preAdded);
     dreams = [];
     localStorage.removeItem('events');
     localStorage.removeItem('dreams');
     localStorage.removeItem('shifts');
-
     updateCalendar();
     updateAccountUI();
 }
@@ -2275,15 +2207,12 @@ function getBackupData() {
     if (syncPrefs.events) {
         backup.events = events.filter(e => !e.preAdded);
     }
-
     if (syncPrefs.dreams) {
         backup.dreams = dreams;
     }
-
     if (syncPrefs.shifts) {
         backup.shifts = JSON.parse(localStorage.getItem("shifts") || "{}");
     }
-
     if (syncPrefs.settings) {
         backup.settings = {
             theme: localStorage.getItem('theme'),
@@ -2291,7 +2220,6 @@ function getBackupData() {
             notifications: dailyNotificationTimes
         };
     }
-
     return backup;
 }
 
@@ -2301,27 +2229,20 @@ async function applyBackupData(backup) {
     if (syncPrefs.events && backup.events && Array.isArray(backup.events)) {
         const localUserEvents = JSON.parse(localStorage.getItem('events')) || [];
         const cloudEvents = backup.events;
-
         const eventMap = new Map();
-
         localUserEvents.forEach(evt => eventMap.set(evt.id, evt));
-
         cloudEvents.forEach(cloudEvt => {
             const localEvt = eventMap.get(cloudEvt.id);
             if (localEvt) {
-                const localTime = localEvt.lastModified || 0;
                 const cloudTime = cloudEvt.lastModified || 0;
-                if (cloudTime > localTime) {
-                    eventMap.set(cloudEvt.id, cloudEvt);
-                }
+                const localTime = localEvt.lastModified || 0;
+                if (cloudTime > localTime) eventMap.set(cloudEvt.id, cloudEvt);
             } else {
                 eventMap.set(cloudEvt.id, cloudEvt);
             }
         });
-
         const mergedUserEvents = Array.from(eventMap.values());
         localStorage.setItem('events', JSON.stringify(mergedUserEvents));
-
         let fetchedEvents = [];
         try {
             const response = await fetch('events-update.json');
@@ -2335,10 +2256,8 @@ async function applyBackupData(backup) {
         const localDreams = JSON.parse(localStorage.getItem('dreams')) || [];
         const cloudDreams = backup.dreams;
         const dreamMap = new Map();
-
         cloudDreams.forEach(d => dreamMap.set(d.id, d));
         localDreams.forEach(d => dreamMap.set(d.id, d));
-
         dreams = Array.from(dreamMap.values());
         localStorage.setItem('dreams', JSON.stringify(dreams));
         if (document.getElementById('dreams-popup').classList.contains('active')) renderDreams();
@@ -2353,20 +2272,14 @@ async function applyBackupData(backup) {
 
     if (syncPrefs.settings && backup.settings) {
         if (backup.settings.theme) changeTheme(backup.settings.theme);
-
         if (backup.settings.showPreAdded !== undefined) {
             showPreAddedEvents = backup.settings.showPreAdded;
             localStorage.setItem('showPreAddedEvents', JSON.stringify(showPreAddedEvents));
             const toggle = document.getElementById('pre-added-toggle');
             if (toggle) toggle.checked = showPreAddedEvents;
         }
-
         if (backup.settings.notifications) {
-            const localNotifs = dailyNotificationTimes;
-            const cloudNotifs = backup.settings.notifications;
-            const mergedNotifs = [...new Set([...localNotifs, ...cloudNotifs])].sort();
-
-            dailyNotificationTimes = mergedNotifs;
+            dailyNotificationTimes = [...new Set([...dailyNotificationTimes, ...backup.settings.notifications])].sort();
             localStorage.setItem(DAILY_SUMMARY_TIMES_KEY, JSON.stringify(dailyNotificationTimes));
         }
     }
@@ -2374,17 +2287,11 @@ async function applyBackupData(backup) {
 
 async function performSync(direction) {
     if (!currentUser || isSyncing) return;
-
     isSyncing = true;
     updateSyncStatus('Syncing...');
-
     try {
         if (direction === 'pull') {
-            const result = await apiRequest({
-                action: 'backup_download',
-                email: currentUser.email
-            });
-
+            const result = await apiRequest({ action: 'backup_download', email: currentUser.email });
             if (result.status === 'success') {
                 await applyBackupData(result.backup);
                 updateSyncStatus('Sync complete (Pulled)');
@@ -2392,24 +2299,16 @@ async function performSync(direction) {
                 updateSyncStatus(`Sync error: ${result.message || 'Pull failed'}`, true);
             }
         }
-
         if (direction === 'push') {
             const backupData = getBackupData();
-            const result = await apiRequest({
-                action: 'backup_upload',
-                email: currentUser.email,
-                backup: backupData
-            });
-
+            const result = await apiRequest({ action: 'backup_upload', email: currentUser.email, backup: backupData });
             if (result.status === 'success') {
                 updateSyncStatus('Sync complete (Saved)');
             } else {
                 updateSyncStatus(`Sync error: ${result.message || 'Save failed'}`, true);
             }
         }
-
     } catch (e) {
-        console.error("Sync Error:", e);
         updateSyncStatus('Sync Failed', true);
     } finally {
         isSyncing = false;
@@ -2419,33 +2318,23 @@ async function performSync(direction) {
 function showPastEventsPopup() {
     const popups = document.querySelectorAll('.popup:not(#past-events-popup), .search-popup');
     popups.forEach(p => p.classList.remove('active'));
-
     const overlay = document.getElementById('overlay');
     overlay.style.zIndex = '1019';
     overlay.style.display = 'block';
-
     const popup = document.getElementById('past-events-popup');
     popup.classList.add('active');
-
     history.pushState({ popup: 'past-events-popup' }, '', null);
     hideActionButtons();
-
     document.getElementById('past-events-loader').style.display = 'block';
     document.getElementById('past-events-container').style.display = 'none';
-
-    setTimeout(() => {
-        renderPastEvents();
-    }, 50);
+    setTimeout(() => { renderPastEvents(); }, 50);
 }
 
 function renderPastEvents() {
     const container = document.getElementById('past-events-container');
     const loader = document.getElementById('past-events-loader');
-
     container.innerHTML = '';
-
     const todayStr = getLocalDateString(new Date());
-
     const pastEvents = getVisibleEvents()
         .filter(event => event.date < todayStr)
         .sort((a, b) => {
@@ -2481,12 +2370,10 @@ function renderPastEvents() {
                 `;
 
             card.onclick = () => {
-                currentDate = new Date(event.date.split('-').map(Number)[0], event.date.split('-').map(Number)[1] - 1, event.date.split('-').map(Number)[2]);
+                const parts = event.date.split('-').map(Number);
+                currentDate = new Date(parts[0], parts[1] - 1, parts[2]);
                 updateCalendar();
-
-                const popup = document.getElementById('past-events-popup');
-                popup.classList.remove('active');
-
+                document.getElementById('past-events-popup').classList.remove('active');
                 if (isMobileMiniCalVisible) {
                     toggleMobileMiniCalendar();
                 } else {
@@ -2494,11 +2381,9 @@ function renderPastEvents() {
                     showActionButtons();
                 }
             };
-
             container.appendChild(card);
         });
     }
-
     loader.style.display = 'none';
     container.style.display = 'block';
 }
@@ -2506,7 +2391,7 @@ function renderPastEvents() {
 function printCurrentWeek() {
     const today = new Date(currentDate);
     const day = today.getDay();
-    const diff = today.getDate() - day + (day === 0 ? -6 : 1); // Adjust to Monday
+    const diff = today.getDate() - day + (day === 0 ? -6 : 1);
     const monday = new Date(today.setDate(diff));
     
     let printContent = `
@@ -2539,18 +2424,14 @@ function printCurrentWeek() {
                 `;
             });
         }
-
         printContent += `</div></div>`;
     }
 
     printContent += `</div>`;
-
     const printWindow = window.open('', '_blank');
     printWindow.document.write('<html><head><title>Print Week</title></head><body>' + printContent + '</body></html>');
     printWindow.document.close();
     printWindow.print();
-
-    // Cleanup: Return to homescreen after dialog opens
     closePopupAndGoBack();
 }
 
@@ -2560,11 +2441,9 @@ async function apiRequest(payload) {
             method: 'POST',
             body: JSON.stringify(payload)
         });
-
         const text = await response.text();
         return JSON.parse(text);
     } catch (error) {
-        console.error(error);
         throw error;
     }
 }
