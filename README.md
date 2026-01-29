@@ -6,12 +6,17 @@ A distraction-free, high-contrast calendar application specifically designed for
 
 ## 📱 Screenshots
 
-| Home & Interaction | Menu & Accounts | Planning & History |
-| :--- | :--- | :--- |
-| Home view | Calendar menu | Search |
-| New entry | Aftercup account | Upcoming |
-| Aftercup brief | Shortcuts | Shift planner |
-| | | Archive |
+| Home View | New Entry | Aftercup Brief |
+| :---: | :---: | :---: |
+| ![Home Screen]([screenshots/home.png](https://i.postimg.cc/L80thkY5/Screenshot_20260129_161951.png) | ![New Entry](https://i.postimg.cc/Z5D80PBR/Screenshot_20260129_162007.png) | ![Briefing](https://i.postimg.cc/bwFxd0Dv/Screenshot_20260129_162025.png) |
+
+| Calendar Menu | Account Settings | Keyboard Shortcuts |
+| :---: | :---: | :---: |
+| ![Menu](https://i.postimg.cc/bwFxd0Dd/Screenshot_20260129_162036.png) | ![Account](screenshots/account.png) | ![Shortcuts](https://i.postimg.cc/sg0Y1PQV/Screenshot_20260129_190926.png) |
+
+| Full-Text Search | Upcoming View | History & Archive |
+| :---: | :---: | :---: |
+| ![Search](https://i.postimg.cc/XYDfXKG7/Screenshot_20260129_162206.png) | ![Upcoming](https://i.postimg.cc/P5FWNbpf/Screenshot_20260129_162148.png) | ![Shift planner](https://i.postimg.cc/4xF6nv7f/Screenshot_20260129_192009.png) |
 
 ---
 
@@ -32,13 +37,6 @@ Built-in support for the Aftercup coffee blog (can be toggled in settings):
 ### 💭 Dream Journal
 A private space to record your dreams. Associate entries with specific years to track your subconscious journey over time.
 
-### 📥 Pocket & Archive
-* **Pocket:** Integrated view to access your external reading list or curated content.
-* **Archive & History:** A dedicated "History" view to browse and revisit all past events and completed tasks in a clean timeline.
-
-### 🔍 Full-Text Search
-Quickly locate any entry using robust search functionality. Results update in real-time as you type for instant navigation.
-
 ---
 
 ## ⌨️ QWERTY Keyboard Mastery
@@ -54,7 +52,7 @@ Designed for devices with physical keyboards. Control the entire app without tou
 | <kbd>A</kbd> / <kbd>S</kbd> | Open **A**ftercup brief or Account **S**ettings |
 | <kbd>⌫</kbd> | Close active popups or return to homescreen |
 
-> **🔢 Quick Jump to Day:** Simply type a number (<kbd>1</kbd>-<kbd>3</kbd><kbd>1</kbd>) while on the home screen. A mini popup appears for two-digit entry. After 2.5 seconds, the calendar automatically jumps to that day.
+> **🔢 Quick Jump to Day:** Simply type a number (<kbd>1</kbd>-<kbd>3</kbd><kbd>1</kbd>) on the home screen. A mini popup appears for two-digit entry. After 2.5 seconds, the calendar automatically jumps to that day.
 
 ---
 
