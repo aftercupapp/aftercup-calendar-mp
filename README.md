@@ -14,7 +14,7 @@ A distraction-free, high-contrast calendar application specifically designed for
 | :---: | :---: | :---: |
 | ![Menu](https://i.postimg.cc/bwFxd0Dd/Screenshot_20260129_162036.png) | ![Account](https://i.postimg.cc/K8sP47kg/Screenshot_20260129_162044.png) | ![Shortcuts](https://i.postimg.cc/sg0Y1PQV/Screenshot_20260129_190926.png) |
 
-| Full-Text Search | Upcoming View | History & Archive |
+| Full-Text Search | Upcoming View | Shift Planner |
 | :---: | :---: | :---: |
 | ![Search](https://i.postimg.cc/XYDfXKG7/Screenshot_20260129_162206.png) | ![Upcoming](https://i.postimg.cc/P5FWNbpf/Screenshot_20260129_162148.png) | ![Shift planner](https://i.postimg.cc/4xF6nv7f/Screenshot_20260129_192009.png) |
 
@@ -22,24 +22,24 @@ A distraction-free, high-contrast calendar application specifically designed for
 
 ## ✨ Key Features
 
-### 📅 Core Management Tools
+### 📅 Core functionality
 The app serves as a central hub for your daily life, supporting multiple entry types:
 * **Events:** Standard time-based appointments with physical or virtual location support.
 * **Tasks:** To-do items with interactive checkboxes and completion states.
 * **Notes:** Rich text entries supporting **Bold**, *Italic*, <u>Underline</u>, and ~~Strikethrough~~. Notes feature a smart "show more" toggle to keep the daily view clean.
 * **Routines:** A powerful recurring engine that allows for entries to repeat every $X$ days, weeks, or months with optional end dates.
 
-### ☕ Aftercup Integration
-Built-in support for the Aftercup coffee blog (can be toggled in settings):
+### ☕ Aftercup integration
+Built-in support for the (hungarian) Aftercup coffee blog (can be toggled in/out in settings):
 * **Blog Entries:** View the latest coffee culture posts directly in your timeline.
 * **Aftercup Brief:** A dedicated daily summary popup combining your scheduled agenda, geolocation-based weather reports, and blog updates.
 
-### 💭 Dream Journal
+### 💭 Dream journal
 A private space to record your dreams. Associate entries with specific years to track your subconscious journey over time.
 
 ---
 
-## ⌨️ QWERTY Keyboard Mastery
+## ⌨️ QWERTY keyboard support
 
 Designed for devices with physical keyboards. Control the entire app without touching the screen:
 
@@ -56,11 +56,11 @@ Designed for devices with physical keyboards. Control the entire app without tou
 
 ---
 
-## 🛠️ Professional Tools
+## 🛠️ Professional tools
 
 * **Symbol-based Shift Planner:** Track work cycles using high-visibility icons for morning, afternoon, night, resting, holiday, and sick pay.
 * **Print Week Overview:** Generate a clean, printer-friendly summary of your current week.
-* **Cloud Sync & Backup:** Securely backup to the cloud or perform manual local exports/restores via `.json` files for total data sovereignty.
+* **Cloud Sync & Backup:** Securely backup to the cloud (Aftercup Account) or perform manual local exports/restores via `.json` files for total data sovereignty.
 
 ---
 
@@ -75,7 +75,7 @@ Designed for devices with physical keyboards. Control the entire app without tou
 
 ## 📥 Installation
 
-1. Download the latest **APK** from the release badge above.
+1. Download the latest **APK** from the release badge below.
 2. Install on your **Minimal Phone**.
 3. *(Optional)* Log in to enable automatic cloud synchronization across devices.
 
