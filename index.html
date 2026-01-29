@@ -676,6 +676,21 @@
             min-width: 25px;
             text-align: center;
         }
+
+        .kbd-grid {
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 3px; 
+            font-size: 0.85rem; 
+            line-height: 1.8;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .kbd-grid {
+                gap: 6px; /* slightly more space for tap targets on mobile */
+            }
+        }
     </style>
 </head>
 <body class="light-theme">
@@ -841,13 +856,19 @@
             </div>
         </div>
 
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button class="popup-btn" style="flex: 1; border-style: dashed; background: transparent; color: var(--text-color);" onclick="printCurrentWeek()">
+                <span class="material-icons-outlined" style="vertical-align: middle; margin-right: 5px;">print</span> Print Week
+            </button>
+        </div>
+
         <div style="margin-bottom: 5px;">
             <label class="task-checkbox-label">
                 <input type="checkbox" id="pre-added-toggle"> Show Aftercup Posts
             </label>
         </div>
 
-        <p style="text-align: center; opacity: 0.5; font-size: 0.7rem; margin-top: 20px; font-family: var(--font-mono);">v0.1 MP1</p>
+        <p style="text-align: center; opacity: 0.5; font-size: 0.7rem; margin-top: 20px; font-family: var(--font-mono);">v0.1.1 (MP01 build)</p>
     </div>
 
     <div id="search-popup" class="search-popup">
@@ -955,7 +976,7 @@
         </div>
 
         <h3 style="margin-top: 20px;">Keyboard Shortcuts</h3>
-        <div style="font-size: 0.85rem; line-height: 1.8; display: grid; grid-template-columns: 1fr 1fr;">
+        <div class="kbd-grid">
             <div><span class="kbd-shortcut">T</span> Tomorrow</div>
             <div><span class="kbd-shortcut">Y</span> Yesterday</div>
             <div><span class="kbd-shortcut">N</span> Today</div>
@@ -968,7 +989,7 @@
             <div><span class="kbd-shortcut">U</span> Upcoming</div>
             <div><span class="kbd-shortcut">I</span> History</div>
             <div><span class="kbd-shortcut">0-9</span> Jump Day</div>
-            <div><span class="kbd-shortcut">BS</span> Back</div>
+            <div><span class="kbd-shortcut">⌫</span> Back</div>
         </div>
 
         <h3 style="margin-top: 20px;">Data management</h3>
