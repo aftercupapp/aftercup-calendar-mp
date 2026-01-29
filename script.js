@@ -308,13 +308,25 @@ let events = [];
                              activeElement.tagName === 'TEXTAREA' || 
                              activeElement.isContentEditable;
             
-            const activePopupId = getActivePopupId();
-            
-            // Disable global shortcuts if typing or a popup is active
-            if (isTyping || activePopupId) return;
+            if (isTyping) return;
 
-            const key = e.key.toLowerCase();
-            switch (key) {
+            const key = e.key;
+            const activePopupId = getActivePopupId();
+
+            // Special handling for Back actions
+            if (key === 'Backspace' || key === 'Escape') {
+                if (activePopupId) {
+                    e.preventDefault();
+                    closePopupAndGoBack();
+                }
+                return;
+            }
+            
+            // Global navigation - Disable if a popup is active to avoid mis-navigation
+            if (activePopupId) return;
+
+            const lowerKey = key.toLowerCase();
+            switch (lowerKey) {
                 case 't': // Tomorrow
                     e.preventDefault();
                     switchToRelativeDay(1);
@@ -1508,6 +1520,8 @@ let events = [];
                     
                     let fetchedEvents = [];
                     try {
+                        const response = await fetch('events-update.json');
+                        if (response.ok) fetchedEvents = await response.json();
                     } catch(e) {}
 
                     events = mergeEvents(fetchedEvents, restoredUserEvents);
