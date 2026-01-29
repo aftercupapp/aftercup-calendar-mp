@@ -38,6 +38,16 @@ let events = [];
 
     let dailyNotificationTimes = [];
 
+    // Mapping for e-paper friendly icons
+    const shiftIconMap = {
+        'highlight-yellow': 'light_mode',        // Morning
+        'highlight-orange': 'wb_sunny',         // Afternoon
+        'highlight-blue': 'dark_mode',          // Night
+        'day-highlight-grey': 'coffee',         // Resting Day
+        'day-highlight-green': 'event_available',// Holiday
+        'day-highlight-light-red': 'medical_services' // Sick Pay
+    };
+
     function getLocalDateString(dateObj) {
         const year = dateObj.getFullYear();
         const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
@@ -1667,10 +1677,20 @@ let events = [];
         for (let i = 0; i < adjustedFirstDay; i++) spCalendarGridEl.insertAdjacentHTML('beforeend', '<div class="sp-day"></div>');
         for (let day = 1; day <= daysInMonth; day++) {
             const shiftKey = `${year}-${month + 1}-${day}`;
-            const shiftClass = savedShifts[shiftKey] || '';
+            const shiftType = savedShifts[shiftKey] || '';
             const dayCell = document.createElement("div");
-            dayCell.className = `sp-day ${shiftClass}`;
-            dayCell.innerHTML = `<div class="sp-day-number">${day}</div>`;
+            dayCell.className = `sp-day`;
+            
+            let iconHTML = '';
+            if (shiftType && shiftIconMap[shiftType]) {
+                iconHTML = `<span class="material-symbols-outlined sp-shift-icon">${shiftIconMap[shiftType]}</span>`;
+            }
+
+            dayCell.innerHTML = `
+                <div class="sp-day-number">${day}</div>
+                ${iconHTML}
+            `;
+            
             dayCell.addEventListener("click", () => {
                 spSelectedDayCell = dayCell;
                 spShowShiftPopup(year, month, day);
@@ -1695,15 +1715,15 @@ let events = [];
         popup.className = "sp-select-popup";
         popup.innerHTML = `
             <h3>Select Shift for ${day}/${month + 1}/${year}</h3>
-            <div style="display:flex; flex-direction:column; gap:5px;">
-                <label><input type="radio" name="sp-shift" value="highlight-yellow" ${currentShift === "highlight-yellow" ? "checked" : ""}> Morning</label>
-                <label><input type="radio" name="sp-shift" value="highlight-orange" ${currentShift === "highlight-orange" ? "checked" : ""}> Afternoon</label>
-                <label><input type="radio" name="sp-shift" value="highlight-blue" ${currentShift === "highlight-blue" ? "checked" : ""}> Night</label>
-                <label><input type="radio" name="sp-shift" value="day-highlight-grey" ${currentShift === "day-highlight-grey" ? "checked" : ""}> Resting Day</label>
-                <label><input type="radio" name="sp-shift" value="day-highlight-green" ${currentShift === "day-highlight-green" ? "checked" : ""}> Holiday</label>
-                <label><input type="radio" name="sp-shift" value="day-highlight-light-red" ${currentShift === "day-highlight-light-red" ? "checked" : ""}> Sick Pay</label>
-                <hr class="sp-divider-line" style="width:100%;">
-                <label><input type="radio" name="sp-shift" value="delete"> Delete</label>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <label class="sp-radio-label"><input type="radio" name="sp-shift" value="highlight-yellow" ${currentShift === "highlight-yellow" ? "checked" : ""}> <span class="material-symbols-outlined">light_mode</span> Morning</label>
+                <label class="sp-radio-label"><input type="radio" name="sp-shift" value="highlight-orange" ${currentShift === "highlight-orange" ? "checked" : ""}> <span class="material-symbols-outlined">wb_sunny</span> Afternoon</label>
+                <label class="sp-radio-label"><input type="radio" name="sp-shift" value="highlight-blue" ${currentShift === "highlight-blue" ? "checked" : ""}> <span class="material-symbols-outlined">dark_mode</span> Night</label>
+                <label class="sp-radio-label"><input type="radio" name="sp-shift" value="day-highlight-grey" ${currentShift === "day-highlight-grey" ? "checked" : ""}> <span class="material-symbols-outlined">coffee</span> Resting Day</label>
+                <label class="sp-radio-label"><input type="radio" name="sp-shift" value="day-highlight-green" ${currentShift === "day-highlight-green" ? "checked" : ""}> <span class="material-symbols-outlined">event_available</span> Holiday</label>
+                <label class="sp-radio-label"><input type="radio" name="sp-shift" value="day-highlight-light-red" ${currentShift === "day-highlight-light-red" ? "checked" : ""}> <span class="material-symbols-outlined">medical_services</span> Sick Pay</label>
+                <hr class="sp-divider-line" style="width:100%; border:none; border-top: 1px solid var(--border-color); opacity: 0.3; margin: 5px 0;">
+                <label class="sp-radio-label"><input type="radio" name="sp-shift" value="delete"> Delete</label>
             </div>
             <button id="sp-select-close-btn" class="popup-btn" style="margin-top: 15px;">Close</button>`;
         document.body.appendChild(popup);
@@ -1719,15 +1739,14 @@ let events = [];
         popup.querySelectorAll('input[name="sp-shift"]').forEach(radio => {
             radio.addEventListener("change", () => {
                 const className = radio.value;
-                spSelectedDayCell.className = 'sp-day';
                 if (className && className !== "delete") {
-                    spSelectedDayCell.classList.add(className);
                     savedShifts[shiftKey] = className;
                 } else {
                     delete savedShifts[shiftKey];
                 }
                 localStorage.setItem("shifts", JSON.stringify(savedShifts));
                 closeSpSelectPopup();
+                spRenderCalendar(); // Redraw grid with new icons
                 
                 if (currentUser) triggerAutoSync();
             });
