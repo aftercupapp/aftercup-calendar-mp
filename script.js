@@ -341,8 +341,8 @@ let events = [];
                 return;
             }
 
-            // Numeric Jump logic - Only work with the current month
-            if (!activePopupId && /^[0-9]$/.test(key)) {
+            // Numeric Jump logic - Allow typing digits even if the Quick Jump popup is active
+            if ((!activePopupId || activePopupId === 'quick-jump-popup') && /^[0-9]$/.test(key)) {
                 e.preventDefault();
                 handleQuickJumpInput(key);
                 return;
@@ -430,6 +430,7 @@ let events = [];
     }
 
     function showQuickJumpPopup(val) {
+        // We use hidePopups(true) but ensure overlay stays/updates
         hidePopups(true);
         const popup = document.getElementById('quick-jump-popup');
         const overlay = document.getElementById('overlay');
