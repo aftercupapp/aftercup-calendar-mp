@@ -300,6 +300,43 @@ let events = [];
         if (laterBtn) {
             laterBtn.addEventListener('click', hideInstallPopup);
         }
+
+        // QWERTY keyboard actions
+        document.addEventListener('keydown', (e) => {
+            const activeElement = document.activeElement;
+            const isTyping = activeElement.tagName === 'INPUT' || 
+                             activeElement.tagName === 'TEXTAREA' || 
+                             activeElement.isContentEditable;
+            
+            const activePopupId = getActivePopupId();
+            
+            // Disable global shortcuts if typing or a popup is active
+            if (isTyping || activePopupId) return;
+
+            const key = e.key.toLowerCase();
+            switch (key) {
+                case 't': // Tomorrow
+                    e.preventDefault();
+                    switchToRelativeDay(1);
+                    break;
+                case 'y': // Yesterday
+                    e.preventDefault();
+                    switchToRelativeDay(-1);
+                    break;
+                case 'n': // Now/Today
+                    e.preventDefault();
+                    goToToday();
+                    break;
+                case 'a': // Aftercup Brief
+                    e.preventDefault();
+                    showTodaySummaryPopup();
+                    break;
+                case 's': // Settings
+                    e.preventDefault();
+                    showAccountPopup();
+                    break;
+            }
+        });
     });
 
     function toggleAddPopupFields() {
@@ -2098,6 +2135,15 @@ let events = [];
     function handleLogout() {
         currentUser = null;
         localStorage.removeItem('currentUser');
+        
+        // Clear user-created local data
+        events = events.filter(e => e.preAdded);
+        dreams = [];
+        localStorage.removeItem('events');
+        localStorage.removeItem('dreams');
+        localStorage.removeItem('shifts');
+        
+        updateCalendar();
         updateAccountUI();
     }
 
@@ -2163,6 +2209,8 @@ let events = [];
             
             let fetchedEvents = [];
             try {
+                const response = await fetch('events-update.json');
+                if (response.ok) fetchedEvents = await response.json();
             } catch (e) {}
             events = mergeEvents(fetchedEvents, mergedUserEvents);
             updateCalendar();
@@ -2212,11 +2260,6 @@ let events = [];
     async function performSync(direction) {
         if (!currentUser || isSyncing) return;
         
-        if (isSyncing) {
-            console.log("Sync already in progress, skipping.");
-            return;
-        }
-
         isSyncing = true;
         updateSyncStatus('Syncing...');
 
