@@ -40,7 +40,7 @@ let events = [];
 
     // Mapping for e-paper friendly icons
     const shiftIconMap = {
-        'highlight-yellow': 'light_mode',        // Morning
+        'highlight-yellow': 'wb_twilight',        // Morning
         'highlight-orange': 'wb_sunny',         // Afternoon
         'highlight-blue': 'dark_mode',          // Night
         'day-highlight-grey': 'coffee',         // Resting Day
