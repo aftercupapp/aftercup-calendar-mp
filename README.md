@@ -81,4 +81,4 @@ Designed for devices with physical keyboards. Control the entire app without tou
 
 [![Download](https://img.shields.io/badge/↓_Download-v0.1-000000?style=for-the-badge&logoColor=white&labelColor=black&color=white)](https://dl.dropbox.com/scl/fi/msh96pbswouo12808aoks/0.1.apk?rlkey=pou4rtfszm7he5ek85v9rz7ro&st=e92k96d2)
 
-[![Normal version on Google Play](https://img.shields.io/badge/Get_it_on-Google_Play-000000?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=com.aftercup.calendar&hl=en)
+[![Normal version on Google Play](https://img.shields.io/badge/Google_Play-normal_verion-000000?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=com.aftercup.calendar&hl=en)
