@@ -393,6 +393,10 @@ let events = [];
                     e.preventDefault();
                     showPastEventsPopup();
                     break;
+                case 'c': // Calendar
+                    e.preventDefault();
+                    showDatePopup();
+                    break;
             }
         });
     });
@@ -404,11 +408,8 @@ let events = [];
         let newValue = quickJumpValue + digit;
         let numericValue = parseInt(newValue, 10);
 
-        // Basic validation: 1 to maxDays of current month
+        // If the new resulting number is greater than max days, treat the new digit as a fresh start
         if (numericValue > maxDays) {
-            // If the user types "4" and month has 31 days, don't allow. 
-            // However, we allow "3" then "1". 
-            // If the first digit already exceeds tens place logic, we reset.
             newValue = digit;
             numericValue = parseInt(newValue, 10);
         }
@@ -753,12 +754,12 @@ let events = [];
                 aftercupPostsContentEl.appendChild(postEl);
             });
         } else {
-            aftercupPostsContentEl.innerHTML = '<p style=\"opacity: 1; font-size: 15px; text-align: left; margin-top: 10px;\">No Aftercup posts today.</p>';
+            aftercupPostsContentEl.innerHTML = '<p style="opacity: 1; font-size: 15px; text-align: left; margin-top: 10px;">No Aftercup posts today.</p>';
         }
 
         if (userAgendaItems.length > 0) {
             summaryContentContainer.style.display = 'block';
-            summaryContentEl.innerHTML = '<ul style=\"padding-left: 20px; list-style-type: disc;\">' + userAgendaItems.map(e =>
+            summaryContentEl.innerHTML = '<ul style="padding-left: 20px; list-style-type: disc;">' + userAgendaItems.map(e =>
                 `<li>${e.importance === 'high' ? '❗ ' : ''}${e.time ? `<strong>${e.time}</strong> - ` : ''}${e.text} (${e.type})</li>`
             ).join('') + '</ul>';
         } else {
@@ -897,13 +898,13 @@ let events = [];
         const oneDay = 1000 * 60 * 60 * 24;
         const dayOfYear = Math.floor((todayUTC - startOfYear) / oneDay) + 1;
         element.innerHTML = `
-            <div class=\"info-row\">
-                <span class=\"info-label\">Week:</span>
-                <span class=\"info-value\">${getWeekNumber(date)}</span>
+            <div class="info-row">
+                <span class="info-label">Week:</span>
+                <span class="info-value">${getWeekNumber(date)}</span>
             </div>
-            <div class=\"info-row\">
-                <span class=\"info-label\">Day of year:</span>
-                <span class=\"info-value\">${dayOfYear}${getDaySuffix(dayOfYear)}</span>
+            <div class="info-row">
+                <span class="info-label">Day of year:</span>
+                <span class="info-value">${dayOfYear}${getDaySuffix(dayOfYear)}</span>
             </div>
         `;
     }
@@ -931,8 +932,8 @@ let events = [];
 
         if (sortedEvents.length === 0) {
             eventsContainer.innerHTML = `
-                <div class=\"no-events-message\">
-                    <span class=\"material-icons-outlined\" style=\"font-size: 50px; margin-bottom: 16px;\">
+                <div class="no-events-message">
+                    <span class="material-icons-outlined" style="font-size: 50px; margin-bottom: 16px;">
                         event_available
                     </span><br>
                     Looks like a perfect day<br>for anything
@@ -956,8 +957,8 @@ let events = [];
             }
 
             let deleteButtonHTML = event.preAdded ? '' : `
-                <button class=\"delete-btn\" onclick=\"deleteEvent(${event.id}, event)\">
-                    <span class=\"material-icons-outlined\">delete_outline</span>
+                <button class="delete-btn" onclick="deleteEvent(${event.id}, event)">
+                    <span class="material-icons-outlined">delete_outline</span>
                 </button>`;
 
             if (event.type === 'note') {
@@ -967,16 +968,16 @@ let events = [];
                 const isLong = textContent.length > 10 || (textContent.match(/\n/g) || []).length > 2;
 
                 eventItem.innerHTML = `
-                    <div class=\"event-item-content-wrapper\" style=\"align-items: flex-start; flex-direction: column; width: calc(100% - 40px);\">
-                        <div style=\"font-size: 12px; opacity: 0.7; margin-bottom: 4px; display: flex; align-items: center;\">
-                            <span class=\"material-icons-outlined\" style=\"font-size: 14px; margin-right: 4px;\">sticky_note_2</span> Note
+                    <div class="event-item-content-wrapper" style="align-items: flex-start; flex-direction: column; width: calc(100% - 40px);">
+                        <div style="font-size: 12px; opacity: 0.7; margin-bottom: 4px; display: flex; align-items: center;">
+                            <span class="material-icons-outlined" style="font-size: 14px; margin-right: 4px;">sticky_note_2</span> Note
                         </div>
                         
-                        <div class=\"event-note-preview\">
+                        <div class="event-note-preview">
                             ${event.text}
                         </div>
                         
-                        <button class=\"read-more-btn\" onclick=\"toggleNoteExpand(this)\" style=\"display: ${isLong ? 'block' : 'none'}\">
+                        <button class="read-more-btn" onclick="toggleNoteExpand(this)" style="display: ${isLong ? 'block' : 'none'}">
                             Show more
                         </button>
                     </div>
@@ -986,7 +987,7 @@ let events = [];
             else {
                 let textDisplay = event.text;
                 const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-                textDisplay = textDisplay.replace(urlRegex, url => `<a href=\"${url}\" target=\"_blank\" style=\"color: inherit; text-decoration: underline;\" onclick=\"event.stopPropagation();\">${url}</a>`);
+                textDisplay = textDisplay.replace(urlRegex, url => `<a href="${url}" target="_blank" style="color: inherit; text-decoration: underline;" onclick="event.stopPropagation();">${url}</a>`);
 
                 let taskMarkerHTML = '';
                 let textSpanClass = "event-text";
@@ -994,10 +995,10 @@ let events = [];
                     textSpanClass += " task-text";
                     if (event.completed) textSpanClass += " completed-text";
                     taskMarkerHTML = `
-                        <label class=\"task-checkbox-label\" onclick=\"event.stopPropagation();\">
-                            <input type=\"checkbox\" class=\"hidden-task-checkbox\" ${event.completed ? 'checked' : ''} onchange=\"toggleTask(${event.id}, event)\">
-                            <span class=\"custom-checkbox\">
-                                <span class=\"material-icons-outlined check-icon\">check_small</span>
+                        <label class="task-checkbox-label" onclick="event.stopPropagation();">
+                            <input type="checkbox" class="hidden-task-checkbox" ${event.completed ? 'checked' : ''} onchange="toggleTask(${event.id}, event)">
+                            <span class="custom-checkbox">
+                                <span class="material-icons-outlined check-icon">check_small</span>
                             </span>
                         </label>
                     `;
@@ -1005,7 +1006,7 @@ let events = [];
 
                 let routineIcon = '';
                 if (event.type === 'routine' || event.routineId) {
-                    routineIcon = '<span class=\"material-symbols-outlined\" style=\"font-size: 16px; margin-right: 5px; opacity: 0.7; vertical-align: middle;\">sync</span>';
+                    routineIcon = '<span class="material-symbols-outlined" style="font-size: 16px; margin-right: 5px; opacity: 0.7; vertical-align: middle;">sync</span>';
                 }
 
                 let placeHTML = '';
@@ -1022,20 +1023,20 @@ let events = [];
                     }
                     if (link) {
                         placeHTML = `
-                            <a href=\"${link}\" target=\"_blank\" class=\"event-place-link\" title=\"${title}\" onclick=\"event.stopPropagation();\">
-                                <span class=\"material-icons-outlined\" style=\"font-size: 14px;\">${icon}</span>
-                                <span class=\"place-text\" style=\"margin-left:4px;\">${displayText}</span>
+                            <a href="${link}" target="_blank" class="event-place-link" title="${title}" onclick="event.stopPropagation();">
+                                <span class="material-icons-outlined" style="font-size: 14px;">${icon}</span>
+                                <span class="place-text" style="margin-left:4px;">${displayText}</span>
                             </a>`;
                     }
                 }
 
                 eventItem.innerHTML = `
-                    <div class=\"event-item-content-wrapper\">
+                    <div class="event-item-content-wrapper">
                         ${taskMarkerHTML}
-                        <span class=\"${textSpanClass}\">${routineIcon}${textDisplay}</span>
+                        <span class="${textSpanClass}">${routineIcon}${textDisplay}</span>
                     </div>
-                    <div class=\"event-footer\">
-                        <div class=\"event-date\">${event.time || ''}</div>
+                    <div class="event-footer">
+                        <div class="event-date">${event.time || ''}</div>
                         ${placeHTML}
                     </div>
                     ${deleteButtonHTML}
@@ -1087,7 +1088,7 @@ let events = [];
             });
 
         if (upcomingEvents.length === 0) {
-            timelineContainer.innerHTML = '<p style=\"text-align: center; opacity: 0.6;\">No upcoming events found.</p>';
+            timelineContainer.innerHTML = '<p style="text-align: center; opacity: 0.6;">No upcoming events found.</p>';
             return;
         }
 
@@ -1129,7 +1130,7 @@ let events = [];
                       } 
                 }
 
-                eventEl.innerHTML = `<span class=\"event-text\">${event.text}</span> <span class=\"event-time\" style=\"float:right; opacity:0.7;\">${event.time || ''}</span>`;
+                eventEl.innerHTML = `<span class="event-text">${event.text}</span> <span class="event-time" style="float:right; opacity:0.7;">${event.time || ''}</span>`;
                 dateGroup.appendChild(eventEl);
             });
 
@@ -1554,13 +1555,13 @@ let events = [];
             (event.date && event.date.includes(query))
         );
         if (filteredEvents.length === 0) {
-            resultsContainer.innerHTML = '<div class=\"no-results\">No entries found</div>';
+            resultsContainer.innerHTML = '<div class="no-results">No entries found</div>';
             return;
         }
         filteredEvents.sort((a, b) => new Date(a.date) - new Date(b.date)).forEach(event => {
             const resultItem = document.createElement('div');
             resultItem.className = 'event-item item-glassy';
-            resultItem.innerHTML = `<div>${event.text}</div><div class=\"event-date\">${event.date} ${event.time || ''}</div>`;
+            resultItem.innerHTML = `<div>${event.text}</div><div class="event-date">${event.date} ${event.time || ''}</div>`;
             resultItem.onclick = () => {
                 const [year, month, day] = event.date.split('-').map(Number);
                 currentDate = new Date(year, month - 1, day);
@@ -1641,7 +1642,7 @@ let events = [];
 
         if (dreams.length === 0) {
             dreamsContainer.classList.add('is-empty');
-            dreamsList.innerHTML = '<p style=\"text-align: center; opacity: 0.6;\">Let‘s begin your dream journal together</p>';
+            dreamsList.innerHTML = '<p style="text-align: center; opacity: 0.6;">Let‘s begin your dream journal together</p>';
             return;
         }
 
@@ -1666,8 +1667,8 @@ let events = [];
 
             dreamItem.innerHTML = `
                 <span>${dreamContent}</span>
-                <button class=\"delete-dream-btn icon-btn\" onclick=\"deleteDream(${dream.id}, event)\">
-                    <span class=\"material-icons-outlined\">close</span>
+                <button class="delete-dream-btn icon-btn" onclick="deleteDream(${dream.id}, event)">
+                    <span class="material-icons-outlined">close</span>
                 </button>
             `;
             dreamsList.appendChild(dreamItem);
@@ -1746,12 +1747,12 @@ let events = [];
             month: "long",
             year: "numeric"
         });
-        spCalendarGridEl.innerHTML = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(name => `<div class=\"sp-day sp-day-name\">${name}</div>`).join('');
+        spCalendarGridEl.innerHTML = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(name => `<div class="sp-day sp-day-name">${name}</div>`).join('');
         const firstDayOfMonth = new Date(year, month, 1).getDay();
         const adjustedFirstDay = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const savedShifts = JSON.parse(localStorage.getItem("shifts")) || {};
-        for (let i = 0; i < adjustedFirstDay; i++) spCalendarGridEl.insertAdjacentHTML('beforeend', '<div class=\"sp-day\"></div>');
+        for (let i = 0; i < adjustedFirstDay; i++) spCalendarGridEl.insertAdjacentHTML('beforeend', '<div class="sp-day"></div>');
         for (let day = 1; day <= daysInMonth; day++) {
             const shiftKey = `${year}-${month + 1}-${day}`;
             const shiftType = savedShifts[shiftKey] || '';
@@ -1760,11 +1761,11 @@ let events = [];
             
             let iconHTML = '';
             if (shiftType && shiftIconMap[shiftType]) {
-                iconHTML = `<span class=\"material-symbols-outlined sp-shift-icon\">${shiftIconMap[shiftType]}</span>`;
+                iconHTML = `<span class="material-symbols-outlined sp-shift-icon">${shiftIconMap[shiftType]}</span>`;
             }
 
             dayCell.innerHTML = `
-                <div class=\"sp-day-number\">${day}</div>
+                <div class="sp-day-number">${day}</div>
                 ${iconHTML}
             `;
             
@@ -1792,17 +1793,17 @@ let events = [];
         popup.className = "sp-select-popup";
         popup.innerHTML = `
             <h3>Select Shift for ${day}/${month + 1}/${year}</h3>
-            <div style=\"display:flex; flex-direction:column; gap:8px;\">
-                <label class=\"sp-radio-label\"><input type=\"radio\" name=\"sp-shift\" value=\"highlight-yellow\" ${currentShift === "highlight-yellow" ? "checked" : ""}> <span class=\"material-symbols-outlined\">wb_twilight</span> Morning</label>
-                <label class=\"sp-radio-label\"><input type=\"radio\" name=\"sp-shift\" value=\"highlight-orange\" ${currentShift === "highlight-orange" ? "checked" : ""}> <span class=\"material-symbols-outlined\">wb_sunny</span> Afternoon</label>
-                <label class=\"sp-radio-label\"><input type=\"radio\" name=\"sp-shift\" value=\"highlight-blue\" ${currentShift === "highlight-blue" ? "checked" : ""}> <span class=\"material-symbols-outlined\">dark_mode</span> Night</label>
-                <label class=\"sp-radio-label\"><input type=\"radio\" name=\"sp-shift\" value=\"day-highlight-grey\" ${currentShift === "day-highlight-grey" ? "checked" : ""}> <span class=\"material-symbols-outlined\">coffee</span> Resting Day</label>
-                <label class=\"sp-radio-label\"><input type=\"radio\" name=\"sp-shift\" value=\"day-highlight-green\" ${currentShift === "day-highlight-green" ? "checked" : ""}> <span class=\"material-symbols-outlined\">weekend</span> Holiday</label>
-                <label class=\"sp-radio-label\"><input type=\"radio\" name=\"sp-shift\" value=\"day-highlight-light-red\" ${currentShift === "day-highlight-light-red" ? "checked" : ""}> <span class=\"material-symbols-outlined\">medical_services</span> Sick Pay</label>
-                <hr class=\"sp-divider-line\" style=\"width:100%; border:none; border-top: 1px solid var(--border-color); opacity: 0.3; margin: 5px 0;\">
-                <label class=\"sp-radio-label\"><input type=\"radio\" name=\"sp-shift\" value=\"delete\"> Delete</label>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <label class="sp-radio-label"><input type="radio" name="sp-shift" value="highlight-yellow" ${currentShift === "highlight-yellow" ? "checked" : ""}> <span class="material-symbols-outlined">wb_twilight</span> Morning</label>
+                <label class="sp-radio-label"><input type="radio" name="sp-shift" value="highlight-orange" ${currentShift === "highlight-orange" ? "checked" : ""}> <span class="material-symbols-outlined">wb_sunny</span> Afternoon</label>
+                <label class="sp-radio-label"><input type="radio" name="sp-shift" value="highlight-blue" ${currentShift === "highlight-blue" ? "checked" : ""}> <span class="material-symbols-outlined">dark_mode</span> Night</label>
+                <label class="sp-radio-label"><input type="radio" name="sp-shift" value="day-highlight-grey" ${currentShift === "day-highlight-grey" ? "checked" : ""}> <span class="material-symbols-outlined">coffee</span> Resting Day</label>
+                <label class="sp-radio-label"><input type="radio" name="sp-shift" value="day-highlight-green" ${currentShift === "day-highlight-green" ? "checked" : ""}> <span class="material-symbols-outlined">weekend</span> Holiday</label>
+                <label class="sp-radio-label"><input type="radio" name="sp-shift" value="day-highlight-light-red" ${currentShift === "day-highlight-light-red" ? "checked" : ""}> <span class="material-symbols-outlined">medical_services</span> Sick Pay</label>
+                <hr class="sp-divider-line" style="width:100%; border:none; border-top: 1px solid var(--border-color); opacity: 0.3; margin: 5px 0;">
+                <label class="sp-radio-label"><input type="radio" name="sp-shift" value="delete"> Delete</label>
             </div>
-            <button id=\"sp-select-close-btn\" class=\"popup-btn\" style=\"margin-top: 15px;\">Close</button>`;
+            <button id="sp-select-close-btn" class="popup-btn" style="margin-top: 15px;">Close</button>`;
         document.body.appendChild(popup);
         
         const closeSpSelectPopup = () => {
@@ -1846,9 +1847,9 @@ let events = [];
         const inputDiv = document.createElement('div');
         inputDiv.style.cssText = 'display:flex; align-items:center; margin-bottom:8px;';
         inputDiv.innerHTML = `
-            <input type=\"time\" class=\"summary-notification-time-input popup-input-style\" value=\"${timeValue}\" style=\"margin-bottom:0;\">
-            <button onclick=\"this.parentElement.remove()\" style=\"margin-left:10px; background:transparent; border:none; color:inherit; cursor:pointer; padding:5px; line-height:1;\">
-                <span class=\"material-icons-outlined\" style=\"font-size:18px; vertical-align:middle;\">remove_circle_outline</span>
+            <input type="time" class="summary-notification-time-input popup-input-style" value="${timeValue}" style="margin-bottom:0;">
+            <button onclick="this.parentElement.remove()" style="margin-left:10px; background:transparent; border:none; color:inherit; cursor:pointer; padding:5px; line-height:1;">
+                <span class="material-icons-outlined" style="font-size:18px; vertical-align:middle;">remove_circle_outline</span>
             </button>
         `;
         container.appendChild(inputDiv);
@@ -2071,14 +2072,14 @@ let events = [];
                 const minTemp = Math.round(data.daily.temperature_2m_min[0]);
 
                 weatherInfoEl.innerHTML = `
-                    <div class=\"weather-main\" style=\"display:flex; align-items:center; gap:10px;\">
-                        <span class=\"material-symbols-outlined\" style=\"font-size:30px;\">${getWeatherIcon(weatherCode)}</span>
+                    <div class="weather-main" style="display:flex; align-items:center; gap:10px;">
+                        <span class="material-symbols-outlined" style="font-size:30px;">${getWeatherIcon(weatherCode)}</span>
                         <div>
-                            <div class=\"weather-temp\" style=\"font-size:1.2rem; font-weight:bold;\">${temp}°C</div>
-                            <div class=\"weather-desc\" style=\"opacity:0.7;\">${getWeatherDescription(weatherCode)}</div>
+                            <div class="weather-temp" style="font-size:1.2rem; font-weight:bold;">${temp}°C</div>
+                            <div class="weather-desc" style="opacity:0.7;">${getWeatherDescription(weatherCode)}</div>
                         </div>
                     </div>
-                    <div class=\"weather-details\" style=\"display:flex; gap:15px; margin-top:5px; font-size:0.9rem;\">
+                    <div class="weather-details" style="display:flex; gap:15px; margin-top:5px; font-size:0.9rem;">
                         <div>High: ${maxTemp}°C</div>
                         <div>Low: ${minTemp}°C</div>
                     </div>
@@ -2151,9 +2152,9 @@ let events = [];
             const pfpDisplay = document.getElementById('pfp-display');
             if (pfpDisplay) {
                 if (currentUser.pfp && currentUser.pfp.trim() !== "") {
-                    pfpDisplay.innerHTML = `<img src=\"${currentUser.pfp}\" style=\"width: 60px; height: 60px; border-radius: 50%; object-fit: cover; box-shadow: 0 2px 5px rgba(0,0,0,0.2); display: block; margin: 0 auto;\">`;
+                    pfpDisplay.innerHTML = `<img src="${currentUser.pfp}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; box-shadow: 0 2px 5px rgba(0,0,0,0.2); display: block; margin: 0 auto;">`;
                 } else {
-                    pfpDisplay.innerHTML = `<span class=\"material-icons-outlined\" style=\"font-size: 55px; opacity: 0.8;\">account_circle</span>`;
+                    pfpDisplay.innerHTML = `<span class="material-icons-outlined" style="font-size: 55px; opacity: 0.8;">account_circle</span>`;
                 }
             }
 
@@ -2450,7 +2451,7 @@ let events = [];
             });
 
         if (pastEvents.length === 0) {
-            container.innerHTML = '<p style=\"text-align: center; opacity: 0.6; width: 100%; margin-top: 50px;\">No past history found.</p>';
+            container.innerHTML = '<p style="text-align: center; opacity: 0.6; width: 100%; margin-top: 50px;">No past history found.</p>';
         } else {
             pastEvents.forEach(event => {
                 const card = document.createElement('div');
@@ -2470,9 +2471,9 @@ let events = [];
                 const dateStr = dateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 
                 card.innerHTML = `
-                    <div class=\"past-date\" style=\"font-weight:bold; min-width:80px;\">${dateStr}</div>
-                    <div style=\"flex-grow: 1; overflow: hidden; text-overflow: ellipsis;\">${event.text}</div>
-                    ${event.time ? `<div style=\"font-size: 11px; opacity: 0.8; margin-top: 5px; text-align: right;\">${event.time}</div>` : ''}
+                    <div class="past-date" style="font-weight:bold; min-width:80px;">${dateStr}</div>
+                    <div style="flex-grow: 1; overflow: hidden; text-overflow: ellipsis;">${event.text}</div>
+                    ${event.time ? `<div style="font-size: 11px; opacity: 0.8; margin-top: 5px; text-align: right;">${event.time}</div>` : ''}
                 `;
 
                 card.onclick = () => {
