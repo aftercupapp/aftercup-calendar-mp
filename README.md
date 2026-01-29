@@ -48,7 +48,7 @@ Designed for devices with physical keyboards. Control the entire app without tou
 | <kbd>T</kbd> / <kbd>Y</kbd> / <kbd>N</kbd> | Jump to **T**omorrow, **Y**esterday, or **N**ow (Today) |
 | <kbd>C</kbd> | Open **C**alendar date picker |
 | <kbd>H</kbd> | Access the Shift **H**eader (Planner) |
-| <kbd>P</kbd> / <kbd>D</kbd> / <kbd>U</kbd> / <kbd>I</kbd> | Quick access: **P**ocket, **D**reams, **U**pcoming, and **I**nbox (History) |
+| <kbd>P</kbd> / <kbd>D</kbd> / <kbd>U</kbd> / <kbd>I</kbd> | Quick access: **P**ocket, **D**reams, **U**pcoming, and H**i**story |
 | <kbd>A</kbd> / <kbd>S</kbd> | Open **A**ftercup brief or Account **S**ettings |
 | <kbd>⌫</kbd> | Close active popups or return to homescreen |
 
