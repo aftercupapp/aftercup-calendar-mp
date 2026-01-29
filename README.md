@@ -8,11 +8,11 @@ A distraction-free, high-contrast calendar application specifically designed for
 
 | Home View | New Entry | Aftercup Brief |
 | :---: | :---: | :---: |
-| ![Home Screen]([screenshots/home.png](https://i.postimg.cc/L80thkY5/Screenshot_20260129_161951.png) | ![New Entry](https://i.postimg.cc/Z5D80PBR/Screenshot_20260129_162007.png) | ![Briefing](https://i.postimg.cc/bwFxd0Dv/Screenshot_20260129_162025.png) |
+| ![Home Screen](https://i.postimg.cc/L80thkY5/Screenshot_20260129_161951.png) | ![New Entry](https://i.postimg.cc/Z5D80PBR/Screenshot_20260129_162007.png) | ![Briefing](https://i.postimg.cc/bwFxd0Dv/Screenshot_20260129_162025.png) |
 
 | Calendar Menu | Account Settings | Keyboard Shortcuts |
 | :---: | :---: | :---: |
-| ![Menu](https://i.postimg.cc/bwFxd0Dd/Screenshot_20260129_162036.png) | ![Account](screenshots/account.png) | ![Shortcuts](https://i.postimg.cc/sg0Y1PQV/Screenshot_20260129_190926.png) |
+| ![Menu](https://i.postimg.cc/bwFxd0Dd/Screenshot_20260129_162036.png) | ![Account](https://i.postimg.cc/K8sP47kg/Screenshot_20260129_162044.png) | ![Shortcuts](https://i.postimg.cc/sg0Y1PQV/Screenshot_20260129_190926.png) |
 
 | Full-Text Search | Upcoming View | History & Archive |
 | :---: | :---: | :---: |
