@@ -44,7 +44,7 @@ let events = [];
         'highlight-orange': 'wb_sunny',         // Afternoon
         'highlight-blue': 'dark_mode',          // Night
         'day-highlight-grey': 'coffee',         // Resting Day
-        'day-highlight-green': 'event_available',// Holiday
+        'day-highlight-green': 'weekend',// Holiday
         'day-highlight-light-red': 'medical_services' // Sick Pay
     };
 
