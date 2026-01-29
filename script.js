@@ -1375,7 +1375,7 @@ function populatePopupForEdit(eventId) {
             placeUrlInput.style.display = 'block';
             placePhysicalInput.style.display = 'none';
         } else if (eventToEdit.place.type === 'physical') {
-            placePhysicalInput.value = eventToEdit.place.value;
+            placeValue = eventToEdit.place.value;
             placeUrlInput.style.display = 'none';
             placePhysicalInput.style.display = 'block';
         }
@@ -2549,6 +2549,9 @@ function printCurrentWeek() {
     printWindow.document.write('<html><head><title>Print Week</title></head><body>' + printContent + '</body></html>');
     printWindow.document.close();
     printWindow.print();
+
+    // Cleanup: Return to homescreen after dialog opens
+    closePopupAndGoBack();
 }
 
 async function apiRequest(payload) {
