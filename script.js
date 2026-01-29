@@ -330,7 +330,6 @@ let events = [];
             if (key === 'Backspace' || key === 'Escape') {
                 if (activePopupId) {
                     e.preventDefault();
-                    // If quick jump is open, clear it
                     if (activePopupId === 'quick-jump-popup') {
                         quickJumpValue = "";
                         hidePopups();
@@ -341,11 +340,13 @@ let events = [];
                 return;
             }
 
-            // Numeric Jump logic - Allow typing digits even if the Quick Jump popup is active
-            if ((!activePopupId || activePopupId === 'quick-jump-popup') && /^[0-9]$/.test(key)) {
-                e.preventDefault();
-                handleQuickJumpInput(key);
-                return;
+            // Numeric Jump logic - Specifically prioritizes digit entry if Jump popup is active
+            if (/^[0-9]$/.test(key)) {
+                if (!activePopupId || activePopupId === 'quick-jump-popup') {
+                    e.preventDefault();
+                    handleQuickJumpInput(key);
+                    return;
+                }
             }
             
             // Disable global shortcuts if typing or a popup is active
@@ -408,10 +409,10 @@ let events = [];
         let newValue = quickJumpValue + digit;
         let numericValue = parseInt(newValue, 10);
 
-        // If the new resulting number is greater than max days, treat the new digit as a fresh start
+        // If the new digit results in a number > max month days, start over with just the new digit
         if (numericValue > maxDays) {
             newValue = digit;
-            numericValue = parseInt(newValue, 10);
+            numericValue = parseInt(digit, 10);
         }
 
         quickJumpValue = newValue;
@@ -430,14 +431,18 @@ let events = [];
     }
 
     function showQuickJumpPopup(val) {
-        // We use hidePopups(true) but ensure overlay stays/updates
-        hidePopups(true);
         const popup = document.getElementById('quick-jump-popup');
-        const overlay = document.getElementById('overlay');
-        overlay.style.display = 'block';
-        overlay.style.zIndex = '1005';
-        popup.classList.add('active');
-        document.getElementById('quick-jump-value').textContent = val;
+        const valEl = document.getElementById('quick-jump-value');
+        if (valEl) valEl.textContent = val;
+        
+        // Surgical display to avoid resetting entire overlay/popup state on every digit
+        if (popup && !popup.classList.contains('active')) {
+            hidePopups(true); 
+            popup.classList.add('active');
+            const overlay = document.getElementById('overlay');
+            overlay.style.display = 'block';
+            overlay.style.zIndex = '1005';
+        }
     }
 
     function toggleAddPopupFields() {
