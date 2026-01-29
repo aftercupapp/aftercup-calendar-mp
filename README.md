@@ -12,7 +12,7 @@ A distraction-free, high-contrast calendar application specifically designed for
 | ![Briefing](https://i.postimg.cc/bwFxd0Dv/Screenshot_20260129_162025.png) | ![Menu](https://i.postimg.cc/bwFxd0Dd/Screenshot_20260129_162036.png) |
 | ![Account](https://i.postimg.cc/K8sP47kg/Screenshot_20260129_162044.png) | ![Shortcuts](https://i.postimg.cc/sg0Y1PQV/Screenshot_20260129_190926.png) |
 | ![Search](https://i.postimg.cc/XYDfXKG7/Screenshot_20260129_162206.png) | ![Upcoming](https://i.postimg.cc/P5FWNbpf/Screenshot_20260129_162148.png) |
-| ![Shift planner](https://i.postimg.cc/4xF6nv7f/Screenshot_20260129_192009.png) | |
+| ![Shift planner](https://i.postimg.cc/4xF6nv7f/Screenshot_20260129_192009.png) | ![Instant jump](https://i.postimg.cc/bvKpsVfW/Screenshot-20260129-203252.png) |
 
 ---
 
