@@ -847,7 +847,7 @@
             </label>
         </div>
 
-        <p style="text-align: center; opacity: 0.5; font-size: 0.7rem; margin-top: 20px; font-family: var(--font-mono);">v0.1.1 MP01 build</p>
+        <p style="text-align: center; opacity: 0.5; font-size: 0.7rem; margin-top: 20px; font-family: var(--font-mono);">v0.1.1 MP01</p>
     </div>
 
     <div id="search-popup" class="search-popup">
@@ -901,6 +901,11 @@
         <button id="sp-back-button" class="popup-btn" style="margin-top: 20px;">Back</button>
     </div>
 
+    <div id="quick-jump-popup" class="popup" style="width: 150px; text-align: center; padding: 15px;">
+        <div style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 5px; font-family: var(--font-mono);">GO TO DAY:</div>
+        <div id="quick-jump-value" style="font-size: 2rem; font-weight: bold; font-family: var(--font-mono);"></div>
+    </div>
+
     <div id="account-popup" class="popup">
         <h2>Account & Settings</h2>
         
@@ -950,13 +955,19 @@
         </div>
 
         <h3 style="margin-top: 20px;">Keyboard Shortcuts</h3>
-        <div style="font-size: 0.85rem; line-height: 1.8;">
+        <div style="font-size: 0.85rem; line-height: 1.8; display: grid; grid-template-columns: 1fr 1fr;">
             <div><span class="kbd-shortcut">T</span> Tomorrow</div>
             <div><span class="kbd-shortcut">Y</span> Yesterday</div>
-            <div><span class="kbd-shortcut">N</span> Today (Now)</div>
+            <div><span class="kbd-shortcut">N</span> Today</div>
             <div><span class="kbd-shortcut">A</span> Aftercup Brief</div>
-            <div><span class="kbd-shortcut">S</span> Settings / Account</div>
-            <div><span class="kbd-shortcut">BS</span> Close Popup / Back</div>
+            <div><span class="kbd-shortcut">S</span> Settings</div>
+            <div><span class="kbd-shortcut">H</span> Shifts</div>
+            <div><span class="kbd-shortcut">P</span> Pocket</div>
+            <div><span class="kbd-shortcut">D</span> Dreams</div>
+            <div><span class="kbd-shortcut">U</span> Upcoming</div>
+            <div><span class="kbd-shortcut">I</span> History</div>
+            <div><span class="kbd-shortcut">0-9</span> Quick Day Jump</div>
+            <div><span class="kbd-shortcut">BS</span> Close/Back</div>
         </div>
 
         <h3 style="margin-top: 20px;">Data management</h3>
