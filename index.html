@@ -532,7 +532,7 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: color 0.2s;
+            transition: color 0.2s, background-color 0.2s;
         }
 
         .sp-day-name {
@@ -540,13 +540,49 @@
             background: var(--secondary-bg);
         }
 
-        /* Improved Contrast for Shift Planner */
-        .highlight-yellow { background-image: radial-gradient(var(--text-color) 1px, transparent 1px); background-size: 5px 5px; opacity: 0.6; }
-        .highlight-orange { background-image: linear-gradient(45deg, var(--text-color) 25%, transparent 25%, transparent 50%, var(--text-color) 50%, var(--text-color) 75%, transparent 75%, transparent); background-size: 10px 10px; opacity: 0.5; }
-        .highlight-blue { border: 2px inset var(--border-color); background: var(--text-color); color: var(--bg-color); }
-        .day-highlight-grey { background-color: #777; color: white; }
-        .day-highlight-green { background-color: #2e7d32; color: white; }
-        .day-highlight-light-red { background-color: #c62828; color: white; }
+        /* Improved High Contrast for Shift Planner (e-paper friendly) */
+        .highlight-yellow { 
+            background-color: var(--text-color) !important; 
+            color: var(--bg-color) !important;
+            background-image: radial-gradient(var(--bg-color) 1px, transparent 1px);
+            background-size: 4px 4px;
+        }
+        .highlight-orange { 
+            background-color: var(--text-color) !important; 
+            color: var(--bg-color) !important;
+            background-image: linear-gradient(45deg, var(--bg-color) 1px, transparent 1px);
+            background-size: 5px 5px;
+        }
+        .highlight-blue { 
+            background-color: var(--text-color) !important; 
+            color: var(--bg-color) !important; 
+            border: 2px solid var(--bg-color);
+        }
+        .day-highlight-grey { 
+            background-color: var(--text-color) !important; 
+            color: var(--bg-color) !important;
+            opacity: 0.6;
+        }
+        .day-highlight-green { 
+            background-color: var(--text-color) !important; 
+            color: var(--bg-color) !important;
+            font-weight: bold;
+        }
+        .day-highlight-light-red { 
+            background-color: var(--text-color) !important; 
+            color: var(--bg-color) !important;
+            text-decoration: underline;
+        }
+
+        /* Force font colors for any day with a background class to ensure readability */
+        .sp-day.highlight-yellow, 
+        .sp-day.highlight-orange, 
+        .sp-day.highlight-blue, 
+        .sp-day.day-highlight-grey, 
+        .sp-day.day-highlight-green, 
+        .sp-day.day-highlight-light-red {
+            color: var(--bg-color) !important;
+        }
 
         .dream-item {
             padding: 10px;
@@ -930,6 +966,7 @@
             <div><span class="kbd-shortcut">N</span> Today (Now)</div>
             <div><span class="kbd-shortcut">A</span> Aftercup Brief</div>
             <div><span class="kbd-shortcut">S</span> Settings / Account</div>
+            <div><span class="kbd-shortcut">BS</span> Close Popup / Back</div>
         </div>
 
         <h3 style="margin-top: 20px;">Data management</h3>
