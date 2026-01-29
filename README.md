@@ -48,7 +48,7 @@ Designed for devices with physical keyboards. Control the entire app without tou
 | <kbd>A</kbd> / <kbd>S</kbd> | Open **A**ftercup brief or Account **S**ettings |
 | <kbd>⌫</kbd> | Close active popups or return to homescreen |
 
-> **🔢 Quick Jump to Day:** Simply type a number (<kbd>1</kbd>-<kbd>3</kbd><kbd>1</kbd>) on the home screen. A mini popup appears for two-digit entry. After 2.5 seconds, the calendar automatically jumps to that day.
+> **Quick Jump to Day:** Simply type a number (<kbd>1</kbd>-<kbd>3</kbd><kbd>1</kbd>) on the home screen. A mini popup appears for two-digit entry. After 2.5 seconds, the calendar automatically jumps to that day.
 
 ---
 
