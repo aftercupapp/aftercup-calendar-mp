@@ -1,4 +1,4 @@
-# Aftercup Calendar (Minimal Phone Edition)
+# Aftercup Calendar (Minimal Phone edition)
 
 A distraction-free, high-contrast calendar application specifically designed for the **Minimal Phone** and other e-paper devices. Aftercup Calendar combines essential productivity tools with a unique integration of the Aftercup coffee blog, wrapped in a QWERTY-optimized interface.
 
