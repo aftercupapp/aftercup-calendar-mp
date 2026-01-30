@@ -2388,114 +2388,53 @@ function renderPastEvents() {
     container.style.display = 'block';
 }
 
-function openPrintSettings() {
-    const datePopup = document.getElementById('date-popup');
-    if (datePopup && datePopup.classList.contains('active')) {
-        datePopup.classList.remove('active');
-    }
-
-    const overlay = document.getElementById('overlay');
-    if (overlay) {
-        overlay.style.zIndex = '1005';
-        overlay.style.display = 'block';
-    }
-
-    const popup = document.getElementById('print-settings-popup');
-    if (popup) {
-        popup.classList.add('active');
-        history.pushState({ popup: 'print-settings-popup' }, '', null);
-        hideActionButtons();
-    }
-}
-
-function printWeeklyPlanner(theme = 'normal') {
-    const printContainer = document.getElementById('printable-week-container');
-    if (!printContainer) return;
-
-    hidePopups();
-
-    printContainer.innerHTML = ''; 
-    printContainer.className = ''; 
+function printCurrentWeek() {
+    const today = new Date(currentDate);
+    const day = today.getDay();
+    const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+    const monday = new Date(today.setDate(diff));
     
-    if (theme !== 'normal') {
-        printContainer.classList.add(`theme-${theme}`);
-    }
-
-    const currentDay = currentDate.getDay(); 
-    const distanceToMonday = currentDay === 0 ? -6 : 1 - currentDay;
-    const weekStart = new Date(currentDate);
-    weekStart.setDate(currentDate.getDate() + distanceToMonday);
-    weekStart.setHours(0,0,0,0);
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 6);
-    
-    const header = document.createElement('div');
-    header.className = 'print-header';
-    const startStr = weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    const endStr = weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    header.innerHTML = `<h1>Weekly Planner</h1><p>Week ${getWeekNumber(weekStart)} • ${startStr} – ${endStr}</p>`;
-    printContainer.appendChild(header);
-
-    const grid = document.createElement('div');
-    grid.className = 'print-grid';
+    let printContent = `
+        <div style="font-family: 'Inter', sans-serif; padding: 20px;">
+            <h1 style="border-bottom: 2px solid #000; padding-bottom: 10px;">Week Overview: Week ${getWeekNumber(monday)}</h1>
+            <p style="font-family: 'JetBrains Mono', monospace; opacity: 0.7;">${monday.toLocaleDateString()} - ${new Date(new Date(monday).setDate(monday.getDate() + 6)).toLocaleDateString()}</p>
+    `;
 
     for (let i = 0; i < 7; i++) {
-        const dayDate = new Date(weekStart);
-        dayDate.setDate(weekStart.getDate() + i);
-        const dayStr = getLocalDateString(dayDate);
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        const dateStr = getLocalDateString(d);
+        const dayEvents = getVisibleEvents().filter(e => e.date === dateStr && e.type !== 'note');
 
-        const col = document.createElement('div');
-        col.className = 'print-day-col';
+        printContent += `
+            <div style="margin-bottom: 20px;">
+                <h3 style="background: #f0f0f0; padding: 5px 10px; border-left: 4px solid #000;">${dayNamesFull[d.getDay()]} (${d.toLocaleDateString()})</h3>
+                <div style="padding-left: 10px;">
+        `;
 
-        const dayHeader = document.createElement('div');
-        dayHeader.className = 'print-day-header';
-        dayHeader.innerHTML = `${dayDate.toLocaleDateString('en-US', { weekday: 'short' })} ${dayDate.getDate()}`;
-        col.appendChild(dayHeader);
-
-        let dayEvents = getVisibleEvents()
-            .filter(e => {
-                if (e.date === dayStr) return true;
-                if (e.type === 'event' && e.endDate) return dayStr >= e.date && dayStr <= e.endDate;
-                return false;
-            })
-            .sort((a, b) => (a.time || "23:59").localeCompare(b.time || "23:59"));
-
-        const MAX_ITEMS = 12;
-        const visibleEvents = dayEvents.slice(0, MAX_ITEMS);
-        const hiddenCount = dayEvents.length - MAX_ITEMS;
-
-        visibleEvents.forEach(evt => {
-            const evtDiv = document.createElement('div');
-            evtDiv.className = 'print-event-item';
-            if (evt.color && evt.color !== '#FFFFFF' && evt.color !== '#000000') {
-                evtDiv.style.borderLeftColor = evt.color;
-            }
-            
-            let timeStr = evt.time ? `<span class="print-event-time">${evt.time}</span>` : '';
-            let prefix = evt.type === 'task' ? (evt.completed ? '☑ ' : '☐ ') : (evt.type === 'routine' ? '↻ ' : '');
-            
-            evtDiv.innerHTML = `${prefix}${timeStr}${evt.text}`;
-            col.appendChild(evtDiv);
-        });
-
-        if (hiddenCount > 0) {
-            const moreDiv = document.createElement('div');
-            moreDiv.style.fontSize = '10px';
-            moreDiv.style.textAlign = 'center';
-            moreDiv.style.opacity = '0.7';
-            moreDiv.innerText = `+${hiddenCount} more items`;
-            col.appendChild(moreDiv);
+        if (dayEvents.length === 0) {
+            printContent += `<p style="opacity: 0.5; font-style: italic;">No events</p>`;
+        } else {
+            dayEvents.sort((a, b) => (a.time || "23:59").localeCompare(b.time || "23:59")).forEach(e => {
+                printContent += `
+                    <div style="display: flex; gap: 15px; border-bottom: 1px solid #eee; padding: 5px 0;">
+                        <span style="min-width: 60px; font-weight: bold;">${e.time || '--:--'}</span>
+                        <span>${e.text}</span>
+                    </div>
+                `;
+            });
         }
-
-        grid.appendChild(col);
+        printContent += `</div></div>`;
     }
 
-    printContainer.appendChild(grid);
-
-    setTimeout(() => {
-        window.print();
-    }, 500); 
+    printContent += `</div>`;
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write('<html><head><title>Print Week</title></head><body>' + printContent + '</body></html>');
+    printWindow.document.close();
+    printWindow.print();
+    closePopupAndGoBack();
 }
+
 async function apiRequest(payload) {
     try {
         const response = await fetch(API_URL, {
