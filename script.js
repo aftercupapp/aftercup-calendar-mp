@@ -35,6 +35,11 @@ const APP_LAST_RESET_DATE_KEY = 'appLastResetDate';
 
 const API_URL = 'https://script.google.com/macros/s/AKfycbxHrk5gnCYw6iIWQ_DR1wh53Hpgnxvj80A1N-DcqRgfvzn12Ubk_9sx7hrikr3cVoxaKw/exec';
 
+const syncInput = document.getElementById('sync-file-input');
+if (syncInput) {
+    syncInput.addEventListener('change', handleSyncFromFile);
+}
+
 let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
 let isSyncing = false;
 let syncDebounceTimer = null;
@@ -1606,6 +1611,44 @@ async function handleRestoreFile(event) {
             console.error("Error restoring data", error);
         } finally {
             event.target.value = '';
+        }
+    };
+    reader.readAsText(file);
+}
+
+async function handleSyncFromFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            const importedData = JSON.parse(e.target.result);
+
+            // 1. Use existing logic to merge file data into current state
+            await applyBackupData(importedData);
+
+            // 2. Save explicitly to LocalStorage
+            saveEvents(true); // Save Events (skip auto-sync trigger for a moment)
+            
+            if (importedData.dreams) {
+                localStorage.setItem('dreams', JSON.stringify(dreams));
+            }
+
+            // 3. Force Push to Google Sheets
+            if (currentUser) {
+                updateSyncStatus('Uploading merged data...');
+                await performSync('push');
+                alert("Merged and uploaded to cloud!");
+            } else {
+                alert("Merged locally (Not logged in, so not uploaded).");
+            }
+
+        } catch (error) {
+            console.error(error);
+            alert("Failed to sync file.");
+        } finally {
+            event.target.value = ''; // Reset input
         }
     };
     reader.readAsText(file);
