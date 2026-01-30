@@ -33,7 +33,7 @@ const DAILY_SUMMARY_TIMES_KEY = 'dailySummaryNotificationTimes';
 const LAST_NOTIFIED_TIMES_KEY = 'dailySummaryLastNotifiedTimes';
 const APP_LAST_RESET_DATE_KEY = 'appLastResetDate';
 
-const API_URL = 'https://script.google.com/macros/s/AKfycbxwA06EVYQIcc3heOVvoxYslDoUoWayP7NCcvxf1pF4nZhYyrP5sfxQJbijhrYhWvY8Hw/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxHrk5gnCYw6iIWQ_DR1wh53Hpgnxvj80A1N-DcqRgfvzn12Ubk_9sx7hrikr3cVoxaKw/exec';
 
 let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
 let isSyncing = false;
