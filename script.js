@@ -2388,53 +2388,155 @@ function renderPastEvents() {
     container.style.display = 'block';
 }
 
-function printCurrentWeek() {
-    const today = new Date(currentDate);
-    const day = today.getDay();
-    const diff = today.getDate() - day + (day === 0 ? -6 : 1);
-    const monday = new Date(today.setDate(diff));
-    
-    let printContent = `
-        <div style="font-family: 'Inter', sans-serif; padding: 20px;">
-            <h1 style="border-bottom: 2px solid #000; padding-bottom: 10px;">Week Overview: Week ${getWeekNumber(monday)}</h1>
-            <p style="font-family: 'JetBrains Mono', monospace; opacity: 0.7;">${monday.toLocaleDateString()} - ${new Date(new Date(monday).setDate(monday.getDate() + 6)).toLocaleDateString()}</p>
-    `;
-
-    for (let i = 0; i < 7; i++) {
-        const d = new Date(monday);
-        d.setDate(monday.getDate() + i);
-        const dateStr = getLocalDateString(d);
-        const dayEvents = getVisibleEvents().filter(e => e.date === dateStr && e.type !== 'note');
-
-        printContent += `
-            <div style="margin-bottom: 20px;">
-                <h3 style="background: #f0f0f0; padding: 5px 10px; border-left: 4px solid #000;">${dayNamesFull[d.getDay()]} (${d.toLocaleDateString()})</h3>
-                <div style="padding-left: 10px;">
-        `;
-
-        if (dayEvents.length === 0) {
-            printContent += `<p style="opacity: 0.5; font-style: italic;">No events</p>`;
-        } else {
-            dayEvents.sort((a, b) => (a.time || "23:59").localeCompare(b.time || "23:59")).forEach(e => {
-                printContent += `
-                    <div style="display: flex; gap: 15px; border-bottom: 1px solid #eee; padding: 5px 0;">
-                        <span style="min-width: 60px; font-weight: bold;">${e.time || '--:--'}</span>
-                        <span>${e.text}</span>
-                    </div>
-                `;
-            });
-        }
-        printContent += `</div></div>`;
+function openPrintSettings() {
+    const datePopup = document.getElementById('date-popup');
+    if (datePopup && datePopup.classList.contains('active')) {
+        datePopup.classList.remove('active');
     }
 
-    printContent += `</div>`;
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write('<html><head><title>Print Week</title></head><body>' + printContent + '</body></html>');
-    printWindow.document.close();
-    printWindow.print();
-    closePopupAndGoBack();
+    const overlay = document.getElementById('overlay');
+    if (overlay) {
+        overlay.style.zIndex = '1005';
+        overlay.style.display = 'block';
+    }
+
+    const popup = document.getElementById('print-settings-popup');
+    if (popup) {
+        popup.classList.add('active');
+        history.pushState({ popup: 'print-settings-popup' }, '', null);
+        hideActionButtons();
+    }
 }
 
+function printWeeklyPlanner(theme = 'normal') {
+    const printContainer = document.getElementById('printable-week-container');
+    if (!printContainer) return;
+
+    hidePopups();
+
+    printContainer.innerHTML = ''; 
+    
+    printContainer.className = ''; 
+    if (theme !== 'normal') {
+        printContainer.classList.add(`theme-${theme}`);
+    }
+
+    const currentDay = currentDate.getDay(); 
+    const distanceToMonday = currentDay === 0 ? -6 : 1 - currentDay;
+    
+    const weekStart = new Date(currentDate);
+    weekStart.setDate(currentDate.getDate() + distanceToMonday);
+    weekStart.setHours(0,0,0,0);
+    
+    const header = document.createElement('div');
+    header.className = 'print-header';
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    
+    const startStr = weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const endStr = weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    
+    header.innerHTML = `
+        <h1>Weekly Planner</h1>
+        <p>Week ${getWeekNumber(weekStart)} • ${startStr} – ${endStr}</p>
+    `;
+    printContainer.appendChild(header);
+
+    const grid = document.createElement('div');
+    grid.className = 'print-grid';
+
+    const MAX_ITEMS_PER_DAY = 14; 
+
+    for (let i = 0; i < 7; i++) {
+        const dayDate = new Date(weekStart);
+        dayDate.setDate(weekStart.getDate() + i);
+        const dayStr = getLocalDateString(dayDate);
+
+        const col = document.createElement('div');
+        col.className = 'print-day-col';
+
+        const dayHeader = document.createElement('div');
+        dayHeader.className = 'print-day-header';
+        dayHeader.innerHTML = `${dayDate.toLocaleDateString('en-US', { weekday: 'short' })} ${dayDate.getDate()}`;
+        col.appendChild(dayHeader);
+
+        let dayEvents = getVisibleEvents()
+            .filter(e => {
+                if (e.date === dayStr) return true;
+                if (e.type === 'event' && e.endDate) {
+                    return dayStr >= e.date && dayStr <= e.endDate;
+                }
+                return false;
+            })
+            .sort((a, b) => (a.time || "23:59").localeCompare(b.time || "23:59"));
+
+        let visibleEvents = dayEvents;
+        let hiddenEvents = [];
+
+        if (dayEvents.length > MAX_ITEMS_PER_DAY) {
+            visibleEvents = dayEvents.slice(0, MAX_ITEMS_PER_DAY - 1);
+            hiddenEvents = dayEvents.slice(MAX_ITEMS_PER_DAY - 1);
+        }
+
+        visibleEvents.forEach(evt => {
+            const evtDiv = document.createElement('div');
+            evtDiv.className = 'print-event-item';
+            
+            if (evt.color && evt.color !== '#FFFFFF' && evt.color !== '#000000') {
+                evtDiv.style.borderLeftColor = evt.color;
+            }
+
+            let timeContent = evt.time ? `<span class="print-event-time">${evt.time}</span>` : '';
+            let prefix = '';
+            if (evt.type === 'task') prefix = evt.completed ? '☑ ' : '☐ ';
+            else if (evt.type === 'routine') prefix = '↻ ';
+            else if (evt.importance === 'high') prefix = '! ';
+
+            let textDisplay = evt.text;
+            if (textDisplay.length > 300) {
+                textDisplay = textDisplay.substring(0, 300) + '…';
+            }
+
+            evtDiv.innerHTML = `${prefix}${timeContent}${textDisplay}`;
+            col.appendChild(evtDiv);
+        });
+
+        if (hiddenEvents.length > 0) {
+            const counts = { event: 0, task: 0, note: 0, routine: 0 };
+            hiddenEvents.forEach(e => {
+                const type = counts[e.type] !== undefined ? e.type : 'event';
+                counts[type]++;
+            });
+
+            let summaryParts = [];
+            if (counts.event > 0) summaryParts.push(`+${counts.event} event${counts.event > 1 ? 's' : ''}`);
+            if (counts.task > 0) summaryParts.push(`+${counts.task} task${counts.task > 1 ? 's' : ''}`);
+            if (counts.note > 0) summaryParts.push(`+${counts.note} note${counts.note > 1 ? 's' : ''}`);
+            if (counts.routine > 0) summaryParts.push(`+${counts.routine} routine${counts.routine > 1 ? 's' : ''}`);
+
+            const summaryDiv = document.createElement('div');
+            summaryDiv.style.fontSize = '10px';
+            summaryDiv.style.fontStyle = 'italic';
+            summaryDiv.style.marginTop = '4px';
+            summaryDiv.style.textAlign = 'center';
+            summaryDiv.style.opacity = '0.7';
+            summaryDiv.innerText = summaryParts.join(', ');
+            col.appendChild(summaryDiv);
+        }
+
+        grid.appendChild(col);
+    }
+
+    printContainer.appendChild(grid);
+
+    setTimeout(() => {
+        window.print();
+        setTimeout(() => {
+            printContainer.innerHTML = '';
+            printContainer.className = '';
+        }, 500);
+    }, 100);
+}
 async function apiRequest(payload) {
     try {
         const response = await fetch(API_URL, {
