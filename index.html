@@ -32,6 +32,22 @@
             --secondary-bg: #1a1a1a;
         }
 
+        /* Pink Theme */
+        body.pink-theme {
+            --bg-color: #fff0f6;
+            --text-color: #991b38;
+            --border-color: #ffc2d1;
+            --secondary-bg: #ffe0eb;
+        }
+
+        /* Coffee Theme */
+        body.coffee-theme {
+            --bg-color: #f7f3f0;
+            --text-color: #5d4037;
+            --border-color: #dccbc1;
+            --secondary-bg: #ebe0d8;
+        }
+
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
@@ -203,6 +219,7 @@
             font-weight: 600;
             transition: 0.1s;
             background: transparent;
+            text-align: left;
         }
 
         .menu-item:active {
@@ -322,7 +339,7 @@
         .event-footer {
             margin-top: 8px;
             display: flex;
-            justify(space-between);
+            justify-content: space-between;
             font-size: 0.8rem;
             opacity: 0.8;
             font-family: var(--font-mono);
@@ -356,14 +373,6 @@
         }
 
         .custom-checkbox .check-icon {
-            width: 16px !important;
-            height: 16px !important;
-            min-width: 16px !important;
-            display: block !important;
-            text-align: center;
-            line-height: 16px !important;
-            margin: 0 !important;
-            padding: 0 !important;
             font-size: 16px !important;
             color: var(--text-color);
             opacity: 0;
@@ -420,10 +429,6 @@
             box-shadow: none;
         }
 
-        #auth-forms a {
-            color: var(--text-color);
-        }
-
         #overlay {
             position: fixed;
             top: 0;
@@ -455,10 +460,6 @@
 
         .popup.active, .search-popup.active {
             display: block;
-        }
-
-        #past-events-popup {
-            z-index: 1020;
         }
 
         .popup h2 {
@@ -565,20 +566,73 @@
             cursor: pointer;
         }
 
-        .sp-radio-label:hover {
-            background: var(--secondary-bg);
-            border-color: var(--border-color);
-        }
-
-        .sp-radio-label input {
-            margin: 0;
-        }
-
         .dream-item {
             padding: 10px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
+        }
+
+        /* --- PRINT SYSTEM STYLES --- */
+        #printable-week-container {
+            display: none !important;
+        }
+
+        @media print {
+            @page { size: landscape; margin: 0; }
+
+            html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: visible !important;
+                background: white !important;
+            }
+
+            body > *:not(#printable-week-container) {
+                display: none !important;
+            }
+
+            #printable-week-container {
+                display: flex !important;
+                flex-direction: column;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                min-height: 100vh;
+                color: black;
+                font-family: sans-serif;
+                z-index: 9999;
+                box-sizing: border-box;
+                padding: 10mm 20mm; 
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            #printable-week-container.theme-blue { background-color: #e6f3ff !important; }
+            #printable-week-container.theme-blue .print-day-col { background-color: #ffffff !important; border-color: #9ecaff !important; }
+            #printable-week-container.theme-blue .print-day-header { background-color: #d1e9ff !important; color: #004085 !important; border-bottom: 1px solid #9ecaff !important; }
+
+            #printable-week-container.theme-pink { background-color: #fff0f6 !important; }
+            #printable-week-container.theme-pink .print-day-col { background-color: #ffffff !important; border-color: #ffc2d1 !important; }
+            #printable-week-container.theme-pink .print-day-header { background-color: #ffe0eb !important; color: #991b38 !important; border-bottom: 1px solid #ffc2d1 !important; }
+
+            #printable-week-container.theme-coffee { background-color: #f7f3f0 !important; }
+            #printable-week-container.theme-coffee .print-day-col { background-color: #ffffff !important; border-color: #dccbc1 !important; }
+            #printable-week-container.theme-coffee .print-day-header { background-color: #ebe0d8 !important; color: #5d4037 !important; border-bottom: 1px solid #dccbc1 !important; }
+
+            .print-header { text-align: center; margin-top: 5mm; margin-bottom: 8mm; border-bottom: 2px solid #333; padding-bottom: 5px; }
+            .print-header h1 { margin: 0; font-size: 24px; color: black; }
+            .print-header p { margin: 5px 0 0; font-size: 14px; color: #444; }
+
+            .print-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 12px; flex-grow: 1; width: 100%; }
+            .print-day-col { border: 1px solid #999; border-radius: 8px; padding: 6px; display: flex; flex-direction: column; overflow: hidden; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+            .print-day-header { font-weight: bold; text-align: center; border-bottom: 1px solid #ccc; padding: 6px; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; color: black; border-radius: 4px; }
+            .print-event-item { font-size: 10px; margin-bottom: 4px; padding: 4px; background: rgba(0,0,0,0.05) !important; border-radius: 4px; border-left: 4px solid #666; color: black; break-inside: avoid; word-wrap: break-word; overflow-wrap: break-word; white-space: normal; }
+            .print-event-time { font-weight: 800; display: block; font-size: 9px; margin-bottom: 2px; color: #222; }
         }
 
         .anim-fade { animation: fadeIn 0.3s; }
@@ -589,108 +643,16 @@
         @keyframes slideInRight { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes slideInLeft { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         
-        #note-input-container {
-            border: 2px solid var(--border-color);
-            margin-bottom: 15px;
-            background: var(--bg-color);
-        }
+        #note-input-container { border: 2px solid var(--border-color); margin-bottom: 15px; background: var(--bg-color); }
+        .note-toolbar { display: flex; gap: 5px; padding: 5px; border-bottom: 2px solid var(--border-color); background: var(--secondary-bg); }
+        .format-btn { width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; border: 2px solid transparent; background: transparent; color: var(--text-color); cursor: pointer; }
+        #new-note-content { border: none; min-height: 100px; padding: 10px; margin-bottom: 0; outline: none; background: var(--bg-color); color: var(--text-color); }
 
-        .note-toolbar {
-            display: flex;
-            gap: 5px;
-            padding: 5px;
-            border-bottom: 2px solid var(--border-color);
-            background: var(--secondary-bg);
-        }
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; }
+        .kbd-shortcut { display: inline-block; padding: 2px 6px; font-family: var(--font-mono); font-size: 0.75rem; background: var(--secondary-bg); border: 1px solid var(--border-color); border-radius: 3px; margin-right: 8px; min-width: 25px; text-align: center; }
+        .kbd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.85rem; line-height: 1.8; margin-top: 10px; }
 
-        .format-btn {
-            width: 32px;
-            height: 32px;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid transparent;
-            background: transparent;
-            color: var(--text-color);
-            cursor: pointer;
-        }
-
-        .format-btn:hover {
-            border-color: var(--border-color);
-            background: var(--bg-color);
-        }
-
-        .format-btn .material-icons-outlined {
-            font-size: 20px;
-        }
-
-        #new-note-content {
-            border: none;
-            min-height: 100px;
-            padding: 10px;
-            margin-bottom: 0;
-            outline: none;
-            background: var(--bg-color);
-            color: var(--text-color);
-        }
-        
-        #new-note-content:focus {
-            background-color: var(--bg-color);
-        }
-
-        .sp-select-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1050;
-            display: none;
-        }
-        .sp-select-popup {
-            position: fixed;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            background: var(--bg-color);
-            border: 2px solid var(--border-color);
-            padding: 20px;
-            z-index: 1051;
-            width: 300px;
-        }
-        
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-            font-size: 0.9rem;
-        }
-
-        .kbd-shortcut {
-            display: inline-block;
-            padding: 2px 6px;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            background: var(--secondary-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 3px;
-            margin-right: 8px;
-            min-width: 25px;
-            text-align: center;
-        }
-
-        .kbd-grid {
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 3px; 
-            font-size: 0.85rem; 
-            line-height: 1.8;
-            margin-top: 10px;
-        }
-
-        @media (max-width: 600px) {
-            .kbd-grid {
-                gap: 6px; 
-            }
-        }
+        .theme-btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
     </style>
 </head>
 <body class="light-theme">
@@ -716,8 +678,7 @@
 
     <div class="main-container">
         <aside class="sidebar">
-            <div id="desktop-date-info">
-            </div>
+            <div id="desktop-date-info"></div>
             
             <div class="mini-calendar-container">
                 <div class="mini-calendar-header">
@@ -729,21 +690,21 @@
             </div>
 
             <nav class="sidebar-menu">
-                <div class="menu-item" onclick="showUpcomingPopup()">
+                <button class="menu-item" onclick="showUpcomingPopup()">
                     <span class="material-icons-outlined">timeline</span> Upcoming
-                </div>
-                <div class="menu-item" onclick="showDreamsPopup()">
+                </button>
+                <button class="menu-item" onclick="showDreamsPopup()">
                     <span class="material-icons-outlined">cloud</span> Dreams
-                </div>
-                <div class="menu-item" onclick="openShiftPlanner()">
+                </button>
+                <button class="menu-item" onclick="openShiftPlanner()">
                     <span class="material-icons-outlined">work</span> Shifts
-                </div>
-                <div class="menu-item" onclick="showPocketPopup()">
-                    <span class="material-icons-outlined">archive</span> Pocket
-                </div>
-                <div class="menu-item" onclick="showPastEventsPopup()">
+                </button>
+                <button class="menu-item" onclick="openPrintSettings()">
+                    <span class="material-icons-outlined">print</span> Print Week
+                </button>
+                <button class="menu-item" onclick="showPastEventsPopup()">
                     <span class="material-icons-outlined">history</span> History
-                </div>
+                </button>
             </nav>
         </aside>
 
@@ -754,8 +715,7 @@
                 <div class="nav-day" onclick="switchToRelativeDay(1)" id="tomorrow">Tomorrow</div>
             </div>
 
-            <div id="events">
-            </div>
+            <div id="events"></div>
         </main>
     </div>
 
@@ -768,8 +728,9 @@
         </button>
     </div>
 
+    <!-- Modals -->
     <div id="add-popup" class="popup">
-        <h2>New entry</h2>
+        <h2 id="add-popup-title">New entry</h2>
         <select id="event-type" onchange="toggleAddPopupFields()">
             <option value="event">Event</option>
             <option value="task">Task</option>
@@ -781,10 +742,10 @@
         
         <div id="note-input-container" style="display:none; flex-direction:column;">
             <div class="note-toolbar">
-                <button type="button" class="format-btn" onclick="document.execCommand('bold', false, null)" title="Bold"><span class="material-icons-outlined">format_bold</span></button>
-                <button type="button" class="format-btn" onclick="document.execCommand('italic', false, null)" title="Italic"><span class="material-icons-outlined">format_italic</span></button>
-                <button type="button" class="format-btn" onclick="document.execCommand('underline', false, null)" title="Underline"><span class="material-icons-outlined">format_underlined</span></button>
-                <button type="button" class="format-btn" onclick="document.execCommand('strikethrough', false, null)" title="Strikethrough"><span class="material-icons-outlined">strikethrough_s</span></button>
+                <button type="button" class="format-btn" onclick="document.execCommand('bold', false, null)"><span class="material-icons-outlined">format_bold</span></button>
+                <button type="button" class="format-btn" onclick="document.execCommand('italic', false, null)"><span class="material-icons-outlined">format_italic</span></button>
+                <button type="button" class="format-btn" onclick="document.execCommand('underline', false, null)"><span class="material-icons-outlined">format_underlined</span></button>
+                <button type="button" class="format-btn" onclick="document.execCommand('strikethrough', false, null)"><span class="material-icons-outlined">strikethrough_s</span></button>
             </div>
             <div id="new-note-content" contenteditable="true" placeholder="Type your note here..."></div>
         </div>
@@ -839,15 +800,11 @@
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
              <button class="menu-item" style="justify-content:center;" onclick="showUpcomingPopup()">Upcoming</button>
-             <button class="menu-item" style="justify-content:center;" onclick="showDreamsPopup()">Dreams</button>
-             <button class="menu-item" style="justify-content:center;" onclick="openShiftPlanner()">Shifts</button>
-             <button class="menu-item" style="justify-content:center;" onclick="showPocketPopup()">Pocket</button>
-             <button class="menu-item" style="justify-content:center;" onclick="showPastEventsPopup()">History</button>
+             <button class="menu-item" style="justify-content:center;" onclick="openPrintSettings()">Print Planner</button>
              <button class="menu-item" style="justify-content:center;" onclick="showAccountPopup()">Settings</button>
+             <button class="menu-item" style="justify-content:center;" onclick="showPastEventsPopup()">History</button>
         </div>
 
-        <hr style="border: 1px solid var(--border-color); margin-bottom: 15px; opacity: 0.3;">
-        
         <div style="margin-bottom: 15px;">
             <label style="display:block; margin-bottom:5px; font-size:0.9rem;">Jump to specific date:</label>
             <div style="display: flex; gap: 10px;">
@@ -856,26 +813,23 @@
             </div>
         </div>
 
-        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <button class="popup-btn" style="flex: 1; border-style: dashed; background: transparent; color: var(--text-color);" onclick="printCurrentWeek()">
-                <span class="material-icons-outlined" style="vertical-align: middle; margin-right: 5px;">print</span> Print Week
-            </button>
-        </div>
-
         <div style="margin-bottom: 5px;">
             <label class="task-checkbox-label">
                 <input type="checkbox" id="pre-added-toggle"> Show Aftercup Posts
             </label>
         </div>
+    </div>
 
-        <div style="text-align: center; margin-top: 30px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1);">
-    <a href="https://github.com/aftercupapp/aftercup-calendar-mp.git" 
-       target="_blank" 
-       style="color: var(--text-color); text-decoration: none; font-family: var(--font-mono); font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
-        <span class="material-icons-outlined" style="font-size: 14px;">code</span>
-        v0.1.1 build: 8 (MP01 build)
-    </a>
-</div>
+    <div id="print-settings-popup" class="popup">
+        <h2>Print Weekly Planner</h2>
+        <p style="font-size: 0.9rem; margin-bottom: 15px; opacity: 0.8;">Select a theme for your weekly overview. The planner will generate a landscape layout starting from Monday of the selected week.</p>
+        <div class="theme-btn-grid">
+            <button class="popup-btn" onclick="printWeeklyPlanner('normal')">B&W Minimal</button>
+            <button class="popup-btn" style="background:#e6f3ff; color:#004085; border-color:#9ecaff;" onclick="printWeeklyPlanner('blue')">Blue</button>
+            <button class="popup-btn" style="background:#fff0f6; color:#991b38; border-color:#ffc2d1;" onclick="printWeeklyPlanner('pink')">Pink</button>
+            <button class="popup-btn" style="background:#f7f3f0; color:#5d4037; border-color:#dccbc1;" onclick="printWeeklyPlanner('coffee')">Coffee</button>
+        </div>
+        <button class="popup-btn" style="margin-top: 20px; background: transparent; color: var(--text-color);" onclick="closePopupAndGoBack()">Cancel</button>
     </div>
 
     <div id="search-popup" class="search-popup">
@@ -888,9 +842,7 @@
         <h2>Aftercup Brief</h2>
         <div id="weather-info" style="margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;"></div>
         <div id="today-summary-stats" style="font-weight: bold; margin-bottom: 10px;"></div>
-        <div id="today-summary-content-container">
-            <div id="today-summary-content"></div>
-        </div>
+        <div id="today-summary-content"></div>
         <div id="aftercup-posts-section" style="margin-top: 15px;">
             <h3>Aftercup Posts</h3>
             <div id="aftercup-posts-content"></div>
@@ -909,9 +861,7 @@
             <input type="number" id="new-dream-year" class="popup-input-style" placeholder="Year" style="flex:1; margin-bottom:0;">
             <button class="icon-btn" style="border: 2px solid var(--border-color);" onclick="addDream()"><span class="material-icons-outlined">add</span></button>
         </div>
-        <div id="dreams-container">
-            <div id="dreams-list"></div>
-        </div>
+        <div id="dreams-list"></div>
     </div>
 
     <div id="upcoming-popup" class="popup">
@@ -929,94 +879,30 @@
         <button id="sp-back-button" class="popup-btn" style="margin-top: 20px;">Back</button>
     </div>
 
-    <div id="quick-jump-popup" class="popup" style="width: 150px; text-align: center; padding: 15px;">
-        <div style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 5px; font-family: var(--font-mono);">GO TO DAY:</div>
-        <div id="quick-jump-value" style="font-size: 2rem; font-weight: bold; font-family: var(--font-mono);"></div>
-    </div>
-
     <div id="account-popup" class="popup">
         <h2>Account & Settings</h2>
-        
         <div id="auth-forms">
             <div id="login-form-container">
-                <h3>Login</h3>
                 <input type="email" id="login-email" class="popup-input-style" placeholder="Email">
                 <input type="password" id="login-password" class="popup-input-style" placeholder="Password">
                 <button class="popup-btn" onclick="handleLogin()">Login</button>
-                <div style="text-align:center; margin-top:10px;">
-                    <a href="#" onclick="toggleAuthMode('register')">Need an account? Register</a>
-                </div>
+                <div style="text-align:center; margin-top:10px;"><a href="#" onclick="toggleAuthMode('register')">Register</a></div>
             </div>
-            
             <div id="register-form-container" style="display:none;">
-                <h3>Register</h3>
                 <input type="text" id="reg-username" class="popup-input-style" placeholder="Username">
                 <input type="email" id="reg-email" class="popup-input-style" placeholder="Email">
                 <input type="password" id="reg-password" class="popup-input-style" placeholder="Password">
                 <button class="popup-btn" onclick="handleRegister()">Register</button>
-                <div style="text-align:center; margin-top:10px;">
-                    <a href="#" onclick="toggleAuthMode('login')">Have an account? Login</a>
-                </div>
+                <div style="text-align:center; margin-top:10px;"><a href="#" onclick="toggleAuthMode('login')">Login</a></div>
             </div>
         </div>
-
         <div id="logged-in-view" style="display:none;">
             <div id="pfp-display" style="text-align: center; margin-bottom: 10px;"></div>
             <div style="text-align: center; font-weight: bold;" id="current-username">User</div>
-            <div style="text-align: center; opacity: 0.6; margin-bottom: 20px;" id="current-email">email@example.com</div>
-            
             <div id="sync-status" style="text-align: center; margin-bottom: 10px; font-family: var(--font-mono); font-size: 0.8rem;"></div>
-            
-            <h3>Sync Preferences</h3>
-            <div style="margin-bottom: 10px;">
-                <label><input type="checkbox" id="auto-sync-toggle" onchange="toggleAutoSync(this)"> Auto-Sync</label>
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 0.9rem;">
-                <label><input type="checkbox" id="sync-events-toggle" onchange="toggleSyncOption('events', this)"> Events</label>
-                <label><input type="checkbox" id="sync-dreams-toggle" onchange="toggleSyncOption('dreams', this)"> Dreams</label>
-                <label><input type="checkbox" id="sync-shifts-toggle" onchange="toggleSyncOption('shifts', this)"> Shifts</label>
-                <label><input type="checkbox" id="sync-settings-toggle" onchange="toggleSyncOption('settings', this)"> Settings</label>
-            </div>
-            
             <button class="popup-btn" style="margin-top: 15px;" onclick="forceSync()">Sync Now</button>
             <button class="popup-btn" style="margin-top: 10px; background: transparent; color: var(--text-color);" onclick="handleLogout()">Logout</button>
         </div>
-
-        <h3 style="margin-top: 20px;">Keyboard Shortcuts</h3>
-        <div class="kbd-grid">
-            <div><span class="kbd-shortcut">T</span> Tomorrow</div>
-            <div><span class="kbd-shortcut">Y</span> Yesterday</div>
-            <div><span class="kbd-shortcut">N</span> Today</div>
-            <div><span class="kbd-shortcut">A</span> Aftercup Brief</div>
-            <div><span class="kbd-shortcut">S</span> Settings</div>
-            <div><span class="kbd-shortcut">C</span> Calendar</div>
-            <div><span class="kbd-shortcut">H</span> Shifts</div>
-            <div><span class="kbd-shortcut">P</span> Pocket</div>
-            <div><span class="kbd-shortcut">D</span> Dreams</div>
-            <div><span class="kbd-shortcut">U</span> Upcoming</div>
-            <div><span class="kbd-shortcut">I</span> History</div>
-            <div><span class="kbd-shortcut">0-9</span> Jump to day</div>
-            <div><span class="kbd-shortcut">⌫</span> Back</div>
-        </div>
-
-        <h3 style="margin-top: 20px;">Data management</h3>
-        <button class="popup-btn" style="margin-bottom: 10px;" onclick="backupEventsData()">Download Backup</button>
-        <button class="popup-btn" style="margin-bottom: 10px; border-style: dashed;" onclick="triggerRestore()">Restore from File</button>
-        <input type="file" id="restore-file-input" style="display:none;" accept=".json">
-
-        <h3 style="margin-top: 20px;">Theme</h3>
-        <div style="display: flex; flex-wrap: wrap; gap: 5px;">
-            <button onclick="setLightMode()" style="padding: 5px;">Light</button>
-            <button onclick="setDarkMode()" style="padding: 5px; background: #000; color: #fff;">Dark</button>
-        </div>
-    </div>
-
-    <div id="pocket-popup" class="popup" style="padding: 0; overflow: hidden; height: 80vh;">
-        <div style="height: 40px; border-bottom: 2px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 10px;">
-            <span>Pocket</span>
-            <button class="icon-btn" onclick="closePopupAndGoBack()"><span class="material-icons-outlined">close</span></button>
-        </div>
-        <iframe id="pocket-iframe" style="width: 100%; height: calc(100% - 40px); border: none;" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
     </div>
 
     <div id="past-events-popup" class="popup">
@@ -1025,19 +911,8 @@
         <div id="past-events-container"></div>
     </div>
 
-    <div id="install-popup-overlay" style="position:fixed; bottom:0; left:0; width:100%; background:var(--bg-color); border-top:2px solid var(--border-color); padding:20px; z-index:2000; transform: translateY(100%); transition: transform 0.3s;">
-        <h3>Install App</h3>
-        <p>Install this calendar for offline access.</p>
-        <div style="display:flex; gap:10px; margin-top:10px;">
-            <button id="popup-install-btn" class="popup-btn">Install</button>
-            <button id="popup-later-btn" class="popup-btn" style="background:transparent; color:var(--text-color);">Later</button>
-        </div>
-    </div>
-    <script>
-      if (typeof navigator.serviceWorker !== 'undefined') {
-        navigator.serviceWorker.register('sw.js')
-      }
-    </script>
+    <div id="printable-week-container"></div>
+
     <script src="script.js"></script>
 </body>
 </html>
