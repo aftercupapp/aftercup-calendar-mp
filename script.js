@@ -2415,37 +2415,29 @@ function printWeeklyPlanner(theme = 'normal') {
     hidePopups();
 
     printContainer.innerHTML = ''; 
-    
     printContainer.className = ''; 
+    
     if (theme !== 'normal') {
         printContainer.classList.add(`theme-${theme}`);
     }
 
     const currentDay = currentDate.getDay(); 
     const distanceToMonday = currentDay === 0 ? -6 : 1 - currentDay;
-    
     const weekStart = new Date(currentDate);
     weekStart.setDate(currentDate.getDate() + distanceToMonday);
     weekStart.setHours(0,0,0,0);
-    
-    const header = document.createElement('div');
-    header.className = 'print-header';
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekStart.getDate() + 6);
     
+    const header = document.createElement('div');
+    header.className = 'print-header';
     const startStr = weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     const endStr = weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    
-    header.innerHTML = `
-        <h1>Weekly Planner</h1>
-        <p>Week ${getWeekNumber(weekStart)} • ${startStr} – ${endStr}</p>
-    `;
+    header.innerHTML = `<h1>Weekly Planner</h1><p>Week ${getWeekNumber(weekStart)} • ${startStr} – ${endStr}</p>`;
     printContainer.appendChild(header);
 
     const grid = document.createElement('div');
     grid.className = 'print-grid';
-
-    const MAX_ITEMS_PER_DAY = 14; 
 
     for (let i = 0; i < 7; i++) {
         const dayDate = new Date(weekStart);
@@ -2463,65 +2455,36 @@ function printWeeklyPlanner(theme = 'normal') {
         let dayEvents = getVisibleEvents()
             .filter(e => {
                 if (e.date === dayStr) return true;
-                if (e.type === 'event' && e.endDate) {
-                    return dayStr >= e.date && dayStr <= e.endDate;
-                }
+                if (e.type === 'event' && e.endDate) return dayStr >= e.date && dayStr <= e.endDate;
                 return false;
             })
             .sort((a, b) => (a.time || "23:59").localeCompare(b.time || "23:59"));
 
-        let visibleEvents = dayEvents;
-        let hiddenEvents = [];
-
-        if (dayEvents.length > MAX_ITEMS_PER_DAY) {
-            visibleEvents = dayEvents.slice(0, MAX_ITEMS_PER_DAY - 1);
-            hiddenEvents = dayEvents.slice(MAX_ITEMS_PER_DAY - 1);
-        }
+        const MAX_ITEMS = 12;
+        const visibleEvents = dayEvents.slice(0, MAX_ITEMS);
+        const hiddenCount = dayEvents.length - MAX_ITEMS;
 
         visibleEvents.forEach(evt => {
             const evtDiv = document.createElement('div');
             evtDiv.className = 'print-event-item';
-            
             if (evt.color && evt.color !== '#FFFFFF' && evt.color !== '#000000') {
                 evtDiv.style.borderLeftColor = evt.color;
             }
-
-            let timeContent = evt.time ? `<span class="print-event-time">${evt.time}</span>` : '';
-            let prefix = '';
-            if (evt.type === 'task') prefix = evt.completed ? '☑ ' : '☐ ';
-            else if (evt.type === 'routine') prefix = '↻ ';
-            else if (evt.importance === 'high') prefix = '! ';
-
-            let textDisplay = evt.text;
-            if (textDisplay.length > 300) {
-                textDisplay = textDisplay.substring(0, 300) + '…';
-            }
-
-            evtDiv.innerHTML = `${prefix}${timeContent}${textDisplay}`;
+            
+            let timeStr = evt.time ? `<span class="print-event-time">${evt.time}</span>` : '';
+            let prefix = evt.type === 'task' ? (evt.completed ? '☑ ' : '☐ ') : (evt.type === 'routine' ? '↻ ' : '');
+            
+            evtDiv.innerHTML = `${prefix}${timeStr}${evt.text}`;
             col.appendChild(evtDiv);
         });
 
-        if (hiddenEvents.length > 0) {
-            const counts = { event: 0, task: 0, note: 0, routine: 0 };
-            hiddenEvents.forEach(e => {
-                const type = counts[e.type] !== undefined ? e.type : 'event';
-                counts[type]++;
-            });
-
-            let summaryParts = [];
-            if (counts.event > 0) summaryParts.push(`+${counts.event} event${counts.event > 1 ? 's' : ''}`);
-            if (counts.task > 0) summaryParts.push(`+${counts.task} task${counts.task > 1 ? 's' : ''}`);
-            if (counts.note > 0) summaryParts.push(`+${counts.note} note${counts.note > 1 ? 's' : ''}`);
-            if (counts.routine > 0) summaryParts.push(`+${counts.routine} routine${counts.routine > 1 ? 's' : ''}`);
-
-            const summaryDiv = document.createElement('div');
-            summaryDiv.style.fontSize = '10px';
-            summaryDiv.style.fontStyle = 'italic';
-            summaryDiv.style.marginTop = '4px';
-            summaryDiv.style.textAlign = 'center';
-            summaryDiv.style.opacity = '0.7';
-            summaryDiv.innerText = summaryParts.join(', ');
-            col.appendChild(summaryDiv);
+        if (hiddenCount > 0) {
+            const moreDiv = document.createElement('div');
+            moreDiv.style.fontSize = '10px';
+            moreDiv.style.textAlign = 'center';
+            moreDiv.style.opacity = '0.7';
+            moreDiv.innerText = `+${hiddenCount} more items`;
+            col.appendChild(moreDiv);
         }
 
         grid.appendChild(col);
@@ -2531,11 +2494,7 @@ function printWeeklyPlanner(theme = 'normal') {
 
     setTimeout(() => {
         window.print();
-        setTimeout(() => {
-            printContainer.innerHTML = '';
-            printContainer.className = '';
-        }, 500);
-    }, 100);
+    }, 500); 
 }
 async function apiRequest(payload) {
     try {
