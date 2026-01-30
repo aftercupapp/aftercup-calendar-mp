@@ -1391,15 +1391,19 @@ function handleRoutineDelete(eventId, scope) {
     const eventToDelete = events.find(event => event.id === eventId);
     if (!eventToDelete) return;
 
+    const eventsToSync = []; 
+
     if (scope === 'single') {
         eventToDelete.deleted = true;
         eventToDelete.lastModified = Date.now();
+        if (eventToDelete.sharedWith) eventsToSync.push(eventToDelete);
     } else if (scope === 'future') {
         const { routineId, date } = eventToDelete;
         events.forEach(event => {
             if (event.routineId === routineId && event.date >= date) {
                 event.deleted = true;
                 event.lastModified = Date.now();
+                if (event.sharedWith) eventsToSync.push(event);
             }
         });
     }
@@ -1407,22 +1411,52 @@ function handleRoutineDelete(eventId, scope) {
     updateCalendar();
     saveEvents();
     scheduleAutomaticNotifications();
+
+    if (eventsToSync.length > 0 && currentUser && typeof apiRequest === 'function') {
+        eventsToSync.forEach(evt => {
+            const cleanEventData = { ...evt };
+            evt.sharedWith.forEach(recipient => {
+                apiRequest({
+                    action: 'share_event',
+                    sender: currentUser.email,
+                    recipient: recipient,
+                    eventData: cleanEventData
+                });
+            });
+        });
+    }
 }
 
 function deleteEvent(eventId, e) {
-    e.stopPropagation();
+    if (e) e.stopPropagation();
 
     const eventToDelete = events.find(event => event.id === eventId);
+    
     if (eventToDelete && eventToDelete.routineId) {
         promptForRoutineDelete(eventToDelete);
-    } else {
-        if (eventToDelete) {
-            eventToDelete.deleted = true;
-            eventToDelete.lastModified = Date.now();
-            updateCalendar();
-            saveEvents();
-            scheduleAutomaticNotifications();
+        return;
+    } 
+
+    if (eventToDelete) {
+        eventToDelete.deleted = true;
+        eventToDelete.lastModified = Date.now();
+        
+        updateCalendar();
+        saveEvents();
+        
+        if (typeof apiRequest === 'function' && eventToDelete.sharedWith && eventToDelete.sharedWith.length > 0 && currentUser) {
+             const cleanEventData = { ...eventToDelete };
+             eventToDelete.sharedWith.forEach(recipient => {
+                apiRequest({
+                    action: 'share_event',
+                    sender: currentUser.email,
+                    recipient: recipient,
+                    eventData: cleanEventData
+                }).catch(err => console.error(err));
+             });
         }
+        
+        scheduleAutomaticNotifications();
     }
 }
 
@@ -2272,29 +2306,49 @@ async function applyBackupData(backup) {
     if (syncPrefs.events && backup.events && Array.isArray(backup.events)) {
         const localUserEvents = JSON.parse(localStorage.getItem('events')) || [];
         const cloudEvents = backup.events;
-        const eventMap = new Map();
-        localUserEvents.forEach(evt => eventMap.set(evt.id, evt));
+        
+        let mergedEvents = [...localUserEvents];
+
         cloudEvents.forEach(cloudEvt => {
-            const localEvt = eventMap.get(cloudEvt.id);
-            if (localEvt) {
-                const cloudTime = cloudEvt.lastModified || 0;
+            let matchIndex = -1;
+
+            if (cloudEvt.sharedEventId) {
+                matchIndex = mergedEvents.findIndex(e => e.sharedEventId === cloudEvt.sharedEventId);
+            }
+            if (matchIndex === -1) {
+                matchIndex = mergedEvents.findIndex(e => e.id === cloudEvt.id);
+            }
+
+            if (matchIndex > -1) {
+                const localEvt = mergedEvents[matchIndex];
                 const localTime = localEvt.lastModified || 0;
-                if (cloudTime > localTime) eventMap.set(cloudEvt.id, cloudEvt);
+                const cloudTime = cloudEvt.lastModified || 0;
+
+                if (cloudTime > localTime) {
+                    mergedEvents[matchIndex] = {
+                        ...localEvt,
+                        ...cloudEvt,
+                        id: localEvt.id,
+                        sharedEventId: cloudEvt.sharedEventId 
+                    };
+                }
             } else {
-                eventMap.set(cloudEvt.id, cloudEvt);
+                mergedEvents.push(cloudEvt);
             }
         });
-        const mergedUserEvents = Array.from(eventMap.values());
-        localStorage.setItem('events', JSON.stringify(mergedUserEvents));
+        
+        localStorage.setItem('events', JSON.stringify(mergedEvents));
+        
         let fetchedEvents = [];
         try {
             const response = await fetch('events-update.json');
             if (response.ok) fetchedEvents = await response.json();
-        } catch (e) { }
-        events = mergeEvents(fetchedEvents, mergedUserEvents);
+        } catch (e) {}
+        events = mergeEvents(fetchedEvents, mergedEvents);
+        
         updateCalendar();
     }
-
+    
     if (syncPrefs.dreams && backup.dreams && Array.isArray(backup.dreams)) {
         const localDreams = JSON.parse(localStorage.getItem('dreams')) || [];
         const cloudDreams = backup.dreams;
@@ -2303,7 +2357,7 @@ async function applyBackupData(backup) {
         localDreams.forEach(d => dreamMap.set(d.id, d));
         dreams = Array.from(dreamMap.values());
         localStorage.setItem('dreams', JSON.stringify(dreams));
-        if (document.getElementById('dreams-popup').classList.contains('active')) renderDreams();
+        if (document.getElementById('dreams-popup') && document.getElementById('dreams-popup').classList.contains('active')) renderDreams();
     }
 
     if (syncPrefs.shifts && backup.shifts) {
