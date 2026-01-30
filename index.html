@@ -692,8 +692,7 @@
             }
         }
 
-        /* --- PRINT SETTINGS POPUP STYLES --- */
-.print-theme-options {
+       .print-theme-options {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -703,13 +702,15 @@
     margin-bottom: 0;
 }
 
-/* --- PRINT FUNCTIONALITY STYLES --- */
 #printable-week-container {
     display: none !important;
 }
 
 @media print {
-    @page { size: landscape; margin: 0; }
+    @page { 
+        size: landscape; 
+        margin: 0; 
+    }
 
     html, body {
         width: 100%;
@@ -718,22 +719,21 @@
         padding: 0 !important;
         overflow: visible !important;
         background: white !important;
+        min-width: 100%; 
     }
 
-    /* Hide everything else */
     body > *:not(#printable-week-container) {
         display: none !important;
     }
 
-    /* --- MAIN CONTAINER --- */
     #printable-week-container {
         display: flex !important;
         flex-direction: column;
         position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
+        width: 100vw; 
+        height: 100vh;
         min-height: 100vh;
         color: black;
         font-family: sans-serif;
@@ -745,9 +745,6 @@
         color-adjust: exact !important;
     }
 
-    /* --- THEMES --- */
-    
-    /* BLUE THEME */
     #printable-week-container.theme-blue { 
         background-color: #e6f3ff !important; 
     }
@@ -762,7 +759,6 @@
         -webkit-print-color-adjust: exact !important;
     }
 
-    /* PINK THEME */
     #printable-week-container.theme-pink { 
         background-color: #fff0f6 !important; 
     }
@@ -777,7 +773,6 @@
         -webkit-print-color-adjust: exact !important;
     }
 
-    /* COFFEE THEME */
     #printable-week-container.theme-coffee { 
         background-color: #f7f3f0 !important; 
     }
@@ -792,7 +787,6 @@
         -webkit-print-color-adjust: exact !important;
     }
 
-    /* --- LAYOUT --- */
     .print-header {
         text-align: center;
         margin-top: 5mm;
@@ -809,7 +803,7 @@
         gap: 10px;
         flex-grow: 1;
         width: 100%;
-        align-content: stretch;
+        align-content: stretch; 
     }
 
     .print-day-col {
@@ -1202,27 +1196,30 @@
     <div id="printable-week-container"></div>
 
 <div id="print-settings-popup" class="popup">
-    <h2>Print Weekly Planner</h2>
+    <h2>Print Planner</h2>
     <p style="opacity: 0.7; font-size: 0.9rem; margin-bottom: 20px;">Select a style for your weekly overview:</p>
     
     <div class="print-theme-options">
         <button class="popup-btn" onclick="printWeeklyPlanner('normal')">
             <span class="material-icons-outlined" style="vertical-align:middle; margin-right:5px; font-size: 18px;">print</span> 
-           Plain White
+            Plain white
         </button>
         <button class="popup-btn" style="background-color: #e6f3ff; color: #004085; border-color: #9ecaff;" onclick="printWeeklyPlanner('blue')">
             <span class="material-icons-outlined" style="vertical-align:middle; margin-right:5px; font-size: 18px;">water_drop</span>
-            Seahorse Blue
+            Ocean blue
         </button>
         <button class="popup-btn" style="background-color: #fff0f6; color: #991b38; border-color: #ffc2d1;" onclick="printWeeklyPlanner('pink')">
             <span class="material-icons-outlined" style="vertical-align:middle; margin-right:5px; font-size: 18px;">favorite</span>
-            Hibiscus Pink
+            Pink Hibiscus
         </button>
         <button class="popup-btn" style="background-color: #f7f3f0; color: #5d4037; border-color: #dccbc1;" onclick="printWeeklyPlanner('coffee')">
             <span class="material-icons-outlined" style="vertical-align:middle; margin-right:5px; font-size: 18px;">coffee</span>
-            Creamy Latte
+            Creamy latte
         </button>
     </div>
+
+    <button class="popup-btn" style="margin-top: 15px; background: transparent; color: var(--text-color); border: 1px solid var(--border-color);" onclick="closePopupAndGoBack()">Cancel</button>
+</div>
 
     <button class="popup-btn" style="margin-top: 15px; background: transparent; color: var(--text-color); border: 1px solid var(--border-color);" onclick="closePopupAndGoBack()">Cancel</button>
 </div>
