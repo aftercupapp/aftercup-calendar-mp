@@ -691,119 +691,6 @@
                 gap: 6px; 
             }
         }
-
-      .print-theme-options {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-.print-theme-options .popup-btn {
-    border: 1px solid rgba(0,0,0,0.1);
-    margin-bottom: 0;
-}
-
-#printable-week-container {
-    display: none !important;
-}
-
-@media print {
-    @page { 
-        size: landscape; 
-        margin: 0;
-    }
-
-    html, body {
-        width: 100%;
-        height: auto !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        background: white !important;
-        overflow: visible !important;
-        display: block !important;
-        position: static !important;
-    }
-
-    .app-header, 
-    .main-container, 
-    .fab-container, 
-    #overlay, 
-    .popup, 
-    .search-popup,
-    #install-popup-overlay {
-        display: none !important;
-    }
-
-    #printable-week-container {
-        display: block !important;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        min-width: 1100px;
-        min-height: 100%;
-        box-sizing: border-box;
-        padding: 10mm;
-        background-color: white;
-        z-index: 99999;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-    }
-
-    #printable-week-container.theme-blue { background-color: #e6f3ff !important; }
-    #printable-week-container.theme-blue .print-day-col { background-color: #ffffff !important; border-color: #9ecaff !important; }
-    #printable-week-container.theme-blue .print-day-header { background-color: #d1e9ff !important; color: #004085 !important; border-bottom: 1px solid #9ecaff !important; -webkit-print-color-adjust: exact !important;}
-
-    #printable-week-container.theme-pink { background-color: #fff0f6 !important; }
-    #printable-week-container.theme-pink .print-day-col { background-color: #ffffff !important; border-color: #ffc2d1 !important; }
-    #printable-week-container.theme-pink .print-day-header { background-color: #ffe0eb !important; color: #991b38 !important; border-bottom: 1px solid #ffc2d1 !important; -webkit-print-color-adjust: exact !important;}
-
-    #printable-week-container.theme-coffee { background-color: #f7f3f0 !important; }
-    #printable-week-container.theme-coffee .print-day-col { background-color: #ffffff !important; border-color: #dccbc1 !important; }
-    #printable-week-container.theme-coffee .print-day-header { background-color: #ebe0d8 !important; color: #5d4037 !important; border-bottom: 1px solid #dccbc1 !important; -webkit-print-color-adjust: exact !important;}
-
-    .print-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }
-    .print-header h1 { margin: 0; font-size: 24px; color: #000; }
-    .print-header p { margin: 5px 0 0; font-size: 14px; color: #444; }
-
-    .print-grid {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 10px;
-        width: 100%;
-    }
-
-    .print-day-col {
-        border: 1px solid #999;
-        border-radius: 8px;
-        padding: 5px;
-        background: white;
-        break-inside: avoid;
-    }
-
-    .print-day-header {
-        font-weight: bold;
-        text-align: center;
-        border-bottom: 1px solid #ccc;
-        padding-bottom: 5px;
-        margin-bottom: 5px;
-        font-size: 12px;
-        text-transform: uppercase;
-        color: #000;
-    }
-
-    .print-event-item {
-        font-size: 10px;
-        margin-bottom: 4px;
-        padding: 4px;
-        background: rgba(0,0,0,0.05) !important;
-        border-radius: 4px;
-        border-left: 4px solid #666;
-        color: #000;
-        line-height: 1.2;
-    }
-    
-    .print-event-time { font-weight: 800; display: block; font-size: 9px; margin-bottom: 2px; }
-}
     </style>
 </head>
 <body class="light-theme">
@@ -969,9 +856,9 @@
             </div>
         </div>
 
-       <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <button class="popup-btn" style="flex: 1; border-style: dashed; background: transparent; color: var(--text-color);" onclick="openPrintSettings()">
-            <span class="material-icons-outlined" style="vertical-align: middle; margin-right: 5px;">print</span> Print Week
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button class="popup-btn" style="flex: 1; border-style: dashed; background: transparent; color: var(--text-color);" onclick="printCurrentWeek()">
+                <span class="material-icons-outlined" style="vertical-align: middle; margin-right: 5px;">print</span> Print Week
             </button>
         </div>
 
@@ -986,7 +873,7 @@
        target="_blank" 
        style="color: var(--text-color); text-decoration: none; font-family: var(--font-mono); font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
         <span class="material-icons-outlined" style="font-size: 14px;">code</span>
-        v0.1.1 build: 9 (MP01 build)
+        v0.1.1 build: 8 (MP01 build)
     </a>
 </div>
     </div>
@@ -1146,36 +1033,6 @@
             <button id="popup-later-btn" class="popup-btn" style="background:transparent; color:var(--text-color);">Later</button>
         </div>
     </div>
-    <div id="printable-week-container"></div>
-
-<div id="print-settings-popup" class="popup">
-    <h2>Print Planner</h2>
-    <p style="opacity: 0.7; font-size: 0.9rem; margin-bottom: 20px;">Select a style for your weekly overview:</p>
-    
-    <div class="print-theme-options">
-        <button class="popup-btn" onclick="printWeeklyPlanner('normal')">
-            <span class="material-icons-outlined" style="vertical-align:middle; margin-right:5px; font-size: 18px;">print</span> 
-            Plain white
-        </button>
-        <button class="popup-btn" style="background-color: #e6f3ff; color: #004085; border-color: #9ecaff;" onclick="printWeeklyPlanner('blue')">
-            <span class="material-icons-outlined" style="vertical-align:middle; margin-right:5px; font-size: 18px;">water_drop</span>
-            Ocean blue
-        </button>
-        <button class="popup-btn" style="background-color: #fff0f6; color: #991b38; border-color: #ffc2d1;" onclick="printWeeklyPlanner('pink')">
-            <span class="material-icons-outlined" style="vertical-align:middle; margin-right:5px; font-size: 18px;">favorite</span>
-            Pink Hibiscus
-        </button>
-        <button class="popup-btn" style="background-color: #f7f3f0; color: #5d4037; border-color: #dccbc1;" onclick="printWeeklyPlanner('coffee')">
-            <span class="material-icons-outlined" style="vertical-align:middle; margin-right:5px; font-size: 18px;">coffee</span>
-            Creamy latte
-        </button>
-    </div>
-
-    <button class="popup-btn" style="margin-top: 15px; background: transparent; color: var(--text-color); border: 1px solid var(--border-color);" onclick="closePopupAndGoBack()">Cancel</button>
-</div>
-
-    <button class="popup-btn" style="margin-top: 15px; background: transparent; color: var(--text-color); border: 1px solid var(--border-color);" onclick="closePopupAndGoBack()">Cancel</button>
-</div>
     <script>
       if (typeof navigator.serviceWorker !== 'undefined') {
         navigator.serviceWorker.register('sw.js')
