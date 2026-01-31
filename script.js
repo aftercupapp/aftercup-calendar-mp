@@ -2491,7 +2491,8 @@ function printCurrentWeek() {
     const diff = today.getDate() - day + (day === 0 ? -6 : 1);
     const monday = new Date(today.setDate(diff));
     const sunday = new Date(new Date(monday).setDate(monday.getDate() + 6));
-
+    
+    // Define the print styles for a strict one-page 2-column layout
     const style = `
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400&display=swap');
@@ -2633,6 +2634,7 @@ function printCurrentWeek() {
     
     htmlContent += `<div class="page-grid">`;
 
+    // CELL 1: The Main Header (Top Left)
     htmlContent += `
         <div class="grid-cell header-cell">
             <h1 class="main-title">Week ${getWeekNumber(monday)}</h1>
@@ -2641,6 +2643,7 @@ function printCurrentWeek() {
         </div>
     `;
 
+    // CELLS 2-8: The Days (Mon-Sun)
     for (let i = 0; i < 7; i++) {
         const d = new Date(monday);
         d.setDate(monday.getDate() + i);
@@ -2668,7 +2671,7 @@ function printCurrentWeek() {
             dayEvents.forEach(e => {
                 let timeDisplay = e.time || '';
                 let extraClass = '';
-                let icon = '•';
+                let icon = '•'; // Default bullet
 
                 if (e.importance === 'high') { extraClass += ' priority-high'; icon = '!'; }
                 if (e.type === 'task') { icon = e.completed ? '☒' : '☐'; }
@@ -2694,7 +2697,7 @@ function printCurrentWeek() {
                 `;
             });
         }
-        htmlContent += `</div></div>`; 
+        htmlContent += `</div></div>`;
     }
 
     htmlContent += `</div></body></html>`;
@@ -2702,15 +2705,25 @@ function printCurrentWeek() {
     const printWindow = window.open('', '_blank');
     if (printWindow) {
         printWindow.document.write(htmlContent);
-        printWindow.document.close();
+        printWindow.document.close(); // Important to finish loading
+        
+        // Increased timeout to ensure browser is ready, and added .close()
         setTimeout(() => {
             printWindow.focus();
-            printWindow.print();
-        }, 250);
+            try {
+                printWindow.print();
+            } catch (err) {
+                console.error("Print failed", err);
+            } finally {
+                // This will run after the print dialog is closed (in most browsers)
+                printWindow.close();
+            }
+        }, 500); 
     }
     
     closePopupAndGoBack();
 }
+
 async function apiRequest(payload) {
     try {
         const response = await fetch(API_URL, {
