@@ -2498,7 +2498,7 @@ function printCurrentWeek() {
             
             @page {
                 size: A4 portrait;
-                margin: 5mm; /* Small safe margin for printer */
+                margin: 5mm;
             }
 
             html, body {
@@ -2520,6 +2520,7 @@ function printCurrentWeek() {
                 print-color-adjust: exact;
             }
 
+            /* Toolbar for View Mode */
             .toolbar {
                 height: 50px;
                 background: #f0f0f0;
@@ -2558,37 +2559,58 @@ function printCurrentWeek() {
                 color: #fff;
             }
 
-            /* Container for the Grid */
+            /* Header Section (Week Title) */
+            .page-header {
+                text-align: center;
+                padding: 10px 0;
+                flex-shrink: 0;
+            }
+
+            .main-title {
+                font-size: 18px;
+                font-weight: 800;
+                text-transform: uppercase;
+                margin: 0;
+                line-height: 1.2;
+            }
+
+            .date-range {
+                font-family: 'JetBrains Mono', monospace;
+                font-size: 11px;
+                opacity: 0.6;
+                margin-top: 4px;
+            }
+
+            /* Grid Layout */
             .page-container {
                 width: 100%;
-                /* In view mode, fill height minus toolbar */
-                height: calc(100vh - 50px); 
+                flex-grow: 1; /* Fill remaining vertical space */
                 display: grid;
                 grid-template-columns: 1fr 1fr;
-                /* Force 4 equal rows */
-                grid-template-rows: repeat(4, 1fr); 
-                /* Reduced gap to save vertical space */
-                gap: 5px; 
-                padding: 5mm; 
+                grid-template-rows: repeat(4, 1fr); /* 4 Rows: M/T, W/T, F/S, Sun */
+                gap: 5px;
+                padding: 0 5mm 5mm 5mm; 
                 box-sizing: border-box;
+            }
+
+            /* Sunday spans both columns */
+            .grid-cell:last-child {
+                grid-column: 1 / -1;
             }
 
             @media print {
                 .toolbar { display: none !important; }
                 
                 body {
-                    display: block;
-                    height: auto;
+                    display: flex;
+                    flex-direction: column;
+                    height: 98vh; /* Safe height for print */
                 }
 
                 .page-container { 
-                    /* Use almost full height but leave room for browser header/footer */
-                    height: 98vh; 
+                    height: auto;
                     padding: 0;
                     margin: 0;
-                    /* Ensure grid doesn't break across pages */
-                    break-inside: avoid;
-                    page-break-inside: avoid;
                 }
             }
 
@@ -2601,45 +2623,7 @@ function printCurrentWeek() {
                 position: relative;
                 box-sizing: border-box;
                 height: 100%;
-                /* Ensure background color prints */
-                background-color: #fff; 
-            }
-
-            .header-cell {
-                background-color: #f4f4f4 !important;
-                justify-content: center;
-                align-items: center;
-                text-align: center;
-            }
-
-            .main-title {
-                font-size: 24px;
-                font-weight: 800;
-                text-transform: uppercase;
-                margin: 0;
-                line-height: 1;
-            }
-
-            .date-range {
-                font-family: 'JetBrains Mono', monospace;
-                font-size: 13px;
-                margin-top: 8px;
-                opacity: 0.7;
-            }
-
-            .brand-tag {
-                margin-top: 15px;
-                font-size: 11px;
-                text-transform: uppercase;
-                font-weight: bold;
-                letter-spacing: 0.5px;
-            }
-
-            .sub-brand {
-                font-size: 10px;
-                opacity: 0.6;
-                margin-top: 2px;
-                font-family: 'JetBrains Mono', monospace;
+                background-color: #fff;
             }
 
             .day-header {
@@ -2655,7 +2639,7 @@ function printCurrentWeek() {
             .day-name {
                 font-weight: 700;
                 text-transform: uppercase;
-                font-size: 15px;
+                font-size: 14px;
             }
 
             .day-date {
@@ -2714,20 +2698,16 @@ function printCurrentWeek() {
             <button class="btn" onclick="window.print()">Print Grid</button>
             <button class="btn btn-close" onclick="window.close()">Close Window</button>
         </div>
+        
+        <div class="page-header">
+            <h1 class="main-title">Week ${getWeekNumber(monday)}</h1>
+            <div class="date-range">${monday.toLocaleDateString()} — ${sunday.toLocaleDateString()}</div>
+        </div>
+
         <div class="page-container">
     `;
 
-    // CELL 1: Header
-    htmlContent += `
-        <div class="grid-cell header-cell">
-            <h1 class="main-title">Week ${getWeekNumber(monday)}</h1>
-            <div class="date-range">${monday.toLocaleDateString()} — ${sunday.toLocaleDateString()}</div>
-            <div class="brand-tag">Aftercup Calendar</div>
-            <div class="sub-brand">for Minimal Phone</div>
-        </div>
-    `;
-
-    // CELLS 2-8: Days
+    // CELLS 1-7: Monday to Sunday
     for (let i = 0; i < 7; i++) {
         const d = new Date(monday);
         d.setDate(monday.getDate() + i);
