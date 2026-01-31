@@ -2490,48 +2490,262 @@ function printCurrentWeek() {
     const day = today.getDay();
     const diff = today.getDate() - day + (day === 0 ? -6 : 1);
     const monday = new Date(today.setDate(diff));
+    const sunday = new Date(new Date(monday).setDate(monday.getDate() + 6));
     
-    let printContent = `
-        <div style="font-family: 'Inter', sans-serif; padding: 20px;">
-            <h1 style="border-bottom: 2px solid #000; padding-bottom: 10px;">Week Overview: Week ${getWeekNumber(monday)}</h1>
-            <p style="font-family: 'JetBrains Mono', monospace; opacity: 0.7;">${monday.toLocaleDateString()} - ${new Date(new Date(monday).setDate(monday.getDate() + 6)).toLocaleDateString()}</p>
+    const style = `
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400&display=swap');
+            
+            body {
+                font-family: 'Inter', sans-serif;
+                color: #000;
+                max-width: 100%;
+                margin: 0;
+                padding: 20px;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .header {
+                margin-bottom: 30px;
+                border-bottom: 4px solid #000;
+                padding-bottom: 15px;
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-end;
+            }
+
+            h1 {
+                font-size: 24px;
+                font-weight: 800;
+                text-transform: uppercase;
+                margin: 0;
+                letter-spacing: -0.5px;
+            }
+
+            .date-range {
+                font-family: 'JetBrains Mono', monospace;
+                font-size: 14px;
+                opacity: 0.7;
+                margin-top: 5px;
+            }
+
+            .brand-tag {
+                font-size: 10px;
+                text-transform: uppercase;
+                border: 1px solid #000;
+                padding: 2px 6px;
+                border-radius: 10px;
+            }
+
+            .week-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .day-container {
+                break-inside: avoid;
+                page-break-inside: avoid;
+                border: 2px solid #000;
+                box-shadow: 4px 4px 0 #ddd;
+            }
+
+            .day-header {
+                background: #f4f4f4;
+                border-bottom: 2px solid #000;
+                padding: 8px 12px;
+                display: flex;
+                justify-content: space-between;
+                align-items: baseline;
+            }
+
+            .day-name {
+                font-weight: 700;
+                text-transform: uppercase;
+                font-size: 14px;
+            }
+
+            .day-date {
+                font-family: 'JetBrains Mono', monospace;
+                font-size: 12px;
+            }
+
+            .events-list {
+                padding: 5px 0;
+            }
+
+            .event-row {
+                display: flex;
+                padding: 8px 12px;
+                border-bottom: 1px dashed #ccc;
+                align-items: flex-start;
+            }
+
+            .event-row:last-child {
+                border-bottom: none;
+            }
+
+            .time-col {
+                width: 60px;
+                font-family: 'JetBrains Mono', monospace;
+                font-size: 12px;
+                font-weight: bold;
+                flex-shrink: 0;
+                padding-top: 2px;
+            }
+
+            .content-col {
+                flex-grow: 1;
+                font-size: 13px;
+                line-height: 1.4;
+            }
+
+            .event-meta {
+                display: block;
+                font-size: 10px;
+                color: #666;
+                margin-top: 2px;
+                font-family: 'JetBrains Mono', monospace;
+            }
+
+            .priority-high {
+                color: #d32f2f;
+                font-weight: 600;
+            }
+            
+            .priority-high::before {
+                content: '! ';
+            }
+
+            .type-note {
+                font-style: italic;
+                color: #555;
+            }
+
+            .type-task::before {
+                content: '☐ ';
+                font-size: 14px;
+                margin-right: 3px;
+            }
+            
+            .type-task.completed::before {
+                content: '☒ ';
+            }
+            
+            .completed {
+                text-decoration: line-through;
+                opacity: 0.6;
+            }
+
+            .empty-day {
+                padding: 20px;
+                text-align: center;
+                color: #999;
+                font-style: italic;
+                font-size: 12px;
+                background-image: repeating-linear-gradient(transparent, transparent 19px, #eee 20px);
+            }
+            
+            @media print {
+                .day-container {
+                    box-shadow: none;
+                }
+            }
+        </style>
+    `;
+
+    let htmlContent = `<html><head><title>Week ${getWeekNumber(monday)} Overview</title>${style}</head><body>`;
+    
+    htmlContent += `
+        <div class="header">
+            <div>
+                <h1>Week ${getWeekNumber(monday)}</h1>
+                <div class="date-range">${monday.toLocaleDateString()} — ${sunday.toLocaleDateString()}</div>
+            </div>
+            <div class="brand-tag">Aftercup Calendar</div>
+        </div>
+        <div class="week-grid">
     `;
 
     for (let i = 0; i < 7; i++) {
         const d = new Date(monday);
         d.setDate(monday.getDate() + i);
         const dateStr = getLocalDateString(d);
-        const dayEvents = getVisibleEvents().filter(e => e.date === dateStr && e.type !== 'note');
+        const dayEvents = getVisibleEvents()
+            .filter(e => e.date === dateStr)
+            .sort((a, b) => {
+                if(a.type === 'note' && b.type !== 'note') return 1;
+                if(a.type !== 'note' && b.type === 'note') return -1;
+                return (a.time || "23:59").localeCompare(b.time || "23:59");
+            });
 
-        printContent += `
-            <div style="margin-bottom: 20px;">
-                <h3 style="background: #f0f0f0; padding: 5px 10px; border-left: 4px solid #000;">${dayNamesFull[d.getDay()]} (${d.toLocaleDateString()})</h3>
-                <div style="padding-left: 10px;">
+        htmlContent += `
+            <div class="day-container">
+                <div class="day-header">
+                    <span class="day-name">${dayNamesFull[d.getDay()]}</span>
+                    <span class="day-date">${d.toLocaleDateString()}</span>
+                </div>
         `;
 
         if (dayEvents.length === 0) {
-            printContent += `<p style="opacity: 0.5; font-style: italic;">No events</p>`;
+            htmlContent += `<div class="empty-day">No events scheduled</div>`;
         } else {
-            dayEvents.sort((a, b) => (a.time || "23:59").localeCompare(b.time || "23:59")).forEach(e => {
-                printContent += `
-                    <div style="display: flex; gap: 15px; border-bottom: 1px solid #eee; padding: 5px 0;">
-                        <span style="min-width: 60px; font-weight: bold;">${e.time || '--:--'}</span>
-                        <span>${e.text}</span>
+            htmlContent += `<div class="events-list">`;
+            
+            dayEvents.forEach(e => {
+                let timeDisplay = e.time || '';
+                let contentClass = 'content-col';
+                let extraClass = '';
+                
+                if (e.importance === 'high') extraClass += ' priority-high';
+                if (e.type === 'task') extraClass += ' type-task';
+                if (e.type === 'note') {
+                    extraClass += ' type-note';
+                    timeDisplay = 'NOTE';
+                }
+                if (e.completed) extraClass += ' completed';
+
+                let locationHtml = '';
+                if (e.place && e.place.value) {
+                    let loc = e.place.value;
+                    if(e.place.type === 'virtual') {
+                         try { loc = new URL(loc).hostname; } catch(err) {}
+                         loc = 'Virtual: ' + loc;
+                    }
+                    locationHtml = `<span class="event-meta">📍 ${loc}</span>`;
+                }
+
+                htmlContent += `
+                    <div class="event-row">
+                        <div class="time-col">${timeDisplay}</div>
+                        <div class="${contentClass} ${extraClass}">
+                            ${e.text}
+                            ${locationHtml}
+                        </div>
                     </div>
                 `;
             });
+            
+            htmlContent += `</div>`;
         }
-        printContent += `</div></div>`;
+        htmlContent += `</div>`;
     }
 
-    printContent += `</div>`;
+    htmlContent += `</div></body></html>`;
+
     const printWindow = window.open('', '_blank');
-    printWindow.document.write('<html><head><title>Print Week</title></head><body>' + printContent + '</body></html>');
-    printWindow.document.close();
-    printWindow.print();
+    if (printWindow) {
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
+        setTimeout(() => {
+            printWindow.focus();
+            printWindow.print();
+        }, 250);
+    }
+    
     closePopupAndGoBack();
 }
-
 async function apiRequest(payload) {
     try {
         const response = await fetch(API_URL, {
