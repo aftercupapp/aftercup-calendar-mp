@@ -2509,7 +2509,7 @@ function printCurrentWeek() {
             
             @page {
                 size: A4 portrait;
-                margin: 0;
+                margin: 0; /* We handle margins manually in the body */
             }
 
             html, body {
@@ -2518,7 +2518,6 @@ function printCurrentWeek() {
                 margin: 0;
                 padding: 0;
                 background: #fff;
-                overflow: hidden;
             }
 
             body {
@@ -2561,6 +2560,8 @@ function printCurrentWeek() {
                 text-align: center;
                 padding: 10px 0 5px 0;
                 flex-shrink: 0;
+                /* Ensure header doesn't get crushed */
+                min-height: 60px; 
             }
 
             .main-title {
@@ -2588,11 +2589,13 @@ function printCurrentWeek() {
             /* Main Grid Layout */
             .page-container {
                 width: 100%;
+                /* Screen view: fill mostly */
                 height: calc(100vh - 100px); 
                 display: grid;
-                grid-template-columns: 1fr 1fr;
-                /* Strictly forces 4 equal rows, cutting off overflow */
-                grid-template-rows: repeat(4, minmax(0, 1fr)); 
+                /* Force exactly 2 columns, 50% width each */
+                grid-template-columns: 50% 50%;
+                /* Force exactly 4 rows, 25% height each */
+                grid-template-rows: 25% 25% 25% 25%;
                 gap: 4px; 
                 padding: 5px 10mm 10mm 10mm; 
                 box-sizing: border-box;
@@ -2603,13 +2606,18 @@ function printCurrentWeek() {
                 
                 body {
                     display: block;
+                    width: 100%;
                     height: 100%;
                 }
 
                 .page-container { 
-                    height: 85vh; /* Safe height for A4 */
-                    padding: 0 5mm 0 5mm; 
-                    margin: 0 auto;
+                    /* Fixed Millimeter height for A4 (297mm total - margins) */
+                    height: 260mm; 
+                    /* Margin to center it visually */
+                    margin: 0 auto; 
+                    padding: 0 5mm;
+                    /* Ensure grid doesn't try to be clever with sizing */
+                    grid-template-rows: 25% 25% 25% 25%;
                 }
                 
                 .page-header {
@@ -2623,11 +2631,13 @@ function printCurrentWeek() {
                 padding: 4px;
                 display: flex;
                 flex-direction: column;
-                overflow: hidden; /* Hides content that doesn't fit the cell */
+                /* Crucial: Cut off anything that doesn't fit the 25% height */
+                overflow: hidden; 
                 position: relative;
                 box-sizing: border-box;
-                height: 100%;
+                /* Force background to cover border issues */
                 background-color: #fff;
+                height: 100%;
             }
             
             .notes-cell {
@@ -2666,17 +2676,21 @@ function printCurrentWeek() {
 
             .events-container {
                 flex-grow: 1;
-                overflow: hidden;
+                /* Ensure this container strictly clips overflow */
+                overflow: hidden; 
+                display: flex;
+                flex-direction: column;
             }
 
             .event-row {
                 display: flex;
-                align-items: center;
+                align-items: flex-start; /* Align to top to handle wrapped text */
                 font-size: 9px;
-                padding: 1px 0;
+                padding: 2px 0;
                 border-bottom: 1px dotted #e0e0e0;
                 gap: 5px;
-                line-height: 1.3;
+                line-height: 1.2;
+                flex-shrink: 0; 
             }
 
             .event-time {
@@ -2685,6 +2699,7 @@ function printCurrentWeek() {
                 width: 35px;
                 flex-shrink: 0;
                 text-align: right;
+                margin-top: 1px;
             }
 
             .event-text {
@@ -2694,10 +2709,12 @@ function printCurrentWeek() {
                 text-overflow: ellipsis;
             }
             
-            /* Allow notes to wrap but they will be cut off by the container height if too long */
+            /* Allow notes to wrap slightly, but they will be cut by container */
             .type-note .event-text {
-                white-space: normal; 
-                line-height: 1.1;
+                white-space: normal;
+                display: -webkit-box;
+                -webkit-line-clamp: 4; /* Limit visual lines just in case */
+                -webkit-box-orient: vertical;
             }
 
             .priority-high { color: #d32f2f; font-weight: 600; }
@@ -2772,7 +2789,7 @@ function printCurrentWeek() {
 
                 let displayText = e.text;
                 
-                // Truncate notes longer than 200 characters
+                // Truncate logic
                 if (e.type === 'note' && displayText.length > 200) {
                     displayText = displayText.substring(0, 200) + '...';
                 }
@@ -2794,7 +2811,7 @@ function printCurrentWeek() {
         htmlContent += `</div></div>`;
     }
 
-    // 2. Add 8th "Notes" Cell
+    // 2. Add 8th "Notes" Cell (Bottom Right)
     htmlContent += `<div class="grid-cell notes-cell">Notes</div>`;
 
     htmlContent += `</div></body></html>`;
