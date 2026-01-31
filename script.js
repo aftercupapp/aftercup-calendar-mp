@@ -2498,7 +2498,7 @@ function printCurrentWeek() {
             
             @page {
                 size: A4 portrait;
-                margin: 0; 
+                margin: 0; /* Minimal printer margins */
             }
 
             html, body {
@@ -2507,6 +2507,7 @@ function printCurrentWeek() {
                 margin: 0;
                 padding: 0;
                 background: #fff;
+                overflow: hidden; /* Prevent scrollbars triggering page 2 */
             }
 
             body {
@@ -2519,7 +2520,7 @@ function printCurrentWeek() {
                 print-color-adjust: exact;
             }
 
-            /* Toolbar (Hidden in Print) */
+            /* Toolbar (View Mode Only) */
             .toolbar {
                 height: 40px;
                 background: #f0f0f0;
@@ -2546,15 +2547,15 @@ function printCurrentWeek() {
             .btn-close { color: #d32f2f; border-color: #d32f2f; }
             .btn-close:hover { background: #d32f2f; color: #fff; }
 
-            /* Page Header (Week Title) - Outside the Grid */
+            /* Header Section */
             .page-header {
                 text-align: center;
-                padding: 15px 0 5px 0;
+                padding: 10px 0 5px 0;
                 flex-shrink: 0;
             }
 
             .main-title {
-                font-size: 18px;
+                font-size: 16px;
                 font-weight: 800;
                 text-transform: uppercase;
                 margin: 0;
@@ -2563,9 +2564,9 @@ function printCurrentWeek() {
 
             .date-range {
                 font-family: 'JetBrains Mono', monospace;
-                font-size: 11px;
+                font-size: 10px;
                 opacity: 0.6;
-                margin-top: 4px;
+                margin-top: 2px;
             }
             
             .brand-tag {
@@ -2575,16 +2576,15 @@ function printCurrentWeek() {
                 margin-top: 2px;
             }
 
-            /* The Grid Container */
+            /* Grid Container */
             .page-container {
                 width: 100%;
-                /* View mode height */
-                height: calc(100vh - 100px); 
+                height: calc(100vh - 100px); /* View mode height */
                 display: grid;
                 grid-template-columns: 1fr 1fr;
                 /* Strictly 4 equal rows */
                 grid-template-rows: repeat(4, 1fr); 
-                gap: 8px;
+                gap: 4px; /* Reduced gap */
                 padding: 5px 10mm 10mm 10mm; 
                 box-sizing: border-box;
             }
@@ -2598,21 +2598,21 @@ function printCurrentWeek() {
                 }
 
                 .page-container { 
-                    /* Reduce height to 90vh to ensure it fits within printer margins */
-                    height: 90vh; 
+                    /* Drastically reduced height to fit safely on Page 1 */
+                    height: 85vh; 
                     padding: 0 5mm 0 5mm; 
                     margin: 0 auto;
                 }
                 
                 .page-header {
                     margin-top: 5mm;
-                    margin-bottom: 5mm;
+                    margin-bottom: 2mm;
                 }
             }
 
             .grid-cell {
                 border: 2px solid #000;
-                padding: 8px;
+                padding: 4px; /* Reduced padding */
                 display: flex;
                 flex-direction: column;
                 overflow: hidden;
@@ -2622,14 +2622,14 @@ function printCurrentWeek() {
                 background-color: #fff;
             }
             
-            /* Style for the 8th empty cell (Notes) */
             .notes-cell {
                 border: 2px dashed #ccc;
+                display: flex;
                 justify-content: center;
                 align-items: center;
                 color: #ccc;
                 font-family: 'JetBrains Mono', monospace;
-                font-size: 12px;
+                font-size: 11px;
                 text-transform: uppercase;
                 letter-spacing: 1px;
             }
@@ -2639,20 +2639,20 @@ function printCurrentWeek() {
                 justify-content: space-between;
                 align-items: baseline;
                 border-bottom: 2px solid #eee;
-                padding-bottom: 5px;
-                margin-bottom: 5px;
+                padding-bottom: 3px;
+                margin-bottom: 3px;
                 flex-shrink: 0;
             }
 
             .day-name {
                 font-weight: 700;
                 text-transform: uppercase;
-                font-size: 14px;
+                font-size: 12px;
             }
 
             .day-date {
                 font-family: 'JetBrains Mono', monospace;
-                font-size: 11px;
+                font-size: 10px;
                 color: #555;
             }
 
@@ -2664,16 +2664,17 @@ function printCurrentWeek() {
             .event-row {
                 display: flex;
                 align-items: center;
-                font-size: 10px;
-                padding: 2px 0;
+                font-size: 9px; /* Smaller font for events */
+                padding: 1px 0;
                 border-bottom: 1px dotted #e0e0e0;
-                gap: 6px;
+                gap: 5px;
+                line-height: 1.3;
             }
 
             .event-time {
                 font-family: 'JetBrains Mono', monospace;
                 font-weight: bold;
-                width: 40px;
+                width: 35px;
                 flex-shrink: 0;
                 text-align: right;
             }
@@ -2690,10 +2691,10 @@ function printCurrentWeek() {
             .type-note { font-style: italic; color: #666; }
             
             .empty-msg {
-                font-size: 10px;
+                font-size: 9px;
                 color: #aaa;
                 font-style: italic;
-                margin-top: 10px;
+                margin-top: 5px;
                 text-align: center;
             }
         </style>
@@ -2773,7 +2774,7 @@ function printCurrentWeek() {
         htmlContent += `</div></div>`;
     }
 
-    // 2. Add 8th "Notes" Cell to fill bottom-right corner and maintain grid symmetry
+    // 2. Add 8th "Notes" Cell
     htmlContent += `<div class="grid-cell notes-cell">Notes</div>`;
 
     htmlContent += `</div></body></html>`;
