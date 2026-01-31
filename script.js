@@ -2493,7 +2493,6 @@ function truncateTextByWords(text, maxLength) {
 }
 
 function printCurrentWeek() {
-    // Ensure currentDate is defined globally
     const today = new Date(currentDate);
     const day = today.getDay();
     const diff = today.getDate() - day + (day === 0 ? -6 : 1);
@@ -2502,33 +2501,40 @@ function printCurrentWeek() {
 
     const style = `
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400&display=swap');
+
         @page { size: A4 portrait; margin: 0; }
-        html, body { width: 100%; height: 100%; margin: 0; padding: 0; background: #fff; }
-        body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; display: flex; flex-direction: column; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        .toolbar { height: 42px; background: #f0f0f0; border-bottom: 1px solid #ccc; display: flex; justify-content: center; align-items: center; gap: 20px; }
-        .btn { padding: 7px 18px; border: 1px solid #000; background: #fff; font-weight: 600; font-size: 12px; cursor: pointer; }
+        html, body { width:100%; height:100%; margin:0; padding:0; background:#fff; }
+        body { font-family: 'Inter', sans-serif; display:flex; flex-direction:column; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+        .toolbar { height:42px; background:#f0f0f0; border-bottom:1px solid #ccc; display:flex; justify-content:center; align-items:center; gap:20px; }
+        .btn { padding:7px 18px; border:1px solid #000; background:#fff; font-weight:600; font-size:12px; cursor:pointer; }
         .btn:hover { background:#000; color:#fff; }
         .btn-close { color:#d32f2f; border-color:#d32f2f; }
         .btn-close:hover { background:#d32f2f; color:#fff; }
-        .page-header { text-align: center; padding: 6px 0 4px; }
-        .main-title { font-size: 17px; font-weight: 800; margin: 0; }
-        .date-range { font-family: monospace; font-size: 11px; opacity: .6; }
-        .brand-tag { font-size: 9px; opacity: .5; }
-        .page-container { flex: 1.3; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(4, 1fr); gap: 3px; padding: 4px 6mm 7mm; box-sizing: border-box; }
+
+        .page-header { text-align:center; padding:6px 0 4px; }
+        .main-title { font-size:17px; font-weight:800; margin:0; }
+        .date-range { font-family:'JetBrains Mono', monospace; font-size:11px; opacity:.6; }
+        .brand-tag { font-size:9px; opacity:.5; }
+
+        .page-container { flex:1.3; display:grid; grid-template-columns:1fr 1fr; grid-template-rows:repeat(4,1fr); gap:3px; padding:4px 6mm 7mm; box-sizing:border-box; }
+
         @media print {
             .toolbar { display:none !important; }
             body { height:auto; display:block; }
-            .page-container { height:auto; min-height:100%; padding: 0 3mm 3mm; grid-auto-rows:1fr; }
+            .page-container { height:auto; min-height:100%; padding:0 3mm 3mm; grid-auto-rows:1fr; }
             .page-header { margin-top:3mm; margin-bottom:2mm; }
         }
+
         .grid-cell { border:2px solid #000; padding:7px; display:flex; flex-direction:column; overflow:hidden; }
-        .notes-cell { border:2px dashed #ccc; color:#ccc; display:flex; align-items:center; justify-content:center; font-family:monospace; font-size:11px; }
+        .notes-cell { border:2px dashed #ccc; color:#ccc; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono', monospace; font-size:11px; }
         .day-header { display:flex; justify-content:space-between; border-bottom:2px solid #eee; padding-bottom:4px; margin-bottom:5px; }
         .day-name { font-weight:700; font-size:13px; }
-        .day-date { font-family:monospace; font-size:11px; }
+        .day-date { font-family:'JetBrains Mono', monospace; font-size:11px; }
         .events-container { flex-grow:1; overflow:hidden; }
         .event-row { display:flex; font-size:11px; border-bottom:1px dotted #e0e0e0; padding:4px 0; gap:7px; }
-        .event-time { width:38px; text-align:right; font-family:monospace; font-weight:bold; flex-shrink:0; }
+        .event-time { width:38px; text-align:right; font-family:'JetBrains Mono', monospace; font-weight:bold; flex-shrink:0; }
         .event-text { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex-grow:1; }
         .priority-high { color:#d32f2f; font-weight:600; }
         .completed { text-decoration:line-through; opacity:.5; }
@@ -2541,13 +2547,11 @@ function printCurrentWeek() {
     <html>
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="color-scheme" content="light">
         ${style}
     </head>
     <body>
         <div class="toolbar">
-            <button class="btn" onclick="window.print()">Print</button>
+            <button class="btn" id="printBtn">Print</button>
             <button class="btn btn-close" onclick="window.close()">Close</button>
         </div>
 
@@ -2586,6 +2590,7 @@ function printCurrentWeek() {
             htmlContent += `<div class="empty-msg">No entries</div>`;
         } else {
             let hiddenNotesCount = 0;
+
             dayEvents.forEach(e => {
                 if (e.type === 'note' && e.text.length > 300) {
                     hiddenNotesCount++;
@@ -2601,6 +2606,7 @@ function printCurrentWeek() {
                 if (e.completed) extraClass += ' completed';
 
                 let displayText = e.text;
+
                 if (e.type === 'note') {
                     displayText = truncateTextByWords(displayText, 300);
                     extraClass += ' type-note';
@@ -2632,15 +2638,13 @@ function printCurrentWeek() {
                 `;
             }
         }
+
         htmlContent += `</div></div>`;
     }
 
-    htmlContent += `<div class="grid-cell notes-cell">Notes</div>`;
-    htmlContent += `</div></body></html>`;
+    htmlContent += `<div class="grid-cell notes-cell">Notes</div></div></body></html>`;
 
-    // --- Android-friendly printing ---
-    const printWindow = window.open('', '_blank', 'noopener,noreferrer');
-
+    const printWindow = window.open('', '_blank');
     if (!printWindow) {
         alert('Popup blocked. Please allow popups for printing.');
         return;
@@ -2649,20 +2653,15 @@ function printCurrentWeek() {
     printWindow.document.open();
     printWindow.document.write(htmlContent);
     printWindow.document.close();
-    printWindow.focus();
 
-    const triggerPrint = () => {
-        try { printWindow.print(); } catch (e) { console.error('Print failed:', e); }
+    // Attach click handler for Print button (works on Android)
+    printWindow.onload = () => {
+        const btn = printWindow.document.getElementById('printBtn');
+        btn.addEventListener('click', () => printWindow.print());
     };
 
-    // Double-trigger with delay for Android stability
-    setTimeout(triggerPrint, 800);
-    setTimeout(triggerPrint, 1500);
-
-    // Optional: close your popup if needed
-    if (typeof closePopupAndGoBack === "function") {
-        closePopupAndGoBack();
-    }
+    printWindow.focus();
+    closePopupAndGoBack();
 }
 
 async function apiRequest(payload) {
