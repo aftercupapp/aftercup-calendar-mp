@@ -2498,29 +2498,35 @@ function printCurrentWeek() {
             
             @page {
                 size: A4 portrait;
-                margin: 0.5cm;
+                margin: 0;
+            }
+
+            html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                background: #fff;
             }
 
             body {
                 font-family: 'Inter', sans-serif;
                 color: #000;
-                margin: 0;
-                padding: 0;
-                height: 98vh; /* Force fit to viewport */
-                width: 100%;
-                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                padding: 10mm;
+                box-sizing: border-box;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
-                box-sizing: border-box;
             }
 
-            .page-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr; /* 2 Columns */
-                grid-template-rows: repeat(4, 1fr); /* Strictly 4 Rows */
-                gap: 10px;
-                height: 100%;
+            .page-container {
                 width: 100%;
+                height: 100%;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: repeat(4, 1fr);
+                gap: 10px;
                 box-sizing: border-box;
             }
 
@@ -2532,9 +2538,9 @@ function printCurrentWeek() {
                 overflow: hidden;
                 position: relative;
                 box-sizing: border-box;
+                height: 100%;
             }
 
-            /* Header Cell Styling */
             .header-cell {
                 background-color: #f4f4f4;
                 justify-content: center;
@@ -2572,7 +2578,6 @@ function printCurrentWeek() {
                 font-family: 'JetBrains Mono', monospace;
             }
 
-            /* Day Cell Styling */
             .day-header {
                 display: flex;
                 justify-content: space-between;
@@ -2603,7 +2608,7 @@ function printCurrentWeek() {
             .event-row {
                 display: flex;
                 align-items: center;
-                font-size: 10px; /* Slightly smaller to fit more */
+                font-size: 10px;
                 padding: 3px 0;
                 border-bottom: 1px dotted #e0e0e0;
                 gap: 6px;
@@ -2638,11 +2643,10 @@ function printCurrentWeek() {
         </style>
     `;
 
-    let htmlContent = `<html><head><title>Week Overview</title>${style}</head><body>`;
+    let htmlContent = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Week Overview</title>${style}</head><body>`;
     
-    htmlContent += `<div class="page-grid">`;
+    htmlContent += `<div class="page-container">`;
 
-    // CELL 1: Header
     htmlContent += `
         <div class="grid-cell header-cell">
             <h1 class="main-title">Week ${getWeekNumber(monday)}</h1>
@@ -2652,7 +2656,6 @@ function printCurrentWeek() {
         </div>
     `;
 
-    // CELLS 2-8: Days
     for (let i = 0; i < 7; i++) {
         const d = new Date(monday);
         d.setDate(monday.getDate() + i);
@@ -2709,20 +2712,23 @@ function printCurrentWeek() {
         htmlContent += `</div></div>`;
     }
 
-    htmlContent += `</div></body></html>`;
+    htmlContent += `
+        </div>
+        <script>
+            window.onload = function() {
+                setTimeout(function() {
+                    window.print();
+                }, 1000);
+            };
+        </script>
+    </body></html>`;
 
     const printWindow = window.open('', '_blank');
     if (printWindow) {
         printWindow.document.open();
         printWindow.document.write(htmlContent);
         printWindow.document.close();
-        
-        // Timeout ensures styles are loaded before print dialog triggers.
-        // We do NOT call printWindow.close() anymore to ensure Android compatibility.
-        setTimeout(() => {
-            printWindow.focus();
-            printWindow.print();
-        }, 1000);
+        printWindow.focus();
     }
     
     closePopupAndGoBack();
