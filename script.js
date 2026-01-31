@@ -2705,7 +2705,6 @@ function printCurrentWeek() {
         setTimeout(() => {
             printWindow.focus();
             printWindow.print();
-            printWindow.close();
         }, 1000);
     }
     
