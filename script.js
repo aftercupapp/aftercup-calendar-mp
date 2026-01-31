@@ -2504,6 +2504,14 @@ function truncateTextByWords(text, maxLength) {
     return truncated + '...';
 }
 
+function truncateTextByWords(text, maxLength) {
+    if (text.length <= maxLength) return text;
+
+    let truncated = text.slice(0, maxLength);
+    truncated = truncated.replace(/\s+\S*$/, '');
+    return truncated + '...';
+}
+
 function printCurrentWeek() {
 
     const today = new Date(currentDate);
@@ -2537,6 +2545,8 @@ function printCurrentWeek() {
             print-color-adjust: exact;
         }
 
+        /* Toolbar */
+
         .toolbar {
             height: 40px;
             background: #f0f0f0;
@@ -2561,9 +2571,11 @@ function printCurrentWeek() {
         .btn-close { color:#d32f2f; border-color:#d32f2f; }
         .btn-close:hover { background:#d32f2f; color:#fff; }
 
+        /* Header */
+
         .page-header {
             text-align: center;
-            padding: 10px 0 5px;
+            padding: 8px 0 4px;
         }
 
         .main-title {
@@ -2583,13 +2595,15 @@ function printCurrentWeek() {
             opacity: .5;
         }
 
+        /* Grid */
+
         .page-container {
             flex: 1;
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: repeat(4, 1fr);
-            gap: 4px;
-            padding: 5px 10mm 10mm;
+            gap: 3px; /* slightly smaller gap */
+            padding: 4px 8mm 8mm; /* more usable space */
             box-sizing: border-box;
         }
 
@@ -2604,19 +2618,21 @@ function printCurrentWeek() {
             .page-container {
                 height:auto;
                 min-height:100%;
-                padding: 0 5mm 5mm;
+                padding: 0 4mm 4mm;
                 grid-auto-rows:1fr;
             }
 
             .page-header {
-                margin-top:5mm;
+                margin-top:4mm;
                 margin-bottom:2mm;
             }
         }
 
+        /* Cells */
+
         .grid-cell {
             border:2px solid #000;
-            padding:4px;
+            padding:5px; /* slightly bigger inner space */
             display:flex;
             flex-direction:column;
             overflow:hidden;
@@ -2650,6 +2666,8 @@ function printCurrentWeek() {
             font-size:10px;
         }
 
+        /* Events */
+
         .events-container {
             flex-grow:1;
             overflow:hidden;
@@ -2659,7 +2677,7 @@ function printCurrentWeek() {
             display:flex;
             font-size:9px;
             border-bottom:1px dotted #e0e0e0;
-            padding:1px 0;
+            padding:2px 0; /* taller rows */
             gap:5px;
         }
 
@@ -2805,6 +2823,7 @@ function printCurrentWeek() {
 
     closePopupAndGoBack();
 }
+
 
 async function apiRequest(payload) {
     try {
