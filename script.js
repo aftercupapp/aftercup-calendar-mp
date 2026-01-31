@@ -2507,6 +2507,7 @@ function printCurrentWeek() {
                 margin: 0;
                 padding: 0;
                 background: #fff;
+                overflow: hidden;
             }
 
             body {
@@ -2514,20 +2515,64 @@ function printCurrentWeek() {
                 color: #000;
                 display: flex;
                 flex-direction: column;
-                padding: 10mm;
                 box-sizing: border-box;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
 
+            .toolbar {
+                height: 50px;
+                background: #f0f0f0;
+                border-bottom: 1px solid #ccc;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 20px;
+                width: 100%;
+                flex-shrink: 0;
+            }
+
+            .btn {
+                padding: 8px 20px;
+                border: 1px solid #000;
+                background: #fff;
+                cursor: pointer;
+                font-family: 'Inter', sans-serif;
+                font-weight: 600;
+                text-transform: uppercase;
+                font-size: 12px;
+                transition: background 0.2s;
+            }
+
+            .btn:hover {
+                background: #000;
+                color: #fff;
+            }
+
+            .btn-close {
+                border-color: #d32f2f;
+                color: #d32f2f;
+            }
+            .btn-close:hover {
+                background: #d32f2f;
+                color: #fff;
+            }
+
             .page-container {
                 width: 100%;
-                height: 100%;
+                flex-grow: 1;
                 display: grid;
                 grid-template-columns: 1fr 1fr;
-                grid-template-rows: repeat(4, 1fr);
+                grid-template-rows: repeat(4, minmax(0, 1fr));
                 gap: 10px;
+                padding: 10mm;
                 box-sizing: border-box;
+            }
+
+            @media print {
+                .toolbar { display: none !important; }
+                body { height: 100%; }
+                .page-container { height: 100vh; padding: 5mm; }
             }
 
             .grid-cell {
@@ -2645,7 +2690,13 @@ function printCurrentWeek() {
 
     let htmlContent = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Week Overview</title>${style}</head><body>`;
     
-    htmlContent += `<div class="page-container">`;
+    htmlContent += `
+        <div class="toolbar">
+            <button class="btn" onclick="window.print()">Print Grid</button>
+            <button class="btn btn-close" onclick="window.close()">Close Window</button>
+        </div>
+        <div class="page-container">
+    `;
 
     htmlContent += `
         <div class="grid-cell header-cell">
@@ -2712,16 +2763,7 @@ function printCurrentWeek() {
         htmlContent += `</div></div>`;
     }
 
-    htmlContent += `
-        </div>
-        <script>
-            window.onload = function() {
-                setTimeout(function() {
-                    window.print();
-                }, 1000);
-            };
-        </script>
-    </body></html>`;
+    htmlContent += `</div></body></html>`;
 
     const printWindow = window.open('', '_blank');
     if (printWindow) {
