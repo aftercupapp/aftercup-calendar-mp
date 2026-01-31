@@ -2498,28 +2498,24 @@ function printCurrentWeek() {
             
             @page {
                 size: A4 portrait;
-                margin: 0; /* Request no margins */
-            }
-
-            html {
-                width: 100%;
-                height: 100%;
                 margin: 0;
-                padding: 0;
             }
 
-            body {
+            html, body {
                 width: 100%;
                 height: 100%;
                 margin: 0;
                 padding: 0;
                 background: #fff;
+                overflow: hidden; /* Stop scrollbars */
+            }
+
+            body {
                 font-family: 'Inter', sans-serif;
                 color: #000;
                 display: flex;
                 flex-direction: column;
                 box-sizing: border-box;
-                overflow: hidden; /* Prevent scrollbars */
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
@@ -2564,12 +2560,12 @@ function printCurrentWeek() {
 
             .page-container {
                 width: 100%;
-                /* Flex grow fills remaining space in view, fixed 100% in print */
-                flex-grow: 1; 
+                /* Restrict height to 98% of view/page to prevent overflow onto page 2 */
+                height: 98vh; 
                 display: grid;
                 grid-template-columns: 1fr 1fr;
-                /* Force exactly 4 equal rows to fit available height */
-                grid-template-rows: 25% 25% 25% 25%; 
+                /* Divide strictly into 4 equal rows */
+                grid-template-rows: repeat(4, 1fr); 
                 gap: 10px;
                 padding: 10mm; 
                 box-sizing: border-box;
@@ -2577,22 +2573,23 @@ function printCurrentWeek() {
 
             @media print {
                 .toolbar { display: none !important; }
-                /* Reduce padding in print to ensure bottom row (Sunday) isn't cut off by printer margins */
+                /* Ensure print view uses full available height but no more */
                 .page-container { 
                     height: 100vh; 
                     padding: 5mm; 
+                    margin: 0;
                 }
             }
 
             .grid-cell {
                 border: 2px solid #000;
-                padding: 8px; /* Slightly reduced padding */
+                padding: 8px;
                 display: flex;
                 flex-direction: column;
-                overflow: hidden;
+                overflow: hidden; /* Cut off content that is too long */
                 position: relative;
                 box-sizing: border-box;
-                height: 100%;
+                height: 100%; /* Fill the grid row exactly */
             }
 
             .header-cell {
@@ -2707,7 +2704,7 @@ function printCurrentWeek() {
         <div class="page-container">
     `;
 
-    // CELL 1: Header
+    // CELL 1: Header (Top Left)
     htmlContent += `
         <div class="grid-cell header-cell">
             <h1 class="main-title">Week ${getWeekNumber(monday)}</h1>
@@ -2717,7 +2714,7 @@ function printCurrentWeek() {
         </div>
     `;
 
-    // CELLS 2-8: Days
+    // CELLS 2-8: Monday to Sunday
     for (let i = 0; i < 7; i++) {
         const d = new Date(monday);
         d.setDate(monday.getDate() + i);
