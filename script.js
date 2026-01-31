@@ -2498,7 +2498,7 @@ function printCurrentWeek() {
             
             @page {
                 size: A4 portrait;
-                margin: 0;
+                margin: 5mm; /* Small safe margin for printer */
             }
 
             html, body {
@@ -2507,7 +2507,7 @@ function printCurrentWeek() {
                 margin: 0;
                 padding: 0;
                 background: #fff;
-                overflow: hidden; /* Stop scrollbars */
+                overflow: hidden;
             }
 
             body {
@@ -2558,26 +2558,37 @@ function printCurrentWeek() {
                 color: #fff;
             }
 
+            /* Container for the Grid */
             .page-container {
                 width: 100%;
-                /* Restrict height to 98% of view/page to prevent overflow onto page 2 */
-                height: 98vh; 
+                /* In view mode, fill height minus toolbar */
+                height: calc(100vh - 50px); 
                 display: grid;
                 grid-template-columns: 1fr 1fr;
-                /* Divide strictly into 4 equal rows */
+                /* Force 4 equal rows */
                 grid-template-rows: repeat(4, 1fr); 
-                gap: 10px;
-                padding: 10mm; 
+                /* Reduced gap to save vertical space */
+                gap: 5px; 
+                padding: 5mm; 
                 box-sizing: border-box;
             }
 
             @media print {
                 .toolbar { display: none !important; }
-                /* Ensure print view uses full available height but no more */
+                
+                body {
+                    display: block;
+                    height: auto;
+                }
+
                 .page-container { 
-                    height: 100vh; 
-                    padding: 5mm; 
+                    /* Use almost full height but leave room for browser header/footer */
+                    height: 98vh; 
+                    padding: 0;
                     margin: 0;
+                    /* Ensure grid doesn't break across pages */
+                    break-inside: avoid;
+                    page-break-inside: avoid;
                 }
             }
 
@@ -2586,14 +2597,16 @@ function printCurrentWeek() {
                 padding: 8px;
                 display: flex;
                 flex-direction: column;
-                overflow: hidden; /* Cut off content that is too long */
+                overflow: hidden;
                 position: relative;
                 box-sizing: border-box;
-                height: 100%; /* Fill the grid row exactly */
+                height: 100%;
+                /* Ensure background color prints */
+                background-color: #fff; 
             }
 
             .header-cell {
-                background-color: #f4f4f4;
+                background-color: #f4f4f4 !important;
                 justify-content: center;
                 align-items: center;
                 text-align: center;
@@ -2704,7 +2717,7 @@ function printCurrentWeek() {
         <div class="page-container">
     `;
 
-    // CELL 1: Header (Top Left)
+    // CELL 1: Header
     htmlContent += `
         <div class="grid-cell header-cell">
             <h1 class="main-title">Week ${getWeekNumber(monday)}</h1>
@@ -2714,7 +2727,7 @@ function printCurrentWeek() {
         </div>
     `;
 
-    // CELLS 2-8: Monday to Sunday
+    // CELLS 2-8: Days
     for (let i = 0; i < 7; i++) {
         const d = new Date(monday);
         d.setDate(monday.getDate() + i);
@@ -2783,7 +2796,6 @@ function printCurrentWeek() {
     
     closePopupAndGoBack();
 }
-
 async function apiRequest(payload) {
     try {
         const response = await fetch(API_URL, {
