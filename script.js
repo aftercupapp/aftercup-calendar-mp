@@ -2499,12 +2499,7 @@ function printCurrentWeek() {
     const monday = new Date(today.setDate(diff));
     const sunday = new Date(new Date(monday).setDate(monday.getDate() + 6));
 
-    let htmlContent = `
-    <div style="font-family:'Inter',sans-serif; padding:10px;">
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-    `;
-
-    // Determine the max number of events in any day to equalize heights
+    // Determine the maximum number of events in any day (including notes)
     let maxEvents = 0;
     for (let i = 0; i < 7; i++) {
         const d = new Date(monday);
@@ -2513,6 +2508,14 @@ function printCurrentWeek() {
         const dayEvents = getVisibleEvents().filter(e => e.date === dateStr);
         maxEvents = Math.max(maxEvents, dayEvents.length);
     }
+
+    // Set a fixed cell height based on maxEvents
+    const cellHeight = maxEvents * 22 + 30; // 22px per event + header padding
+
+    let htmlContent = `
+    <div style="font-family:'Inter',sans-serif; padding:10px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+    `;
 
     for (let i = 0; i < 7; i++) {
         const d = new Date(monday);
@@ -2524,7 +2527,7 @@ function printCurrentWeek() {
             .sort((a, b) => (a.time || "23:59").localeCompare(b.time || "23:59"));
 
         htmlContent += `
-        <div style="border:1px solid #000; padding:5px; display:flex; flex-direction:column; min-height:${maxEvents * 25}px;">
+        <div style="border:1px solid #000; padding:5px; display:flex; flex-direction:column; min-height:${cellHeight}px; overflow-y:auto;">
             <div style="font-weight:700; display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding-bottom:3px; margin-bottom:3px;">
                 <span>${dayNamesFull[d.getDay()]}</span>
                 <span style="font-family:'JetBrains Mono', monospace; font-size:11px;">${d.getDate()}/${d.getMonth()+1}</span>
@@ -2583,7 +2586,6 @@ function printCurrentWeek() {
 
     closePopupAndGoBack();
 }
-
 
 async function apiRequest(payload) {
     try {
