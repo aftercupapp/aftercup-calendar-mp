@@ -2498,7 +2498,7 @@ function printCurrentWeek() {
             
             @page {
                 size: A4 portrait;
-                margin: 0; /* Minimal printer margins */
+                margin: 0;
             }
 
             html, body {
@@ -2507,7 +2507,6 @@ function printCurrentWeek() {
                 margin: 0;
                 padding: 0;
                 background: #fff;
-                overflow: hidden; /* Prevent scrollbars triggering page 2 */
             }
 
             body {
@@ -2543,7 +2542,9 @@ function printCurrentWeek() {
                 text-transform: uppercase;
                 font-size: 11px;
             }
+
             .btn:hover { background: #000; color: #fff; }
+
             .btn-close { color: #d32f2f; border-color: #d32f2f; }
             .btn-close:hover { background: #d32f2f; color: #fff; }
 
@@ -2579,46 +2580,45 @@ function printCurrentWeek() {
             /* Grid Container */
             .page-container {
                 width: 100%;
-                height: calc(100vh - 100px); /* View mode height */
+                flex: 1;
                 display: grid;
                 grid-template-columns: 1fr 1fr;
-                /* Strictly 4 equal rows */
-                grid-template-rows: repeat(4, 1fr); 
-                gap: 4px; /* Reduced gap */
-                padding: 5px 10mm 10mm 10mm; 
+                grid-template-rows: repeat(4, 1fr);
+                gap: 4px;
+                padding: 5px 10mm 10mm 10mm;
                 box-sizing: border-box;
             }
 
             @media print {
                 .toolbar { display: none !important; }
-                
+
                 body {
+                    height: auto;
                     display: block;
-                    height: 100%;
                 }
 
-                .page-container { 
-                    /* Drastically reduced height to fit safely on Page 1 */
-                    height: 85vh; 
-                    padding: 0 5mm 0 5mm; 
-                    margin: 0 auto;
-                }
-                
                 .page-header {
                     margin-top: 5mm;
                     margin-bottom: 2mm;
+                }
+
+                .page-container {
+                    height: auto;
+                    min-height: 100%;
+                    padding: 0 5mm 5mm 5mm;
+                    margin: 0 auto;
+                    grid-auto-rows: 1fr;
                 }
             }
 
             .grid-cell {
                 border: 2px solid #000;
-                padding: 4px; /* Reduced padding */
+                padding: 4px;
                 display: flex;
                 flex-direction: column;
                 overflow: hidden;
                 position: relative;
                 box-sizing: border-box;
-                height: 100%;
                 background-color: #fff;
             }
             
@@ -2664,7 +2664,7 @@ function printCurrentWeek() {
             .event-row {
                 display: flex;
                 align-items: center;
-                font-size: 9px; /* Smaller font for events */
+                font-size: 9px;
                 padding: 1px 0;
                 border-bottom: 1px dotted #e0e0e0;
                 gap: 5px;
@@ -2717,16 +2717,17 @@ function printCurrentWeek() {
         <div class="page-container">
     `;
 
-    // 1. Render Monday to Sunday (7 Cells)
+    // Render Monday → Sunday
     for (let i = 0; i < 7; i++) {
         const d = new Date(monday);
         d.setDate(monday.getDate() + i);
         const dateStr = getLocalDateString(d);
+
         const dayEvents = getVisibleEvents()
             .filter(e => e.date === dateStr)
             .sort((a, b) => {
-                if(a.type === 'note' && b.type !== 'note') return 1;
-                if(a.type !== 'note' && b.type === 'note') return -1;
+                if (a.type === 'note' && b.type !== 'note') return 1;
+                if (a.type !== 'note' && b.type === 'note') return -1;
                 return (a.time || "23:59").localeCompare(b.time || "23:59");
             });
 
@@ -2739,27 +2740,32 @@ function printCurrentWeek() {
                 <div class="events-container">
         `;
 
-        if (dayEvents.length === 0) {
+        if (!dayEvents.length) {
             htmlContent += `<div class="empty-msg">No entries</div>`;
         } else {
             dayEvents.forEach(e => {
+
                 let timeDisplay = e.time || '';
                 let extraClass = '';
                 let icon = '•';
 
                 if (e.importance === 'high') { extraClass += ' priority-high'; icon = '!'; }
-                if (e.type === 'task') { icon = e.completed ? '☒' : '☐'; }
+                if (e.type === 'task') icon = e.completed ? '☒' : '☐';
                 if (e.completed) extraClass += ' completed';
-                if (e.type === 'note') { 
-                    extraClass += ' type-note'; 
-                    timeDisplay = 'NOTE'; 
+
+                if (e.type === 'note') {
+                    extraClass += ' type-note';
+                    timeDisplay = 'NOTE';
                     icon = '✎';
                 }
 
                 let displayText = e.text;
+
                 if (e.place && e.place.value) {
                     let loc = e.place.value;
-                    if(e.place.type === 'virtual') try { loc = new URL(loc).hostname; } catch(err) {}
+                    if (e.place.type === 'virtual') {
+                        try { loc = new URL(loc).hostname; } catch {}
+                    }
                     displayText += ` (@${loc})`;
                 }
 
@@ -2771,10 +2777,11 @@ function printCurrentWeek() {
                 `;
             });
         }
+
         htmlContent += `</div></div>`;
     }
 
-    // 2. Add 8th "Notes" Cell
+    // Notes cell
     htmlContent += `<div class="grid-cell notes-cell">Notes</div>`;
 
     htmlContent += `</div></body></html>`;
@@ -2786,9 +2793,10 @@ function printCurrentWeek() {
         printWindow.document.close();
         printWindow.focus();
     }
-    
+
     closePopupAndGoBack();
 }
+
 
 async function apiRequest(payload) {
     try {
