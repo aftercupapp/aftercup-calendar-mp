@@ -2492,6 +2492,13 @@ function truncateTextByWords(text, maxLength) {
     return truncated + '...';
 }
 
+function truncateTextByWords(text, maxLength) {
+    if (text.length <= maxLength) return text;
+    let truncated = text.slice(0, maxLength);
+    truncated = truncated.replace(/\s+\S*$/, '');
+    return truncated + '...';
+}
+
 function printCurrentWeek() {
     const today = new Date(currentDate);
     const day = today.getDay();
@@ -2507,12 +2514,6 @@ function printCurrentWeek() {
         html, body { width:100%; height:100%; margin:0; padding:0; background:#fff; }
         body { font-family: 'Inter', sans-serif; display:flex; flex-direction:column; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
-        .toolbar { height:42px; background:#f0f0f0; border-bottom:1px solid #ccc; display:flex; justify-content:center; align-items:center; gap:20px; }
-        .btn { padding:7px 18px; border:1px solid #000; background:#fff; font-weight:600; font-size:12px; cursor:pointer; }
-        .btn:hover { background:#000; color:#fff; }
-        .btn-close { color:#d32f2f; border-color:#d32f2f; }
-        .btn-close:hover { background:#d32f2f; color:#fff; }
-
         .page-header { text-align:center; padding:6px 0 4px; }
         .main-title { font-size:17px; font-weight:800; margin:0; }
         .date-range { font-family:'JetBrains Mono', monospace; font-size:11px; opacity:.6; }
@@ -2521,7 +2522,6 @@ function printCurrentWeek() {
         .page-container { flex:1.3; display:grid; grid-template-columns:1fr 1fr; grid-template-rows:repeat(4,1fr); gap:3px; padding:4px 6mm 7mm; box-sizing:border-box; }
 
         @media print {
-            .toolbar { display:none !important; }
             body { height:auto; display:block; }
             .page-container { height:auto; min-height:100%; padding:0 3mm 3mm; grid-auto-rows:1fr; }
             .page-header { margin-top:3mm; margin-bottom:2mm; }
@@ -2543,26 +2543,14 @@ function printCurrentWeek() {
     </style>
     `;
 
-    let htmlContent = `<!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="utf-8">
-        ${style}
-    </head>
-    <body>
-        <div class="toolbar">
-            <button class="btn" id="printBtn">Print</button>
-            <button class="btn btn-close" onclick="window.close()">Close</button>
-        </div>
-
+    // Build the HTML for the week
+    let htmlContent = `<div id="printContent">${style}
         <div class="page-header">
             <h1 class="main-title">Week ${getWeekNumber(monday)}</h1>
             <div class="date-range">${monday.toLocaleDateString()} — ${sunday.toLocaleDateString()}</div>
             <div class="brand-tag">Aftercup Calendar for Minimal Phone</div>
         </div>
-
-        <div class="page-container">
-    `;
+        <div class="page-container">`;
 
     for (let i = 0; i < 7; i++) {
         const d = new Date(monday);
@@ -2577,20 +2565,17 @@ function printCurrentWeek() {
                 return (a.time || "23:59").localeCompare(b.time || "23:59");
             });
 
-        htmlContent += `
-        <div class="grid-cell">
+        htmlContent += `<div class="grid-cell">
             <div class="day-header">
                 <span class="day-name">${dayNamesFull[d.getDay()]}</span>
                 <span class="day-date">${d.getDate()}/${d.getMonth()+1}</span>
             </div>
-            <div class="events-container">
-        `;
+            <div class="events-container">`;
 
         if (!dayEvents.length) {
             htmlContent += `<div class="empty-msg">No entries</div>`;
         } else {
             let hiddenNotesCount = 0;
-
             dayEvents.forEach(e => {
                 if (e.type === 'note' && e.text.length > 300) {
                     hiddenNotesCount++;
@@ -2621,48 +2606,39 @@ function printCurrentWeek() {
                     displayText += ` (@${loc})`;
                 }
 
-                htmlContent += `
-                    <div class="event-row ${extraClass}">
-                        <div class="event-time">${timeDisplay || icon}</div>
-                        <div class="event-text">${displayText}</div>
-                    </div>
-                `;
+                htmlContent += `<div class="event-row ${extraClass}">
+                    <div class="event-time">${timeDisplay || icon}</div>
+                    <div class="event-text">${displayText}</div>
+                </div>`;
             });
 
             if (hiddenNotesCount > 0) {
-                htmlContent += `
-                    <div class="event-row type-note">
-                        <div class="event-time">NOTE</div>
-                        <div class="event-text">+${hiddenNotesCount} note${hiddenNotesCount > 1 ? 's' : ''}</div>
-                    </div>
-                `;
+                htmlContent += `<div class="event-row type-note">
+                    <div class="event-time">NOTE</div>
+                    <div class="event-text">+${hiddenNotesCount} note${hiddenNotesCount > 1 ? 's' : ''}</div>
+                </div>`;
             }
         }
 
         htmlContent += `</div></div>`;
     }
 
-    htmlContent += `<div class="grid-cell notes-cell">Notes</div></div></body></html>`;
+    htmlContent += `<div class="grid-cell notes-cell">Notes</div></div>`; // end page-container
+    htmlContent += `</div>`; // end printContent
 
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-        alert('Popup blocked. Please allow popups for printing.');
-        return;
-    }
+    // Save original page content
+    const originalContent = document.body.innerHTML;
 
-    printWindow.document.open();
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
+    // Replace body with print content
+    document.body.innerHTML = htmlContent;
 
-    // Attach click handler for Print button (works on Android)
-    printWindow.onload = () => {
-        const btn = printWindow.document.getElementById('printBtn');
-        btn.addEventListener('click', () => printWindow.print());
-    };
+    // Trigger print (from user gesture)
+    window.print();
 
-    printWindow.focus();
-    closePopupAndGoBack();
+    // Restore original page content after printing
+    document.body.innerHTML = originalContent;
 }
+
 
 async function apiRequest(payload) {
     try {
