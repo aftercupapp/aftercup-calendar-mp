@@ -2485,105 +2485,50 @@ function renderPastEvents() {
     container.style.display = 'block';
 }
 
-function truncateTextByWords(text, maxLength) {
-    if (text.length <= maxLength) return text;
-    let truncated = text.slice(0, maxLength);
-    truncated = truncated.replace(/\s+\S*$/, '');
-    return truncated + '...';
-}
-
 function printCurrentWeek() {
     const today = new Date(currentDate);
     const day = today.getDay();
     const diff = today.getDate() - day + (day === 0 ? -6 : 1);
     const monday = new Date(today.setDate(diff));
-    const sunday = new Date(new Date(monday).setDate(monday.getDate() + 6));
-
-    // Determine the maximum number of events in any day (including notes)
-    let maxEvents = 0;
-    for (let i = 0; i < 7; i++) {
-        const d = new Date(monday);
-        d.setDate(monday.getDate() + i);
-        const dateStr = getLocalDateString(d);
-        const dayEvents = getVisibleEvents().filter(e => e.date === dateStr);
-        maxEvents = Math.max(maxEvents, dayEvents.length);
-    }
-
-    // Set a fixed cell height based on maxEvents
-    const cellHeight = maxEvents * 22 + 30; // 22px per event + header padding
-
-    let htmlContent = `
-    <div style="font-family:'Inter',sans-serif; padding:10px;">
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+    
+    let printContent = `
+        <div style="font-family: 'Inter', sans-serif; padding: 20px;">
+            <h1 style="border-bottom: 2px solid #000; padding-bottom: 10px;">Week Overview: Week ${getWeekNumber(monday)}</h1>
+            <p style="font-family: 'JetBrains Mono', monospace; opacity: 0.7;">${monday.toLocaleDateString()} - ${new Date(new Date(monday).setDate(monday.getDate() + 6)).toLocaleDateString()}</p>
     `;
 
     for (let i = 0; i < 7; i++) {
         const d = new Date(monday);
         d.setDate(monday.getDate() + i);
         const dateStr = getLocalDateString(d);
+        const dayEvents = getVisibleEvents().filter(e => e.date === dateStr && e.type !== 'note');
 
-        const dayEvents = getVisibleEvents()
-            .filter(e => e.date === dateStr)
-            .sort((a, b) => (a.time || "23:59").localeCompare(b.time || "23:59"));
-
-        htmlContent += `
-        <div style="border:1px solid #000; padding:5px; display:flex; flex-direction:column; min-height:${cellHeight}px; overflow-y:auto;">
-            <div style="font-weight:700; display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding-bottom:3px; margin-bottom:3px;">
-                <span>${dayNamesFull[d.getDay()]}</span>
-                <span style="font-family:'JetBrains Mono', monospace; font-size:11px;">${d.getDate()}/${d.getMonth()+1}</span>
-            </div>
-            <div style="flex-grow:1;">
+        printContent += `
+            <div style="margin-bottom: 20px;">
+                <h3 style="background: #f0f0f0; padding: 5px 10px; border-left: 4px solid #000;">${dayNamesFull[d.getDay()]} (${d.toLocaleDateString()})</h3>
+                <div style="padding-left: 10px;">
         `;
 
-        if (!dayEvents.length) {
-            htmlContent += `<p style="opacity:0.5; font-style:italic; margin:0;">No entries</p>`;
+        if (dayEvents.length === 0) {
+            printContent += `<p style="opacity: 0.5; font-style: italic;">No events</p>`;
         } else {
-            let hiddenNotes = 0;
-            dayEvents.forEach(e => {
-                let timeDisplay = e.time || '';
-                let textDisplay = e.text;
-
-                if (e.type === 'note') {
-                    if (textDisplay.length > 300) { hiddenNotes++; return; }
-                    textDisplay = truncateTextByWords(textDisplay, 300);
-                    timeDisplay = 'NOTE';
-                }
-
-                htmlContent += `
-                <div style="display:flex; gap:7px; border-bottom:1px dotted #ccc; padding:2px 0; font-size:11px;">
-                    <span style="min-width:38px; text-align:right; font-family:'JetBrains Mono', monospace; font-weight:bold;">${timeDisplay || '•'}</span>
-                    <span>${textDisplay}</span>
-                </div>
+            dayEvents.sort((a, b) => (a.time || "23:59").localeCompare(b.time || "23:59")).forEach(e => {
+                printContent += `
+                    <div style="display: flex; gap: 15px; border-bottom: 1px solid #eee; padding: 5px 0;">
+                        <span style="min-width: 60px; font-weight: bold;">${e.time || '--:--'}</span>
+                        <span>${e.text}</span>
+                    </div>
                 `;
             });
-
-            if (hiddenNotes > 0) {
-                htmlContent += `
-                <div style="display:flex; gap:7px; border-bottom:1px dotted #ccc; padding:2px 0; font-size:11px;">
-                    <span style="min-width:38px; text-align:right; font-family:'JetBrains Mono', monospace; font-weight:bold;">NOTE</span>
-                    <span>+${hiddenNotes} note${hiddenNotes > 1 ? 's' : ''}</span>
-                </div>
-                `;
-            }
         }
-
-        htmlContent += `</div></div>`;
+        printContent += `</div></div>`;
     }
 
-    htmlContent += `</div></div>`;
-
-    // Open popup and print
+    printContent += `</div>`;
     const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-        alert('Popup blocked. Please allow popups for printing.');
-        return;
-    }
-
-    printWindow.document.write('<html><head><title>Week Print</title></head><body>' + htmlContent + '</body></html>');
+    printWindow.document.write('<html><head><title>Print Week</title></head><body>' + printContent + '</body></html>');
     printWindow.document.close();
-    printWindow.focus();
     printWindow.print();
-
     closePopupAndGoBack();
 }
 
