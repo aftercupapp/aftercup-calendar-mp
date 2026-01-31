@@ -2493,7 +2493,6 @@ function truncateTextByWords(text, maxLength) {
 }
 
 function printCurrentWeek() {
-    // Note: Ensure currentDate is defined in your global scope
     const today = new Date(currentDate);
     const day = today.getDay();
     const diff = today.getDate() - day + (day === 0 ? -6 : 1);
@@ -2504,164 +2503,97 @@ function printCurrentWeek() {
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400&display=swap');
         @page { size: A4 portrait; margin: 0; }
-        html, body { width: 100%; height: 100%; margin: 0; padding: 0; background: #fff; }
-        body { font-family: 'Inter', sans-serif; display: flex; flex-direction: column; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        .toolbar { height: 42px; background: #f0f0f0; border-bottom: 1px solid #ccc; display: flex; justify-content: center; align-items: center; gap: 20px; }
-        .btn { padding: 7px 18px; border: 1px solid #000; background: #fff; font-weight: 600; font-size: 12px; cursor: pointer; }
-        .btn:hover { background:#000; color:#fff; }
-        .btn-close { color:#d32f2f; border-color:#d32f2f; }
-        .btn-close:hover { background:#d32f2f; color:#fff; }
-        .page-header { text-align: center; padding: 6px 0 4px; }
-        .main-title { font-size: 17px; font-weight: 800; margin: 0; }
-        .date-range { font-family: 'JetBrains Mono', monospace; font-size: 11px; opacity: .6; }
-        .brand-tag { font-size: 9px; opacity: .5; }
-        .page-container { flex: 1.3; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(4, 1fr); gap: 3px; padding: 4px 6mm 7mm; box-sizing: border-box; }
-        @media print {
-            .toolbar { display:none !important; }
-            body { height:auto; display:block; }
-            .page-container { height:auto; min-height:100%; padding: 0 3mm 3mm; grid-auto-rows:1fr; }
-            .page-header { margin-top:3mm; margin-bottom:2mm; }
-        }
-        .grid-cell { border:2px solid #000; padding:7px; display:flex; flex-direction:column; overflow:hidden; }
-        .notes-cell { border:2px dashed #ccc; color:#ccc; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono', monospace; font-size:11px; }
-        .day-header { display:flex; justify-content:space-between; border-bottom:2px solid #eee; padding-bottom:4px; margin-bottom:5px; }
-        .day-name { font-weight:700; font-size:13px; }
-        .day-date { font-family:'JetBrains Mono', monospace; font-size:11px; }
-        .events-container { flex-grow:1; overflow:hidden; }
-        .event-row { display:flex; font-size:11px; border-bottom:1px dotted #e0e0e0; padding:4px 0; gap:7px; }
-        .event-time { width:38px; text-align:right; font-family:'JetBrains Mono', monospace; font-weight:bold; flex-shrink:0; }
-        .event-text { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex-grow:1; }
-        .priority-high { color:#d32f2f; font-weight:600; }
-        .completed { text-decoration:line-through; opacity:.5; }
-        .type-note { font-style:italic; color:#666; }
-        .empty-msg { text-align:center; font-size:10px; color:#aaa; font-style:italic; }
+        html, body { width: 100%; margin: 0; padding: 0; background: #fff; }
+        body { font-family: 'Inter', sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .toolbar { height: 50px; background: #eee; display: flex; justify-content: center; align-items: center; gap: 15px; border-bottom: 1px solid #ccc; }
+        .btn { padding: 10px 20px; border: 2px solid #000; background: #fff; font-weight: bold; cursor: pointer; }
+        .btn-close { border-color: #d32f2f; color: #d32f2f; }
+        .page-header { text-align: center; padding: 15px 0; }
+        .main-title { font-size: 18px; font-weight: 800; margin: 0; }
+        .date-range { font-family: 'JetBrains Mono', monospace; font-size: 11px; opacity: 0.7; }
+        .page-container { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; padding: 10px; }
+        .grid-cell { border: 2px solid #000; padding: 8px; min-height: 150px; display: flex; flex-direction: column; }
+        .day-header { display: flex; justify-content: space-between; border-bottom: 2px solid #eee; margin-bottom: 5px; font-weight: bold; }
+        .event-row { display: flex; font-size: 11px; border-bottom: 1px dotted #ccc; padding: 3px 0; gap: 5px; }
+        .event-time { width: 40px; font-family: 'JetBrains Mono', monospace; font-weight: bold; }
+        .event-text { flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .type-note { font-style: italic; color: #555; }
+        @media print { .toolbar { display: none !important; } }
     </style>
     `;
 
-    let htmlContent = `<!DOCTYPE html>
+    // Construct the HTML with an internal script to trigger the print dialog
+    let htmlContent = `
+    <!DOCTYPE html>
     <html>
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Print Week</title>
         ${style}
     </head>
     <body>
         <div class="toolbar">
-            <button class="btn" onclick="window.print()">Print</button>
-            <button class="btn btn-close" onclick="window.close()">Close</button>
+            <button class="btn" onclick="window.print()">TAP TO PRINT</button>
+            <button class="btn btn-close" onclick="window.close()">CANCEL</button>
         </div>
-
         <div class="page-header">
             <h1 class="main-title">Week ${getWeekNumber(monday)}</h1>
             <div class="date-range">${monday.toLocaleDateString()} — ${sunday.toLocaleDateString()}</div>
-            <div class="brand-tag">Aftercup Calendar for Minimal Phone</div>
         </div>
-
         <div class="page-container">
     `;
 
+    // Build the day cells
     for (let i = 0; i < 7; i++) {
         const d = new Date(monday);
         d.setDate(monday.getDate() + i);
         const dateStr = getLocalDateString(d);
-
-        const dayEvents = getVisibleEvents()
-            .filter(e => e.date === dateStr)
-            .sort((a, b) => {
-                if (a.type === 'note' && b.type !== 'note') return 1;
-                if (a.type !== 'note' && b.type === 'note') return -1;
-                return (a.time || "23:59").localeCompare(b.time || "23:59");
-            });
+        const dayEvents = getVisibleEvents().filter(e => e.date === dateStr);
 
         htmlContent += `
         <div class="grid-cell">
             <div class="day-header">
-                <span class="day-name">${dayNamesFull[d.getDay()]}</span>
-                <span class="day-date">${d.getDate()}/${d.getMonth()+1}</span>
+                <span>${dayNamesFull[d.getDay()]}</span>
+                <span>${d.getDate()}/${d.getMonth()+1}</span>
             </div>
-            <div class="events-container">
+            <div class="events">
         `;
 
-        if (!dayEvents.length) {
-            htmlContent += `<div class="empty-msg">No entries</div>`;
-        } else {
-            let hiddenNotesCount = 0;
-            dayEvents.forEach(e => {
-                if (e.type === 'note' && e.text.length > 300) {
-                    hiddenNotesCount++;
-                    return;
-                }
+        dayEvents.forEach(e => {
+            let time = e.time || (e.type === 'note' ? 'NOTE' : '•');
+            let text = e.type === 'note' ? truncateTextByWords(e.text, 50) : e.text;
+            htmlContent += `
+                <div class="event-row ${e.type === 'note' ? 'type-note' : ''}">
+                    <div class="event-time">${time}</div>
+                    <div class="event-text">${text}</div>
+                </div>`;
+        });
 
-                let timeDisplay = e.time || '';
-                let extraClass = '';
-                let icon = '•';
-
-                if (e.importance === 'high') { extraClass += ' priority-high'; icon = '!'; }
-                if (e.type === 'task') icon = e.completed ? '☒' : '☐';
-                if (e.completed) extraClass += ' completed';
-
-                let displayText = e.text;
-                if (e.type === 'note') {
-                    displayText = truncateTextByWords(displayText, 300);
-                    extraClass += ' type-note';
-                    timeDisplay = 'NOTE';
-                }
-
-                if (e.place && e.place.value) {
-                    let loc = e.place.value;
-                    if (e.place.type === 'virtual') {
-                        try { loc = new URL(loc).hostname; } catch {}
-                    }
-                    displayText += ` (@${loc})`;
-                }
-
-                htmlContent += `
-                    <div class="event-row ${extraClass}">
-                        <div class="event-time">${timeDisplay || icon}</div>
-                        <div class="event-text">${displayText}</div>
-                    </div>
-                `;
-            });
-
-            if (hiddenNotesCount > 0) {
-                htmlContent += `
-                    <div class="event-row type-note">
-                        <div class="event-time">NOTE</div>
-                        <div class="event-text">+${hiddenNotesCount} note${hiddenNotesCount > 1 ? 's' : ''}</div>
-                    </div>
-                `;
-            }
-        }
         htmlContent += `</div></div>`;
     }
 
-    htmlContent += `<div class="grid-cell notes-cell">Notes</div>`;
-    htmlContent += `</div></body></html>`;
+    htmlContent += `</div>
+        <script>
+            // This is the key for Android: Trigger only when content is ready
+            window.addEventListener('load', () => {
+                setTimeout(() => {
+                    window.print();
+                }, 800);
+            });
+        </script>
+    </body></html>`;
 
-    // FIX START: Use a variable for the window
-    const printWindow = window.open('', '_blank');
-
-    if (!printWindow) {
-        alert('Popup blocked. Please allow popups for printing.');
+    // Open window
+    const pWin = window.open('', '_blank');
+    if (!pWin) {
+        alert("Please enable popups for this site.");
         return;
     }
 
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
-
-    // Trigger print after the document is fully parsed and images/fonts have a head start
-    printWindow.addEventListener('load', () => {
-        setTimeout(() => {
-            printWindow.print();
-        }, 500); // 500ms delay helps Android Chrome stabilize the UI
-    });
-
-    // Optional: Keep this if you want the original UI to react
-    if (typeof closePopupAndGoBack === "function") {
-        closePopupAndGoBack();
-    }
+    pWin.document.write(htmlContent);
+    pWin.document.close();
 }
-
 async function apiRequest(payload) {
     try {
         const response = await fetch(API_URL, {
