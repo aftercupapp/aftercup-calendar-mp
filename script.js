@@ -2496,249 +2496,209 @@ function truncateTextByWords(text, maxLength) {
     return truncated + '...';
 }
 
+function truncateTextByWords(text, maxLength) {
+    if (text.length <= maxLength) return text;
+
+    let truncated = text.slice(0, maxLength);
+    truncated = truncated.replace(/\s+\S*$/, '');
+    return truncated + '...';
+}
+
 function printCurrentWeek() {
+
     const today = new Date(currentDate);
     const day = today.getDay();
     const diff = today.getDate() - day + (day === 0 ? -6 : 1);
     const monday = new Date(today.setDate(diff));
     const sunday = new Date(new Date(monday).setDate(monday.getDate() + 6));
-    
-    const style = `
-        <style>
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400&display=swap');
-            
-            @page {
-                size: A4 portrait;
-                margin: 0; /* We handle margins manually in the body */
-            }
 
-            html, body {
-                width: 100%;
-                height: 100%;
-                margin: 0;
-                padding: 0;
-                background: #fff;
-            }
+    const style = `
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400&display=swap');
+
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: #fff;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .toolbar {
+            height: 40px;
+            background: #f0f0f0;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 6px 15px;
+            border: 1px solid #000;
+            background: #fff;
+            font-weight: 600;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .btn:hover { background:#000; color:#fff; }
+
+        .btn-close { color:#d32f2f; border-color:#d32f2f; }
+        .btn-close:hover { background:#d32f2f; color:#fff; }
+
+        .page-header {
+            text-align: center;
+            padding: 10px 0 5px;
+        }
+
+        .main-title {
+            font-size: 16px;
+            font-weight: 800;
+            margin: 0;
+        }
+
+        .date-range {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            opacity: .6;
+        }
+
+        .brand-tag {
+            font-size: 9px;
+            opacity: .5;
+        }
+
+        .page-container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: repeat(4, 1fr);
+            gap: 4px;
+            padding: 5px 10mm 10mm;
+            box-sizing: border-box;
+        }
+
+        @media print {
+            .toolbar { display:none !important; }
 
             body {
-                font-family: 'Inter', sans-serif;
-                color: #000;
-                display: flex;
-                flex-direction: column;
-                box-sizing: border-box;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
+                height:auto;
+                display:block;
             }
 
-            .toolbar {
-                height: 40px;
-                background: #f0f0f0;
-                border-bottom: 1px solid #ccc;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 20px;
-                width: 100%;
-                flex-shrink: 0;
+            .page-container {
+                height:auto;
+                min-height:100%;
+                padding: 0 5mm 5mm;
+                grid-auto-rows:1fr;
             }
-
-            .btn {
-                padding: 6px 15px;
-                border: 1px solid #000;
-                background: #fff;
-                cursor: pointer;
-                font-family: 'Inter', sans-serif;
-                font-weight: 600;
-                text-transform: uppercase;
-                font-size: 11px;
-            }
-            .btn:hover { background: #000; color: #fff; }
-            .btn-close { color: #d32f2f; border-color: #d32f2f; }
-            .btn-close:hover { background: #d32f2f; color: #fff; }
 
             .page-header {
-                text-align: center;
-                padding: 10px 0 5px 0;
-                flex-shrink: 0;
-                /* Ensure header doesn't get crushed */
-                min-height: 60px; 
+                margin-top:5mm;
+                margin-bottom:2mm;
             }
+        }
 
-            .main-title {
-                font-size: 16px;
-                font-weight: 800;
-                text-transform: uppercase;
-                margin: 0;
-                line-height: 1.2;
-            }
+        .grid-cell {
+            border:2px solid #000;
+            padding:4px;
+            display:flex;
+            flex-direction:column;
+            overflow:hidden;
+        }
 
-            .date-range {
-                font-family: 'JetBrains Mono', monospace;
-                font-size: 10px;
-                opacity: 0.6;
-                margin-top: 2px;
-            }
-            
-            .brand-tag {
-                font-size: 9px;
-                text-transform: uppercase;
-                opacity: 0.5;
-                margin-top: 2px;
-            }
+        .notes-cell {
+            border:2px dashed #ccc;
+            color:#ccc;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-family:'JetBrains Mono', monospace;
+            font-size:11px;
+        }
 
-            /* Main Grid Layout */
-            .page-container {
-                width: 100%;
-                /* Screen view: fill mostly */
-                height: calc(100vh - 100px); 
-                display: grid;
-                /* Force exactly 2 columns, 50% width each */
-                grid-template-columns: 50% 50%;
-                /* Force exactly 4 rows, 25% height each */
-                grid-template-rows: 25% 25% 25% 25%;
-                gap: 4px; 
-                padding: 5px 10mm 10mm 10mm; 
-                box-sizing: border-box;
-            }
+        .day-header {
+            display:flex;
+            justify-content:space-between;
+            border-bottom:2px solid #eee;
+            padding-bottom:3px;
+            margin-bottom:3px;
+        }
 
-            @media print {
-                .toolbar { display: none !important; }
-                
-                body {
-                    display: block;
-                    width: 100%;
-                    height: 100%;
-                }
+        .day-name {
+            font-weight:700;
+            font-size:12px;
+        }
 
-                .page-container { 
-                    /* Fixed Millimeter height for A4 (297mm total - margins) */
-                    height: 260mm; 
-                    /* Margin to center it visually */
-                    margin: 0 auto; 
-                    padding: 0 5mm;
-                    /* Ensure grid doesn't try to be clever with sizing */
-                    grid-template-rows: 25% 25% 25% 25%;
-                }
-                
-                .page-header {
-                    margin-top: 5mm;
-                    margin-bottom: 2mm;
-                }
-            }
+        .day-date {
+            font-family:'JetBrains Mono', monospace;
+            font-size:10px;
+        }
 
-            .grid-cell {
-                border: 2px solid #000;
-                padding: 4px;
-                display: flex;
-                flex-direction: column;
-                /* Crucial: Cut off anything that doesn't fit the 25% height */
-                overflow: hidden; 
-                position: relative;
-                box-sizing: border-box;
-                /* Force background to cover border issues */
-                background-color: #fff;
-                height: 100%;
-            }
-            
-            .notes-cell {
-                border: 2px dashed #ccc;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                color: #ccc;
-                font-family: 'JetBrains Mono', monospace;
-                font-size: 11px;
-                text-transform: uppercase;
-                letter-spacing: 1px;
-            }
+        .events-container {
+            flex-grow:1;
+            overflow:hidden;
+        }
 
-            .day-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: baseline;
-                border-bottom: 2px solid #eee;
-                padding-bottom: 3px;
-                margin-bottom: 3px;
-                flex-shrink: 0;
-            }
+        .event-row {
+            display:flex;
+            font-size:9px;
+            border-bottom:1px dotted #e0e0e0;
+            padding:1px 0;
+            gap:5px;
+        }
 
-            .day-name {
-                font-weight: 700;
-                text-transform: uppercase;
-                font-size: 12px;
-            }
+        .event-time {
+            width:35px;
+            text-align:right;
+            font-family:'JetBrains Mono', monospace;
+            font-weight:bold;
+            flex-shrink:0;
+        }
 
-            .day-date {
-                font-family: 'JetBrains Mono', monospace;
-                font-size: 10px;
-                color: #555;
-            }
+        .event-text {
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            flex-grow:1;
+        }
 
-            .events-container {
-                flex-grow: 1;
-                /* Ensure this container strictly clips overflow */
-                overflow: hidden; 
-                display: flex;
-                flex-direction: column;
-            }
+        .priority-high { color:#d32f2f; font-weight:600; }
+        .completed { text-decoration:line-through; opacity:.5; }
+        .type-note { font-style:italic; color:#666; }
 
-            .event-row {
-                display: flex;
-                align-items: flex-start; /* Align to top to handle wrapped text */
-                font-size: 9px;
-                padding: 2px 0;
-                border-bottom: 1px dotted #e0e0e0;
-                gap: 5px;
-                line-height: 1.2;
-                flex-shrink: 0; 
-            }
-
-            .event-time {
-                font-family: 'JetBrains Mono', monospace;
-                font-weight: bold;
-                width: 35px;
-                flex-shrink: 0;
-                text-align: right;
-                margin-top: 1px;
-            }
-
-            .event-text {
-                flex-grow: 1;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-            
-            /* Allow notes to wrap slightly, but they will be cut by container */
-            .type-note .event-text {
-                white-space: normal;
-                display: -webkit-box;
-                -webkit-line-clamp: 4; /* Limit visual lines just in case */
-                -webkit-box-orient: vertical;
-            }
-
-            .priority-high { color: #d32f2f; font-weight: 600; }
-            .completed { text-decoration: line-through; opacity: 0.5; }
-            .type-note { font-style: italic; color: #666; }
-            
-            .empty-msg {
-                font-size: 9px;
-                color: #aaa;
-                font-style: italic;
-                margin-top: 5px;
-                text-align: center;
-            }
-        </style>
+        .empty-msg {
+            text-align:center;
+            font-size:9px;
+            color:#aaa;
+            font-style:italic;
+        }
+    </style>
     `;
 
-    let htmlContent = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Week Overview</title>${style}</head><body>`;
-    
+    let htmlContent = `<!DOCTYPE html><html><head><meta charset="utf-8">${style}</head><body>`;
+
     htmlContent += `
         <div class="toolbar">
             <button class="btn" onclick="window.print()">Print</button>
             <button class="btn btn-close" onclick="window.close()">Close</button>
         </div>
-        
+
         <div class="page-header">
             <h1 class="main-title">Week ${getWeekNumber(monday)}</h1>
             <div class="date-range">${monday.toLocaleDateString()} — ${sunday.toLocaleDateString()}</div>
@@ -2748,82 +2708,101 @@ function printCurrentWeek() {
         <div class="page-container">
     `;
 
-    // 1. Render Monday to Sunday (7 Cells)
     for (let i = 0; i < 7; i++) {
+
         const d = new Date(monday);
         d.setDate(monday.getDate() + i);
         const dateStr = getLocalDateString(d);
+
         const dayEvents = getVisibleEvents()
             .filter(e => e.date === dateStr)
             .sort((a, b) => {
-                if(a.type === 'note' && b.type !== 'note') return 1;
-                if(a.type !== 'note' && b.type === 'note') return -1;
+                if (a.type === 'note' && b.type !== 'note') return 1;
+                if (a.type !== 'note' && b.type === 'note') return -1;
                 return (a.time || "23:59").localeCompare(b.time || "23:59");
             });
 
         htmlContent += `
-            <div class="grid-cell">
-                <div class="day-header">
-                    <span class="day-name">${dayNamesFull[d.getDay()]}</span>
-                    <span class="day-date">${d.getDate()}/${d.getMonth()+1}</span>
-                </div>
-                <div class="events-container">
+        <div class="grid-cell">
+            <div class="day-header">
+                <span class="day-name">${dayNamesFull[d.getDay()]}</span>
+                <span class="day-date">${d.getDate()}/${d.getMonth()+1}</span>
+            </div>
+            <div class="events-container">
         `;
 
-        if (dayEvents.length === 0) {
+        if (!dayEvents.length) {
+
             htmlContent += `<div class="empty-msg">No entries</div>`;
+
         } else {
+
+            let hiddenNotesCount = 0;
+
             dayEvents.forEach(e => {
+
+                if (e.type === 'note' && e.text.length > 300) {
+                    hiddenNotesCount++;
+                    return;
+                }
+
                 let timeDisplay = e.time || '';
                 let extraClass = '';
                 let icon = '•';
 
                 if (e.importance === 'high') { extraClass += ' priority-high'; icon = '!'; }
-                if (e.type === 'task') { icon = e.completed ? '☒' : '☐'; }
+                if (e.type === 'task') icon = e.completed ? '☒' : '☐';
                 if (e.completed) extraClass += ' completed';
-                if (e.type === 'note') { 
-                    extraClass += ' type-note'; 
-                    timeDisplay = 'NOTE'; 
-                    icon = '✎';
-                }
 
                 let displayText = e.text;
-                
-                // Truncate logic
-                if (e.type === 'note' && displayText.length > 200) {
-                    displayText = displayText.substring(0, 200) + '...';
+
+                if (e.type === 'note') {
+                    displayText = truncateTextByWords(displayText, 300);
+                    extraClass += ' type-note';
+                    timeDisplay = 'NOTE';
                 }
 
                 if (e.place && e.place.value) {
                     let loc = e.place.value;
-                    if(e.place.type === 'virtual') try { loc = new URL(loc).hostname; } catch(err) {}
+                    if (e.place.type === 'virtual') {
+                        try { loc = new URL(loc).hostname; } catch {}
+                    }
                     displayText += ` (@${loc})`;
                 }
 
                 htmlContent += `
                     <div class="event-row ${extraClass}">
                         <div class="event-time">${timeDisplay || icon}</div>
-                        <div class="event-text" title="${displayText}">${displayText}</div>
+                        <div class="event-text">${displayText}</div>
                     </div>
                 `;
             });
+
+            if (hiddenNotesCount > 0) {
+                htmlContent += `
+                    <div class="event-row type-note">
+                        <div class="event-time">NOTE</div>
+                        <div class="event-text">+${hiddenNotesCount} note${hiddenNotesCount > 1 ? 's' : ''}</div>
+                    </div>
+                `;
+            }
         }
+
         htmlContent += `</div></div>`;
     }
 
-    // 2. Add 8th "Notes" Cell (Bottom Right)
     htmlContent += `<div class="grid-cell notes-cell">Notes</div>`;
-
     htmlContent += `</div></body></html>`;
 
     const printWindow = window.open('', '_blank');
+
     if (printWindow) {
         printWindow.document.open();
         printWindow.document.write(htmlContent);
         printWindow.document.close();
         printWindow.focus();
     }
-    
+
     closePopupAndGoBack();
 }
 
