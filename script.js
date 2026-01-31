@@ -2492,7 +2492,6 @@ function printCurrentWeek() {
     const monday = new Date(today.setDate(diff));
     const sunday = new Date(new Date(monday).setDate(monday.getDate() + 6));
     
-    // Define the print styles for a strict one-page 2-column layout
     const style = `
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400&display=swap');
@@ -2507,14 +2506,13 @@ function printCurrentWeek() {
                 color: #000;
                 margin: 0;
                 padding: 0;
-                height: 98vh; /* Force fit to viewport height */
-                overflow: hidden; /* Prevent spillover */
+                height: 98vh;
+                overflow: hidden;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
                 box-sizing: border-box;
             }
 
-            /* The 2x4 Grid (8 slots: 1 Header + 7 Days) */
             .page-grid {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
@@ -2529,11 +2527,10 @@ function printCurrentWeek() {
                 padding: 10px;
                 display: flex;
                 flex-direction: column;
-                overflow: hidden; /* Crucial for cutting off long content */
+                overflow: hidden;
                 position: relative;
             }
 
-            /* Header Cell Specifics */
             .header-cell {
                 background-color: #f4f4f4;
                 justify-content: center;
@@ -2565,7 +2562,6 @@ function printCurrentWeek() {
                 border-radius: 20px;
             }
 
-            /* Day Cell Specifics */
             .day-header {
                 display: flex;
                 justify-content: space-between;
@@ -2573,7 +2569,7 @@ function printCurrentWeek() {
                 border-bottom: 2px solid #eee;
                 padding-bottom: 5px;
                 margin-bottom: 5px;
-                flex-shrink: 0; /* Header never shrinks */
+                flex-shrink: 0;
             }
 
             .day-name {
@@ -2590,7 +2586,7 @@ function printCurrentWeek() {
 
             .events-container {
                 flex-grow: 1;
-                overflow: hidden; /* Clips events if there are too many */
+                overflow: hidden;
             }
 
             .event-row {
@@ -2612,9 +2608,9 @@ function printCurrentWeek() {
 
             .event-text {
                 flex-grow: 1;
-                white-space: nowrap; /* Forces single line */
+                white-space: nowrap;
                 overflow: hidden;
-                text-overflow: ellipsis; /* Adds '...' if text is too long */
+                text-overflow: ellipsis;
             }
 
             .priority-high { color: #d32f2f; font-weight: 600; }
@@ -2634,7 +2630,6 @@ function printCurrentWeek() {
     
     htmlContent += `<div class="page-grid">`;
 
-    // CELL 1: The Main Header (Top Left)
     htmlContent += `
         <div class="grid-cell header-cell">
             <h1 class="main-title">Week ${getWeekNumber(monday)}</h1>
@@ -2643,7 +2638,6 @@ function printCurrentWeek() {
         </div>
     `;
 
-    // CELLS 2-8: The Days (Mon-Sun)
     for (let i = 0; i < 7; i++) {
         const d = new Date(monday);
         d.setDate(monday.getDate() + i);
@@ -2671,7 +2665,7 @@ function printCurrentWeek() {
             dayEvents.forEach(e => {
                 let timeDisplay = e.time || '';
                 let extraClass = '';
-                let icon = '•'; // Default bullet
+                let icon = '•';
 
                 if (e.importance === 'high') { extraClass += ' priority-high'; icon = '!'; }
                 if (e.type === 'task') { icon = e.completed ? '☒' : '☐'; }
@@ -2704,21 +2698,15 @@ function printCurrentWeek() {
 
     const printWindow = window.open('', '_blank');
     if (printWindow) {
+        printWindow.document.open();
         printWindow.document.write(htmlContent);
-        printWindow.document.close(); // Important to finish loading
+        printWindow.document.close();
         
-        // Increased timeout to ensure browser is ready, and added .close()
         setTimeout(() => {
             printWindow.focus();
-            try {
-                printWindow.print();
-            } catch (err) {
-                console.error("Print failed", err);
-            } finally {
-                // This will run after the print dialog is closed (in most browsers)
-                printWindow.close();
-            }
-        }, 500); 
+            printWindow.print();
+            printWindow.close();
+        }, 1000);
     }
     
     closePopupAndGoBack();
