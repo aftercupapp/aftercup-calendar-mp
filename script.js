@@ -2506,7 +2506,8 @@ function printCurrentWeek() {
                 color: #000;
                 margin: 0;
                 padding: 0;
-                height: 98vh;
+                height: 98vh; /* Force fit to viewport */
+                width: 100%;
                 overflow: hidden;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
@@ -2515,11 +2516,12 @@ function printCurrentWeek() {
 
             .page-grid {
                 display: grid;
-                grid-template-columns: 1fr 1fr;
-                grid-template-rows: repeat(4, 1fr); 
+                grid-template-columns: 1fr 1fr; /* 2 Columns */
+                grid-template-rows: repeat(4, 1fr); /* Strictly 4 Rows */
                 gap: 10px;
                 height: 100%;
                 width: 100%;
+                box-sizing: border-box;
             }
 
             .grid-cell {
@@ -2529,8 +2531,10 @@ function printCurrentWeek() {
                 flex-direction: column;
                 overflow: hidden;
                 position: relative;
+                box-sizing: border-box;
             }
 
+            /* Header Cell Styling */
             .header-cell {
                 background-color: #f4f4f4;
                 justify-content: center;
@@ -2539,7 +2543,7 @@ function printCurrentWeek() {
             }
 
             .main-title {
-                font-size: 28px;
+                font-size: 24px;
                 font-weight: 800;
                 text-transform: uppercase;
                 margin: 0;
@@ -2548,20 +2552,27 @@ function printCurrentWeek() {
 
             .date-range {
                 font-family: 'JetBrains Mono', monospace;
-                font-size: 14px;
-                margin-top: 10px;
+                font-size: 13px;
+                margin-top: 8px;
                 opacity: 0.7;
             }
 
             .brand-tag {
                 margin-top: 15px;
-                font-size: 10px;
+                font-size: 11px;
                 text-transform: uppercase;
-                border: 1px solid #000;
-                padding: 4px 10px;
-                border-radius: 20px;
+                font-weight: bold;
+                letter-spacing: 0.5px;
             }
 
+            .sub-brand {
+                font-size: 10px;
+                opacity: 0.6;
+                margin-top: 2px;
+                font-family: 'JetBrains Mono', monospace;
+            }
+
+            /* Day Cell Styling */
             .day-header {
                 display: flex;
                 justify-content: space-between;
@@ -2575,12 +2586,12 @@ function printCurrentWeek() {
             .day-name {
                 font-weight: 700;
                 text-transform: uppercase;
-                font-size: 16px;
+                font-size: 15px;
             }
 
             .day-date {
                 font-family: 'JetBrains Mono', monospace;
-                font-size: 12px;
+                font-size: 11px;
                 color: #555;
             }
 
@@ -2592,16 +2603,16 @@ function printCurrentWeek() {
             .event-row {
                 display: flex;
                 align-items: center;
-                font-size: 11px;
+                font-size: 10px; /* Slightly smaller to fit more */
                 padding: 3px 0;
                 border-bottom: 1px dotted #e0e0e0;
-                gap: 8px;
+                gap: 6px;
             }
 
             .event-time {
                 font-family: 'JetBrains Mono', monospace;
                 font-weight: bold;
-                width: 45px;
+                width: 40px;
                 flex-shrink: 0;
                 text-align: right;
             }
@@ -2622,6 +2633,7 @@ function printCurrentWeek() {
                 color: #aaa;
                 font-style: italic;
                 margin-top: 10px;
+                text-align: center;
             }
         </style>
     `;
@@ -2630,14 +2642,17 @@ function printCurrentWeek() {
     
     htmlContent += `<div class="page-grid">`;
 
+    // CELL 1: Header
     htmlContent += `
         <div class="grid-cell header-cell">
             <h1 class="main-title">Week ${getWeekNumber(monday)}</h1>
             <div class="date-range">${monday.toLocaleDateString()} — ${sunday.toLocaleDateString()}</div>
             <div class="brand-tag">Aftercup Calendar</div>
+            <div class="sub-brand">for Minimal Phone</div>
         </div>
     `;
 
+    // CELLS 2-8: Days
     for (let i = 0; i < 7; i++) {
         const d = new Date(monday);
         d.setDate(monday.getDate() + i);
@@ -2702,6 +2717,8 @@ function printCurrentWeek() {
         printWindow.document.write(htmlContent);
         printWindow.document.close();
         
+        // Timeout ensures styles are loaded before print dialog triggers.
+        // We do NOT call printWindow.close() anymore to ensure Android compatibility.
         setTimeout(() => {
             printWindow.focus();
             printWindow.print();
