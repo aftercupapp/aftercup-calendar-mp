@@ -2492,13 +2492,6 @@ function truncateTextByWords(text, maxLength) {
     return truncated + '...';
 }
 
-function truncateTextByWords(text, maxLength) {
-    if (text.length <= maxLength) return text;
-    let truncated = text.slice(0, maxLength);
-    truncated = truncated.replace(/\s+\S*$/, '');
-    return truncated + '...';
-}
-
 function printCurrentWeek() {
     const today = new Date(currentDate);
     const day = today.getDay();
@@ -2506,51 +2499,13 @@ function printCurrentWeek() {
     const monday = new Date(today.setDate(diff));
     const sunday = new Date(new Date(monday).setDate(monday.getDate() + 6));
 
-    const style = `
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400&display=swap');
-
-        @page { size: A4 portrait; margin: 0; }
-        html, body { width:100%; height:100%; margin:0; padding:0; background:#fff; }
-        body { font-family: 'Inter', sans-serif; display:flex; flex-direction:column; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-
-        .page-header { text-align:center; padding:6px 0 4px; }
-        .main-title { font-size:17px; font-weight:800; margin:0; }
-        .date-range { font-family:'JetBrains Mono', monospace; font-size:11px; opacity:.6; }
-        .brand-tag { font-size:9px; opacity:.5; }
-
-        .page-container { flex:1.3; display:grid; grid-template-columns:1fr 1fr; grid-template-rows:repeat(4,1fr); gap:3px; padding:4px 6mm 7mm; box-sizing:border-box; }
-
-        @media print {
-            body { height:auto; display:block; }
-            .page-container { height:auto; min-height:100%; padding:0 3mm 3mm; grid-auto-rows:1fr; }
-            .page-header { margin-top:3mm; margin-bottom:2mm; }
-        }
-
-        .grid-cell { border:2px solid #000; padding:7px; display:flex; flex-direction:column; overflow:hidden; }
-        .notes-cell { border:2px dashed #ccc; color:#ccc; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono', monospace; font-size:11px; }
-        .day-header { display:flex; justify-content:space-between; border-bottom:2px solid #eee; padding-bottom:4px; margin-bottom:5px; }
-        .day-name { font-weight:700; font-size:13px; }
-        .day-date { font-family:'JetBrains Mono', monospace; font-size:11px; }
-        .events-container { flex-grow:1; overflow:hidden; }
-        .event-row { display:flex; font-size:11px; border-bottom:1px dotted #e0e0e0; padding:4px 0; gap:7px; }
-        .event-time { width:38px; text-align:right; font-family:'JetBrains Mono', monospace; font-weight:bold; flex-shrink:0; }
-        .event-text { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex-grow:1; }
-        .priority-high { color:#d32f2f; font-weight:600; }
-        .completed { text-decoration:line-through; opacity:.5; }
-        .type-note { font-style:italic; color:#666; }
-        .empty-msg { text-align:center; font-size:10px; color:#aaa; font-style:italic; }
-    </style>
+    // Build the HTML content as a single string
+    let htmlContent = `
+    <div style="font-family: 'Inter', sans-serif; padding: 20px;">
+        <h1 style="border-bottom: 2px solid #000; padding-bottom: 10px;">Week Overview: Week ${getWeekNumber(monday)}</h1>
+        <p style="font-family: 'JetBrains Mono', monospace; opacity: 0.7;">${monday.toLocaleDateString()} - ${sunday.toLocaleDateString()}</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
     `;
-
-    // Build the HTML for the week
-    let htmlContent = `<div id="printContent">${style}
-        <div class="page-header">
-            <h1 class="main-title">Week ${getWeekNumber(monday)}</h1>
-            <div class="date-range">${monday.toLocaleDateString()} — ${sunday.toLocaleDateString()}</div>
-            <div class="brand-tag">Aftercup Calendar for Minimal Phone</div>
-        </div>
-        <div class="page-container">`;
 
     for (let i = 0; i < 7; i++) {
         const d = new Date(monday);
@@ -2559,86 +2514,68 @@ function printCurrentWeek() {
 
         const dayEvents = getVisibleEvents()
             .filter(e => e.date === dateStr)
-            .sort((a, b) => {
-                if (a.type === 'note' && b.type !== 'note') return 1;
-                if (a.type !== 'note' && b.type === 'note') return -1;
-                return (a.time || "23:59").localeCompare(b.time || "23:59");
-            });
+            .sort((a, b) => (a.time || "23:59").localeCompare(b.time || "23:59"));
 
-        htmlContent += `<div class="grid-cell">
-            <div class="day-header">
-                <span class="day-name">${dayNamesFull[d.getDay()]}</span>
-                <span class="day-date">${d.getDate()}/${d.getMonth()+1}</span>
+        htmlContent += `
+        <div style="border: 2px solid #000; padding: 10px; display: flex; flex-direction: column; overflow: hidden;">
+            <div style="font-weight: 700; margin-bottom: 5px; display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+                <span>${dayNamesFull[d.getDay()]}</span>
+                <span style="font-family:'JetBrains Mono', monospace; font-size: 12px;">${d.getDate()}/${d.getMonth()+1}</span>
             </div>
-            <div class="events-container">`;
+            <div style="flex-grow: 1;">
+        `;
 
         if (!dayEvents.length) {
-            htmlContent += `<div class="empty-msg">No entries</div>`;
+            htmlContent += `<p style="opacity: 0.5; font-style: italic;">No entries</p>`;
         } else {
-            let hiddenNotesCount = 0;
+            let hiddenNotes = 0;
             dayEvents.forEach(e => {
-                if (e.type === 'note' && e.text.length > 300) {
-                    hiddenNotesCount++;
-                    return;
-                }
-
                 let timeDisplay = e.time || '';
-                let extraClass = '';
-                let icon = '•';
-
-                if (e.importance === 'high') { extraClass += ' priority-high'; icon = '!'; }
-                if (e.type === 'task') icon = e.completed ? '☒' : '☐';
-                if (e.completed) extraClass += ' completed';
-
-                let displayText = e.text;
+                let textDisplay = e.text;
 
                 if (e.type === 'note') {
-                    displayText = truncateTextByWords(displayText, 300);
-                    extraClass += ' type-note';
+                    if (textDisplay.length > 300) { hiddenNotes++; return; }
+                    textDisplay = truncateTextByWords(textDisplay, 300);
                     timeDisplay = 'NOTE';
                 }
 
-                if (e.place && e.place.value) {
-                    let loc = e.place.value;
-                    if (e.place.type === 'virtual') {
-                        try { loc = new URL(loc).hostname; } catch {}
-                    }
-                    displayText += ` (@${loc})`;
-                }
-
-                htmlContent += `<div class="event-row ${extraClass}">
-                    <div class="event-time">${timeDisplay || icon}</div>
-                    <div class="event-text">${displayText}</div>
-                </div>`;
+                htmlContent += `
+                <div style="display:flex; gap: 7px; border-bottom: 1px dotted #e0e0e0; padding: 3px 0; font-size: 12px;">
+                    <span style="min-width: 38px; text-align:right; font-family:'JetBrains Mono', monospace; font-weight:bold;">${timeDisplay || '•'}</span>
+                    <span>${textDisplay}</span>
+                </div>
+                `;
             });
 
-            if (hiddenNotesCount > 0) {
-                htmlContent += `<div class="event-row type-note">
-                    <div class="event-time">NOTE</div>
-                    <div class="event-text">+${hiddenNotesCount} note${hiddenNotesCount > 1 ? 's' : ''}</div>
-                </div>`;
+            if (hiddenNotes > 0) {
+                htmlContent += `
+                <div style="display:flex; gap: 7px; border-bottom: 1px dotted #e0e0e0; padding: 3px 0; font-size: 12px;">
+                    <span style="min-width:38px; text-align:right; font-family:'JetBrains Mono', monospace; font-weight:bold;">NOTE</span>
+                    <span>+${hiddenNotes} note${hiddenNotes > 1 ? 's' : ''}</span>
+                </div>
+                `;
             }
         }
 
         htmlContent += `</div></div>`;
     }
 
-    htmlContent += `<div class="grid-cell notes-cell">Notes</div></div>`; // end page-container
-    htmlContent += `</div>`; // end printContent
+    htmlContent += `</div></div>`;
 
-    // Save original page content
-    const originalContent = document.body.innerHTML;
+    // Open popup, write content, and print (works on Android)
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+        alert('Popup blocked. Please allow popups for printing.');
+        return;
+    }
 
-    // Replace body with print content
-    document.body.innerHTML = htmlContent;
+    printWindow.document.write('<html><head><title>Print Week</title></head><body>' + htmlContent + '</body></html>');
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
 
-    // Trigger print (from user gesture)
-    window.print();
-
-    // Restore original page content after printing
-    document.body.innerHTML = originalContent;
+    closePopupAndGoBack();
 }
-
 
 async function apiRequest(payload) {
     try {
