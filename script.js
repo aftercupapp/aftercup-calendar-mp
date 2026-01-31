@@ -2557,7 +2557,6 @@ function printCurrentWeek() {
             .btn-close { color: #d32f2f; border-color: #d32f2f; }
             .btn-close:hover { background: #d32f2f; color: #fff; }
 
-            /* Header Section */
             .page-header {
                 text-align: center;
                 padding: 10px 0 5px 0;
@@ -2586,16 +2585,13 @@ function printCurrentWeek() {
                 margin-top: 2px;
             }
 
-            /* GRID CONTAINER
-               Strict constraints to ensure one-page fit 
-            */
+            /* Main Grid Layout */
             .page-container {
                 width: 100%;
-                /* Default height for screen view */
                 height: calc(100vh - 100px); 
                 display: grid;
                 grid-template-columns: 1fr 1fr;
-                /* minmax(0, 1fr) forces rows to stay equal size even if content overflows */
+                /* Strictly forces 4 equal rows, cutting off overflow */
                 grid-template-rows: repeat(4, minmax(0, 1fr)); 
                 gap: 4px; 
                 padding: 5px 10mm 10mm 10mm; 
@@ -2611,8 +2607,7 @@ function printCurrentWeek() {
                 }
 
                 .page-container { 
-                    /* Fixed height for A4 print area */
-                    height: 85vh; 
+                    height: 85vh; /* Safe height for A4 */
                     padding: 0 5mm 0 5mm; 
                     margin: 0 auto;
                 }
@@ -2628,8 +2623,7 @@ function printCurrentWeek() {
                 padding: 4px;
                 display: flex;
                 flex-direction: column;
-                /* Crucial: Hides anything that extends beyond the fixed row height */
-                overflow: hidden; 
+                overflow: hidden; /* Hides content that doesn't fit the cell */
                 position: relative;
                 box-sizing: border-box;
                 height: 100%;
@@ -2672,9 +2666,7 @@ function printCurrentWeek() {
 
             .events-container {
                 flex-grow: 1;
-                overflow: hidden; /* Ensures the list cuts off cleanly */
-                display: flex;
-                flex-direction: column;
+                overflow: hidden;
             }
 
             .event-row {
@@ -2685,7 +2677,6 @@ function printCurrentWeek() {
                 border-bottom: 1px dotted #e0e0e0;
                 gap: 5px;
                 line-height: 1.3;
-                flex-shrink: 0; /* Prevents rows from squishing */
             }
 
             .event-time {
@@ -2701,6 +2692,12 @@ function printCurrentWeek() {
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
+            }
+            
+            /* Allow notes to wrap but they will be cut off by the container height if too long */
+            .type-note .event-text {
+                white-space: normal; 
+                line-height: 1.1;
             }
 
             .priority-high { color: #d32f2f; font-weight: 600; }
@@ -2774,6 +2771,12 @@ function printCurrentWeek() {
                 }
 
                 let displayText = e.text;
+                
+                // Truncate notes longer than 200 characters
+                if (e.type === 'note' && displayText.length > 200) {
+                    displayText = displayText.substring(0, 200) + '...';
+                }
+
                 if (e.place && e.place.value) {
                     let loc = e.place.value;
                     if(e.place.type === 'virtual') try { loc = new URL(loc).hostname; } catch(err) {}
@@ -2806,6 +2809,7 @@ function printCurrentWeek() {
     
     closePopupAndGoBack();
 }
+
 async function apiRequest(payload) {
     try {
         const response = await fetch(API_URL, {
