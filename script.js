@@ -2487,26 +2487,6 @@ function renderPastEvents() {
 
 function truncateTextByWords(text, maxLength) {
     if (text.length <= maxLength) return text;
-
-    let truncated = text.slice(0, maxLength);
-
-    // Remove partial last word
-    truncated = truncated.replace(/\s+\S*$/, '');
-
-    return truncated + '...';
-}
-
-function truncateTextByWords(text, maxLength) {
-    if (text.length <= maxLength) return text;
-
-    let truncated = text.slice(0, maxLength);
-    truncated = truncated.replace(/\s+\S*$/, '');
-    return truncated + '...';
-}
-
-function truncateTextByWords(text, maxLength) {
-    if (text.length <= maxLength) return text;
-
     let truncated = text.slice(0, maxLength);
     truncated = truncated.replace(/\s+\S*$/, '');
     return truncated + '...';
@@ -2524,10 +2504,7 @@ function printCurrentWeek() {
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400&display=swap');
 
-        @page {
-            size: A4 portrait;
-            margin: 0;
-        }
+        @page { size: A4 portrait; margin: 0; }
 
         html, body {
             width: 100%;
@@ -2544,8 +2521,6 @@ function printCurrentWeek() {
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
-
-        /* Toolbar */
 
         .toolbar {
             height: 40px;
@@ -2571,11 +2546,9 @@ function printCurrentWeek() {
         .btn-close { color:#d32f2f; border-color:#d32f2f; }
         .btn-close:hover { background:#d32f2f; color:#fff; }
 
-        /* Header */
-
         .page-header {
             text-align: center;
-            padding: 8px 0 4px;
+            padding: 6px 0 3px;
         }
 
         .main-title {
@@ -2595,15 +2568,13 @@ function printCurrentWeek() {
             opacity: .5;
         }
 
-        /* Grid */
-
         .page-container {
-            flex: 1;
+            flex: 1.2;
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: repeat(4, 1fr);
-            gap: 3px; /* slightly smaller gap */
-            padding: 4px 8mm 8mm; /* more usable space */
+            gap: 2px;
+            padding: 3px 6mm 6mm;
             box-sizing: border-box;
         }
 
@@ -2618,21 +2589,19 @@ function printCurrentWeek() {
             .page-container {
                 height:auto;
                 min-height:100%;
-                padding: 0 4mm 4mm;
+                padding: 0 3mm 3mm;
                 grid-auto-rows:1fr;
             }
 
             .page-header {
-                margin-top:4mm;
+                margin-top:3mm;
                 margin-bottom:2mm;
             }
         }
 
-        /* Cells */
-
         .grid-cell {
             border:2px solid #000;
-            padding:5px; /* slightly bigger inner space */
+            padding:6px;
             display:flex;
             flex-direction:column;
             overflow:hidden;
@@ -2652,8 +2621,8 @@ function printCurrentWeek() {
             display:flex;
             justify-content:space-between;
             border-bottom:2px solid #eee;
-            padding-bottom:3px;
-            margin-bottom:3px;
+            padding-bottom:4px;
+            margin-bottom:4px;
         }
 
         .day-name {
@@ -2666,8 +2635,6 @@ function printCurrentWeek() {
             font-size:10px;
         }
 
-        /* Events */
-
         .events-container {
             flex-grow:1;
             overflow:hidden;
@@ -2675,14 +2642,14 @@ function printCurrentWeek() {
 
         .event-row {
             display:flex;
-            font-size:9px;
+            font-size:10px;
             border-bottom:1px dotted #e0e0e0;
-            padding:2px 0; /* taller rows */
-            gap:5px;
+            padding:3px 0;
+            gap:6px;
         }
 
         .event-time {
-            width:35px;
+            width:36px;
             text-align:right;
             font-family:'JetBrains Mono', monospace;
             font-weight:bold;
@@ -2823,7 +2790,6 @@ function printCurrentWeek() {
 
     closePopupAndGoBack();
 }
-
 
 async function apiRequest(payload) {
     try {
