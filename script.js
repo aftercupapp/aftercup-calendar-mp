@@ -2491,181 +2491,154 @@ function printCurrentWeek() {
     const diff = today.getDate() - day + (day === 0 ? -6 : 1);
     const monday = new Date(today.setDate(diff));
     const sunday = new Date(new Date(monday).setDate(monday.getDate() + 6));
-    
+
     const style = `
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400&display=swap');
             
+            @page {
+                size: A4 portrait;
+                margin: 0.5cm;
+            }
+
             body {
                 font-family: 'Inter', sans-serif;
                 color: #000;
-                max-width: 100%;
                 margin: 0;
-                padding: 20px;
+                padding: 0;
+                height: 98vh; /* Force fit to viewport height */
+                overflow: hidden; /* Prevent spillover */
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
+                box-sizing: border-box;
             }
 
-            .header {
-                margin-bottom: 30px;
-                border-bottom: 4px solid #000;
-                padding-bottom: 15px;
+            /* The 2x4 Grid (8 slots: 1 Header + 7 Days) */
+            .page-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: repeat(4, 1fr); 
+                gap: 10px;
+                height: 100%;
+                width: 100%;
+            }
+
+            .grid-cell {
+                border: 2px solid #000;
+                padding: 10px;
                 display: flex;
-                justify-content: space-between;
-                align-items: flex-end;
+                flex-direction: column;
+                overflow: hidden; /* Crucial for cutting off long content */
+                position: relative;
             }
 
-            h1 {
-                font-size: 24px;
+            /* Header Cell Specifics */
+            .header-cell {
+                background-color: #f4f4f4;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+            }
+
+            .main-title {
+                font-size: 28px;
                 font-weight: 800;
                 text-transform: uppercase;
                 margin: 0;
-                letter-spacing: -0.5px;
+                line-height: 1;
             }
 
             .date-range {
                 font-family: 'JetBrains Mono', monospace;
                 font-size: 14px;
+                margin-top: 10px;
                 opacity: 0.7;
-                margin-top: 5px;
             }
 
             .brand-tag {
+                margin-top: 15px;
                 font-size: 10px;
                 text-transform: uppercase;
                 border: 1px solid #000;
-                padding: 2px 6px;
-                border-radius: 10px;
+                padding: 4px 10px;
+                border-radius: 20px;
             }
 
-            .week-grid {
-                display: flex;
-                flex-direction: column;
-                gap: 20px;
-            }
-
-            .day-container {
-                break-inside: avoid;
-                page-break-inside: avoid;
-                border: 2px solid #000;
-                box-shadow: 4px 4px 0 #ddd;
-            }
-
+            /* Day Cell Specifics */
             .day-header {
-                background: #f4f4f4;
-                border-bottom: 2px solid #000;
-                padding: 8px 12px;
                 display: flex;
                 justify-content: space-between;
                 align-items: baseline;
+                border-bottom: 2px solid #eee;
+                padding-bottom: 5px;
+                margin-bottom: 5px;
+                flex-shrink: 0; /* Header never shrinks */
             }
 
             .day-name {
                 font-weight: 700;
                 text-transform: uppercase;
-                font-size: 14px;
+                font-size: 16px;
             }
 
             .day-date {
                 font-family: 'JetBrains Mono', monospace;
                 font-size: 12px;
+                color: #555;
             }
 
-            .events-list {
-                padding: 5px 0;
+            .events-container {
+                flex-grow: 1;
+                overflow: hidden; /* Clips events if there are too many */
             }
 
             .event-row {
                 display: flex;
-                padding: 8px 12px;
-                border-bottom: 1px dashed #ccc;
-                align-items: flex-start;
+                align-items: center;
+                font-size: 11px;
+                padding: 3px 0;
+                border-bottom: 1px dotted #e0e0e0;
+                gap: 8px;
             }
 
-            .event-row:last-child {
-                border-bottom: none;
-            }
-
-            .time-col {
-                width: 60px;
+            .event-time {
                 font-family: 'JetBrains Mono', monospace;
-                font-size: 12px;
                 font-weight: bold;
+                width: 45px;
                 flex-shrink: 0;
-                padding-top: 2px;
+                text-align: right;
             }
 
-            .content-col {
+            .event-text {
                 flex-grow: 1;
-                font-size: 13px;
-                line-height: 1.4;
+                white-space: nowrap; /* Forces single line */
+                overflow: hidden;
+                text-overflow: ellipsis; /* Adds '...' if text is too long */
             }
 
-            .event-meta {
-                display: block;
+            .priority-high { color: #d32f2f; font-weight: 600; }
+            .completed { text-decoration: line-through; opacity: 0.5; }
+            .type-note { font-style: italic; color: #666; }
+            
+            .empty-msg {
                 font-size: 10px;
-                color: #666;
-                margin-top: 2px;
-                font-family: 'JetBrains Mono', monospace;
-            }
-
-            .priority-high {
-                color: #d32f2f;
-                font-weight: 600;
-            }
-            
-            .priority-high::before {
-                content: '! ';
-            }
-
-            .type-note {
+                color: #aaa;
                 font-style: italic;
-                color: #555;
-            }
-
-            .type-task::before {
-                content: '☐ ';
-                font-size: 14px;
-                margin-right: 3px;
-            }
-            
-            .type-task.completed::before {
-                content: '☒ ';
-            }
-            
-            .completed {
-                text-decoration: line-through;
-                opacity: 0.6;
-            }
-
-            .empty-day {
-                padding: 20px;
-                text-align: center;
-                color: #999;
-                font-style: italic;
-                font-size: 12px;
-                background-image: repeating-linear-gradient(transparent, transparent 19px, #eee 20px);
-            }
-            
-            @media print {
-                .day-container {
-                    box-shadow: none;
-                }
+                margin-top: 10px;
             }
         </style>
     `;
 
-    let htmlContent = `<html><head><title>Week ${getWeekNumber(monday)} Overview</title>${style}</head><body>`;
+    let htmlContent = `<html><head><title>Week Overview</title>${style}</head><body>`;
     
+    htmlContent += `<div class="page-grid">`;
+
     htmlContent += `
-        <div class="header">
-            <div>
-                <h1>Week ${getWeekNumber(monday)}</h1>
-                <div class="date-range">${monday.toLocaleDateString()} — ${sunday.toLocaleDateString()}</div>
-            </div>
+        <div class="grid-cell header-cell">
+            <h1 class="main-title">Week ${getWeekNumber(monday)}</h1>
+            <div class="date-range">${monday.toLocaleDateString()} — ${sunday.toLocaleDateString()}</div>
             <div class="brand-tag">Aftercup Calendar</div>
         </div>
-        <div class="week-grid">
     `;
 
     for (let i = 0; i < 7; i++) {
@@ -2681,55 +2654,47 @@ function printCurrentWeek() {
             });
 
         htmlContent += `
-            <div class="day-container">
+            <div class="grid-cell">
                 <div class="day-header">
                     <span class="day-name">${dayNamesFull[d.getDay()]}</span>
-                    <span class="day-date">${d.toLocaleDateString()}</span>
+                    <span class="day-date">${d.getDate()}/${d.getMonth()+1}</span>
                 </div>
+                <div class="events-container">
         `;
 
         if (dayEvents.length === 0) {
-            htmlContent += `<div class="empty-day">No events scheduled</div>`;
+            htmlContent += `<div class="empty-msg">No entries</div>`;
         } else {
-            htmlContent += `<div class="events-list">`;
-            
             dayEvents.forEach(e => {
                 let timeDisplay = e.time || '';
-                let contentClass = 'content-col';
                 let extraClass = '';
-                
-                if (e.importance === 'high') extraClass += ' priority-high';
-                if (e.type === 'task') extraClass += ' type-task';
-                if (e.type === 'note') {
-                    extraClass += ' type-note';
-                    timeDisplay = 'NOTE';
-                }
-                if (e.completed) extraClass += ' completed';
+                let icon = '•';
 
-                let locationHtml = '';
+                if (e.importance === 'high') { extraClass += ' priority-high'; icon = '!'; }
+                if (e.type === 'task') { icon = e.completed ? '☒' : '☐'; }
+                if (e.completed) extraClass += ' completed';
+                if (e.type === 'note') { 
+                    extraClass += ' type-note'; 
+                    timeDisplay = 'NOTE'; 
+                    icon = '✎';
+                }
+
+                let displayText = e.text;
                 if (e.place && e.place.value) {
                     let loc = e.place.value;
-                    if(e.place.type === 'virtual') {
-                         try { loc = new URL(loc).hostname; } catch(err) {}
-                         loc = 'Virtual: ' + loc;
-                    }
-                    locationHtml = `<span class="event-meta">📍 ${loc}</span>`;
+                    if(e.place.type === 'virtual') try { loc = new URL(loc).hostname; } catch(err) {}
+                    displayText += ` (@${loc})`;
                 }
 
                 htmlContent += `
-                    <div class="event-row">
-                        <div class="time-col">${timeDisplay}</div>
-                        <div class="${contentClass} ${extraClass}">
-                            ${e.text}
-                            ${locationHtml}
-                        </div>
+                    <div class="event-row ${extraClass}">
+                        <div class="event-time">${timeDisplay || icon}</div>
+                        <div class="event-text" title="${displayText}">${displayText}</div>
                     </div>
                 `;
             });
-            
-            htmlContent += `</div>`;
         }
-        htmlContent += `</div>`;
+        htmlContent += `</div></div>`; 
     }
 
     htmlContent += `</div></body></html>`;
