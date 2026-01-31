@@ -2564,6 +2564,8 @@ function printCurrentWeek() {
                 text-align: center;
                 padding: 10px 0;
                 flex-shrink: 0;
+                border-bottom: 2px solid #000;
+                margin: 0 5mm;
             }
 
             .main-title {
@@ -2584,18 +2586,13 @@ function printCurrentWeek() {
             /* Grid Layout */
             .page-container {
                 width: 100%;
-                flex-grow: 1; /* Fill remaining vertical space */
+                flex-grow: 1; 
                 display: grid;
                 grid-template-columns: 1fr 1fr;
-                grid-template-rows: repeat(4, 1fr); /* 4 Rows: M/T, W/T, F/S, Sun */
+                grid-template-rows: repeat(4, 1fr); /* Exactly 4 equal rows */
                 gap: 5px;
-                padding: 0 5mm 5mm 5mm; 
+                padding: 5mm; 
                 box-sizing: border-box;
-            }
-
-            /* Sunday spans both columns */
-            .grid-cell:last-child {
-                grid-column: 1 / -1;
             }
 
             @media print {
@@ -2604,12 +2601,16 @@ function printCurrentWeek() {
                 body {
                     display: flex;
                     flex-direction: column;
-                    height: 98vh; /* Safe height for print */
+                    height: 98vh;
                 }
 
                 .page-container { 
                     height: auto;
-                    padding: 0;
+                    padding: 5mm 0 0 0;
+                    margin: 0;
+                }
+                
+                .page-header {
                     margin: 0;
                 }
             }
@@ -2624,6 +2625,18 @@ function printCurrentWeek() {
                 box-sizing: border-box;
                 height: 100%;
                 background-color: #fff;
+            }
+            
+            /* Notes Box Style for the empty 8th slot */
+            .notes-placeholder {
+                border: 2px dashed #ccc;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #ccc;
+                font-family: 'JetBrains Mono', monospace;
+                font-size: 12px;
+                text-transform: uppercase;
             }
 
             .day-header {
@@ -2764,6 +2777,9 @@ function printCurrentWeek() {
         htmlContent += `</div></div>`;
     }
 
+    // CELL 8: Empty placeholder for layout balance
+    htmlContent += `<div class="grid-cell notes-placeholder">Notes</div>`;
+
     htmlContent += `</div></body></html>`;
 
     const printWindow = window.open('', '_blank');
@@ -2776,6 +2792,7 @@ function printCurrentWeek() {
     
     closePopupAndGoBack();
 }
+
 async function apiRequest(payload) {
     try {
         const response = await fetch(API_URL, {
