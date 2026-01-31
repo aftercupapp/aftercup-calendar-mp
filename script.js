@@ -2499,13 +2499,20 @@ function printCurrentWeek() {
     const monday = new Date(today.setDate(diff));
     const sunday = new Date(new Date(monday).setDate(monday.getDate() + 6));
 
-    // Build the HTML content as a single string
     let htmlContent = `
-    <div style="font-family: 'Inter', sans-serif; padding: 20px;">
-        <h1 style="border-bottom: 2px solid #000; padding-bottom: 10px;">Week Overview: Week ${getWeekNumber(monday)}</h1>
-        <p style="font-family: 'JetBrains Mono', monospace; opacity: 0.7;">${monday.toLocaleDateString()} - ${sunday.toLocaleDateString()}</p>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
+    <div style="font-family:'Inter',sans-serif; padding:10px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
     `;
+
+    // Determine the max number of events in any day to equalize heights
+    let maxEvents = 0;
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        const dateStr = getLocalDateString(d);
+        const dayEvents = getVisibleEvents().filter(e => e.date === dateStr);
+        maxEvents = Math.max(maxEvents, dayEvents.length);
+    }
 
     for (let i = 0; i < 7; i++) {
         const d = new Date(monday);
@@ -2517,16 +2524,16 @@ function printCurrentWeek() {
             .sort((a, b) => (a.time || "23:59").localeCompare(b.time || "23:59"));
 
         htmlContent += `
-        <div style="border: 2px solid #000; padding: 10px; display: flex; flex-direction: column; overflow: hidden;">
-            <div style="font-weight: 700; margin-bottom: 5px; display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+        <div style="border:1px solid #000; padding:5px; display:flex; flex-direction:column; min-height:${maxEvents * 25}px;">
+            <div style="font-weight:700; display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding-bottom:3px; margin-bottom:3px;">
                 <span>${dayNamesFull[d.getDay()]}</span>
-                <span style="font-family:'JetBrains Mono', monospace; font-size: 12px;">${d.getDate()}/${d.getMonth()+1}</span>
+                <span style="font-family:'JetBrains Mono', monospace; font-size:11px;">${d.getDate()}/${d.getMonth()+1}</span>
             </div>
-            <div style="flex-grow: 1;">
+            <div style="flex-grow:1;">
         `;
 
         if (!dayEvents.length) {
-            htmlContent += `<p style="opacity: 0.5; font-style: italic;">No entries</p>`;
+            htmlContent += `<p style="opacity:0.5; font-style:italic; margin:0;">No entries</p>`;
         } else {
             let hiddenNotes = 0;
             dayEvents.forEach(e => {
@@ -2540,8 +2547,8 @@ function printCurrentWeek() {
                 }
 
                 htmlContent += `
-                <div style="display:flex; gap: 7px; border-bottom: 1px dotted #e0e0e0; padding: 3px 0; font-size: 12px;">
-                    <span style="min-width: 38px; text-align:right; font-family:'JetBrains Mono', monospace; font-weight:bold;">${timeDisplay || '•'}</span>
+                <div style="display:flex; gap:7px; border-bottom:1px dotted #ccc; padding:2px 0; font-size:11px;">
+                    <span style="min-width:38px; text-align:right; font-family:'JetBrains Mono', monospace; font-weight:bold;">${timeDisplay || '•'}</span>
                     <span>${textDisplay}</span>
                 </div>
                 `;
@@ -2549,7 +2556,7 @@ function printCurrentWeek() {
 
             if (hiddenNotes > 0) {
                 htmlContent += `
-                <div style="display:flex; gap: 7px; border-bottom: 1px dotted #e0e0e0; padding: 3px 0; font-size: 12px;">
+                <div style="display:flex; gap:7px; border-bottom:1px dotted #ccc; padding:2px 0; font-size:11px;">
                     <span style="min-width:38px; text-align:right; font-family:'JetBrains Mono', monospace; font-weight:bold;">NOTE</span>
                     <span>+${hiddenNotes} note${hiddenNotes > 1 ? 's' : ''}</span>
                 </div>
@@ -2562,20 +2569,21 @@ function printCurrentWeek() {
 
     htmlContent += `</div></div>`;
 
-    // Open popup, write content, and print (works on Android)
+    // Open popup and print
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
         alert('Popup blocked. Please allow popups for printing.');
         return;
     }
 
-    printWindow.document.write('<html><head><title>Print Week</title></head><body>' + htmlContent + '</body></html>');
+    printWindow.document.write('<html><head><title>Week Print</title></head><body>' + htmlContent + '</body></html>');
     printWindow.document.close();
     printWindow.focus();
     printWindow.print();
 
     closePopupAndGoBack();
 }
+
 
 async function apiRequest(payload) {
     try {
