@@ -2502,7 +2502,7 @@ function printCurrentWeek() {
 
     const style = `
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400&display=swap');
 
         @page { size: A4 portrait; margin: 0; }
 
@@ -2523,7 +2523,7 @@ function printCurrentWeek() {
         }
 
         .toolbar {
-            height: 40px;
+            height: 42px;
             background: #f0f0f0;
             border-bottom: 1px solid #ccc;
             display: flex;
@@ -2533,11 +2533,11 @@ function printCurrentWeek() {
         }
 
         .btn {
-            padding: 6px 15px;
+            padding: 7px 18px;
             border: 1px solid #000;
             background: #fff;
             font-weight: 600;
-            font-size: 11px;
+            font-size: 12px;
             cursor: pointer;
         }
 
@@ -2548,18 +2548,18 @@ function printCurrentWeek() {
 
         .page-header {
             text-align: center;
-            padding: 6px 0 3px;
+            padding: 6px 0 4px;
         }
 
         .main-title {
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 800;
             margin: 0;
         }
 
         .date-range {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 10px;
+            font-size: 11px;
             opacity: .6;
         }
 
@@ -2569,12 +2569,12 @@ function printCurrentWeek() {
         }
 
         .page-container {
-            flex: 1.2;
+            flex: 1.3;
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: repeat(4, 1fr);
-            gap: 2px;
-            padding: 3px 6mm 6mm;
+            gap: 3px;
+            padding: 4px 6mm 7mm;
             box-sizing: border-box;
         }
 
@@ -2601,7 +2601,7 @@ function printCurrentWeek() {
 
         .grid-cell {
             border:2px solid #000;
-            padding:6px;
+            padding:7px;
             display:flex;
             flex-direction:column;
             overflow:hidden;
@@ -2622,17 +2622,17 @@ function printCurrentWeek() {
             justify-content:space-between;
             border-bottom:2px solid #eee;
             padding-bottom:4px;
-            margin-bottom:4px;
+            margin-bottom:5px;
         }
 
         .day-name {
             font-weight:700;
-            font-size:12px;
+            font-size:13px;
         }
 
         .day-date {
             font-family:'JetBrains Mono', monospace;
-            font-size:10px;
+            font-size:11px;
         }
 
         .events-container {
@@ -2642,14 +2642,14 @@ function printCurrentWeek() {
 
         .event-row {
             display:flex;
-            font-size:10px;
+            font-size:11px;
             border-bottom:1px dotted #e0e0e0;
-            padding:3px 0;
-            gap:6px;
+            padding:4px 0;
+            gap:7px;
         }
 
         .event-time {
-            width:36px;
+            width:38px;
             text-align:right;
             font-family:'JetBrains Mono', monospace;
             font-weight:bold;
@@ -2669,14 +2669,20 @@ function printCurrentWeek() {
 
         .empty-msg {
             text-align:center;
-            font-size:9px;
+            font-size:10px;
             color:#aaa;
             font-style:italic;
         }
     </style>
     `;
 
-    let htmlContent = `<!DOCTYPE html><html><head><meta charset="utf-8">${style}</head><body>`;
+    let htmlContent = `<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        ${style}
+    </head>
+    <body onload="setTimeout(()=>window.print(),300)">`;
 
     htmlContent += `
         <div class="toolbar">
@@ -2781,16 +2787,18 @@ function printCurrentWeek() {
 
     const printWindow = window.open('', '_blank');
 
-    if (printWindow) {
-        printWindow.document.open();
-        printWindow.document.write(htmlContent);
-        printWindow.document.close();
-        printWindow.focus();
+    if (!printWindow) {
+        alert('Popup blocked. Please allow popups for printing.');
+        return;
     }
+
+    printWindow.document.open();
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+    printWindow.focus();
 
     closePopupAndGoBack();
 }
-
 async function apiRequest(payload) {
     try {
         const response = await fetch(API_URL, {
