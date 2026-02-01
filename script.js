@@ -260,9 +260,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (autoSyncEnabled) {
             await performSync('pull');
         }
-    } else {
-         await new Promise(r => setTimeout(r, 800));
-    }
+    } 
     
     hideStartupLoader();
 
