@@ -348,8 +348,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (activePopupId) return;
 
+        if (key === 'Enter') {
+            const tag = activeElement.tagName;
+            if (tag !== 'BUTTON' && tag !== 'A' && tag !== 'SUMMARY' && activeElement.getAttribute('role') !== 'button') {
+                e.preventDefault();
+                showAddPopup();
+                return;
+            }
+        }
+
         const lowerKey = key.toLowerCase();
         switch (lowerKey) {
+            case 'f':
+                e.preventDefault();
+                showSearchPopup();
+                setTimeout(() => {
+                    const searchInput = document.getElementById('search-input');
+                    if (searchInput) searchInput.focus();
+                }, 100);
+                break;
             case 't':
                 e.preventDefault();
                 switchToRelativeDay(1);
@@ -1659,17 +1676,14 @@ async function handleSyncFromFile(event) {
         try {
             const importedData = JSON.parse(e.target.result);
 
-            // 1. Use existing logic to merge file data into current state
             await applyBackupData(importedData);
 
-            // 2. Save explicitly to LocalStorage
-            saveEvents(true); // Save Events (skip auto-sync trigger for a moment)
+            saveEvents(true); 
             
             if (importedData.dreams) {
                 localStorage.setItem('dreams', JSON.stringify(dreams));
             }
 
-            // 3. Force Push to Google Sheets
             if (currentUser) {
                 updateSyncStatus('Uploading merged data...');
                 await performSync('push');
@@ -1682,7 +1696,7 @@ async function handleSyncFromFile(event) {
             console.error(error);
             alert("Failed to sync file.");
         } finally {
-            event.target.value = ''; // Reset input
+            event.target.value = ''; 
         }
     };
     reader.readAsText(file);
