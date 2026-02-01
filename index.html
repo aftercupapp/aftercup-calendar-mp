@@ -105,7 +105,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 4px; /* Slight touch target indication */
+            border-radius: 4px;
         }
         
         .icon-btn:hover {
@@ -963,6 +963,8 @@
 
         <h3 style="margin-top: 20px;">Keyboard Shortcuts</h3>
         <div class="kbd-grid">
+            <div><span class="kbd-shortcut">↵</span> New Entry</div>
+            <div><span class="kbd-shortcut">F</span> Search</div>
             <div><span class="kbd-shortcut">T</span> Tomorrow</div>
             <div><span class="kbd-shortcut">Y</span> Yesterday</div>
             <div><span class="kbd-shortcut">N</span> Today</div>
@@ -1005,7 +1007,6 @@
 
     <div id="past-events-popup" class="popup">
         <h2>Archive</h2>
-        <div id="past-events-loader" style="text-align: center; padding: 20px;">Loading history...</div>
         <div id="past-events-loader" style="text-align: center; padding: 20px;">Loading history...</div>
         <div id="past-events-container"></div>
     </div>
