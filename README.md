@@ -62,7 +62,7 @@ Designed for devices with physical keyboards. Control the entire app without tou
 
 ## 🚀 Technical Details
 
-* **Version:** `v0.1.1` (MP01 build)
+* **Version:** `v0.1.2` (MP01 build)
 * **Platform:** Optimized for Android/Web (Minimal Phone hardware)
 * **Storage:** `LocalStorage` persistence with optional cloud sync via Google Apps Script API.
 * **Notifications:** Service Worker-based daily summary with Weather API integration.
