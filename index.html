@@ -73,6 +73,15 @@
             align-items: flex-start;
             gap: 0;
         }
+        
+        @media (max-width: 380px) {
+            .header-right {
+                gap: 5px;
+            }
+            .app-header {
+                padding: 10px 10px;
+            }
+        }
 
         .header-day {
             font-size: 1.1rem;
@@ -96,10 +105,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            border-radius: 4px; /* Slight touch target indication */
         }
         
         .icon-btn:hover {
             opacity: 0.6;
+            background-color: var(--secondary-bg);
         }
 
         .main-container {
@@ -391,35 +402,6 @@
             opacity: 1;
         }
 
-        .fab-container {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            z-index: 90;
-        }
-
-        .fab {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%; 
-            background-color: var(--bg-color);
-            border: var(--line-width) solid var(--border-color);
-            color: var(--text-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 2px 2px 0 var(--border-color);
-        }
-        
-        .fab:active {
-            transform: translate(2px, 2px);
-            box-shadow: none;
-        }
-
         #auth-forms a {
             color: var(--text-color);
         }
@@ -704,10 +686,16 @@
         </div>
 
         <div class="header-right" id="header-right-section">
-            <button class="icon-btn" onclick="showTodaySummaryPopup()" id="today-summary-bell">
+            <button class="icon-btn" id="search-button" onclick="showSearchPopup()" aria-label="Search">
+                <span class="material-icons-outlined">search</span>
+            </button>
+            <button class="icon-btn" id="add-button" onclick="showAddPopup()" aria-label="Add New">
+                <span class="material-icons-outlined">add</span>
+            </button>
+            <button class="icon-btn" onclick="showTodaySummaryPopup()" id="today-summary-bell" aria-label="Notifications">
                 <span class="material-icons-outlined">notifications</span>
             </button>
-            <button class="icon-btn" onclick="showDatePopup()">
+            <button class="icon-btn" onclick="showDatePopup()" aria-label="Select Date">
                 <span class="material-icons-outlined">calendar_month</span>
                 <span id="current-day-number" style="font-weight: bold; margin-left: 5px;">1</span>
             </button>
@@ -757,15 +745,6 @@
             <div id="events">
             </div>
         </main>
-    </div>
-
-    <div class="fab-container">
-        <button class="fab" id="search-button" onclick="showSearchPopup()">
-            <span class="material-icons-outlined">search</span>
-        </button>
-        <button class="fab" id="add-button" onclick="showAddPopup()">
-            <span class="material-icons-outlined">add</span>
-        </button>
     </div>
 
     <div id="add-popup" class="popup">
@@ -1026,6 +1005,7 @@
 
     <div id="past-events-popup" class="popup">
         <h2>Archive</h2>
+        <div id="past-events-loader" style="text-align: center; padding: 20px;">Loading history...</div>
         <div id="past-events-loader" style="text-align: center; padding: 20px;">Loading history...</div>
         <div id="past-events-container"></div>
     </div>
