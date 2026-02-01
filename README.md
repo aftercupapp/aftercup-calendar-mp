@@ -7,6 +7,7 @@ A distraction-free, high-contrast calendar application specifically designed for
 ## 📱 Screenshots
 
 | | |
+| :---: | :---: |
 | ![Home Screen](https://i.postimg.cc/QxrNCFgN/Screenshot-20260201-172730.png) | ![New Entry](https://i.postimg.cc/Z5D80PBR/Screenshot_20260129_162007.png) |
 | ![Briefing](https://i.postimg.cc/bwFxd0Dv/Screenshot_20260129_162025.png) | ![Menu](https://i.postimg.cc/bwFxd0Dd/Screenshot_20260129_162036.png) |
 | ![Account](https://i.postimg.cc/K8sP47kg/Screenshot_20260129_162044.png) | ![Shortcuts](https://i.postimg.cc/sg0Y1PQV/Screenshot_20260129_190926.png) |
