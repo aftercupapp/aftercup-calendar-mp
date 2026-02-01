@@ -1676,14 +1676,17 @@ async function handleSyncFromFile(event) {
         try {
             const importedData = JSON.parse(e.target.result);
 
+            // 1. Use existing logic to merge file data into current state
             await applyBackupData(importedData);
 
-            saveEvents(true); 
+            // 2. Save explicitly to LocalStorage
+            saveEvents(true); // Save Events (skip auto-sync trigger for a moment)
             
             if (importedData.dreams) {
                 localStorage.setItem('dreams', JSON.stringify(dreams));
             }
 
+            // 3. Force Push to Google Sheets
             if (currentUser) {
                 updateSyncStatus('Uploading merged data...');
                 await performSync('push');
@@ -1696,7 +1699,7 @@ async function handleSyncFromFile(event) {
             console.error(error);
             alert("Failed to sync file.");
         } finally {
-            event.target.value = ''; 
+            event.target.value = ''; // Reset input
         }
     };
     reader.readAsText(file);
