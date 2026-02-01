@@ -75,6 +75,6 @@ Designed for devices with physical keyboards. Control the entire app without tou
 2. Install on your **Minimal Phone**.
 3. *(Optional)* Log in to enable automatic cloud synchronization across devices.
 
-[![Download](https://img.shields.io/badge/↓_Download-v0.1.1-000000?style=for-the-badge&logoColor=white&labelColor=black&color=white)](https://dl.dropbox.com/scl/fi/9ek6yyhd6qz0xpai6mnn4/AftercupCalendar-0.1.1.apk?rlkey=dzedlb4aizgyrsk6m41zl0ahj&st=s2ufsn74)
+[![Download](https://img.shields.io/badge/↓_Download-v0.1.2-000000?style=for-the-badge&logoColor=white&labelColor=black&color=white)](https://dl.dropbox.com/scl/fi/1mdm080r2nx59d7gfwixs/AftercupCalendarMP-0.1.2.apk?rlkey=lmixzd0k5u3qr0ao6osbp156z&st=fuplef5l)
 
 [![Normal version on Google Play](https://img.shields.io/badge/Google_Play-normal_verion-000000?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=com.aftercup.calendar&hl=en)
