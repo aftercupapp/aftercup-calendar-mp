@@ -144,6 +144,16 @@ function mergeEvents(fetched, stored) {
     return [...preAddedEvents, ...userOnlyEvents];
 }
 
+function hideStartupLoader() {
+    const loader = document.getElementById('startup-loader');
+    if (loader) {
+        loader.style.opacity = '0';
+        setTimeout(() => {
+            loader.style.display = 'none';
+        }, 500);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
 
     const todayStr = getLocalDateString(new Date());
@@ -248,9 +258,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (currentUser) {
         updateAccountUI();
         if (autoSyncEnabled) {
-            performSync('pull');
+            await performSync('pull');
         }
+    } else {
+         await new Promise(r => setTimeout(r, 800));
     }
+    
+    hideStartupLoader();
 
     window.addEventListener('popstate', (event) => {
         const activePopupId = getActivePopupId();
