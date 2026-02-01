@@ -46,6 +46,8 @@ Designed for devices with physical keyboards. Control the entire app without tou
 | <kbd>H</kbd> | Access the S**h**ift Planner |
 | <kbd>P</kbd> / <kbd>D</kbd> / <kbd>U</kbd> / <kbd>I</kbd> | Quick access: **P**ocket, **D**reams, **U**pcoming, and H**i**story |
 | <kbd>A</kbd> / <kbd>S</kbd> | Open **A**ftercup brief or Account **S**ettings |
+| <kbd>F</kbd> | Search between added entries |
+| <kbd>↵</kbd> | Add a new enrty |
 | <kbd>⌫</kbd> | Close active popups or return to homescreen |
 
 > **Quick Jump to Day:** Simply type a number (<kbd>1</kbd>-<kbd>3</kbd><kbd>1</kbd>) on the home screen. A mini popup appears for two-digit entry. After 2.5 seconds, the calendar automatically jumps to that day.
