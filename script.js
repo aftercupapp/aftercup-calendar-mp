@@ -1017,7 +1017,6 @@ function renderEvents() {
 
     sortedEvents.forEach(event => {
         const eventItem = document.createElement('div');
-        // FIX: Add unique ID
         eventItem.id = 'event-item-' + event.id;
         eventItem.className = 'event-item item-glassy';
         if (event.completed) eventItem.classList.add('completed');
@@ -1562,15 +1561,12 @@ function toggleTask(eventId, e) {
     if (eventIndex > -1) {
         const evt = events[eventIndex];
         
-        // 1. Update Data
         evt.completed = !evt.completed;
         evt.lastModified = Date.now();
         saveEvents();
-        
-        // 2. Direct DOM Update
+
         const itemEl = document.getElementById('event-item-' + eventId);
         if (itemEl) {
-            // Container Styles
             if (evt.completed) {
                 itemEl.classList.add('completed');
                 itemEl.style.removeProperty('background-color');
@@ -1585,14 +1581,12 @@ function toggleTask(eventId, e) {
                 }
             }
             
-            // Text Strikethrough
             const textSpan = itemEl.querySelector('.event-text');
             if (textSpan) {
                 if (evt.completed) textSpan.classList.add('completed-text');
                 else textSpan.classList.remove('completed-text');
             }
-            
-            // Checkbox sync
+
             const checkbox = itemEl.querySelector('.hidden-task-checkbox');
             if (checkbox) checkbox.checked = evt.completed;
         }
