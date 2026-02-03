@@ -57,8 +57,8 @@ Designed for devices with physical keyboards. Control the entire app without tou
 ## 🛠️ Professional tools
 
 * **Symbol-based Shift Planner:** Track work cycles using high-visibility icons for morning, afternoon, night, resting, holiday, and sick pay.
-* **Print Week Overview:** Generate a clean, printer-friendly summary of your current week.
-* **Cloud Sync & Backup:** Securely backup to the cloud (Aftercup Account) or perform manual local exports/restores via `.json` files for total data sovereignty.
+* **Print week overview:** Generate a clean, printer-friendly summary of your current week.
+* **Cloud sync & backup:** Securely backup to the cloud (Aftercup Account) or perform manual local exports/restores via `.json` files for total data sovereignty.
 * **Google Calnedar support:** Save your calendar entries to Google Calendar or import them from there.
 
 ---
@@ -68,7 +68,7 @@ Designed for devices with physical keyboards. Control the entire app without tou
 * **Version:** `v0.1.2` (MP01 build)
 * **Platform:** Optimized for Android/Web (Minimal Phone hardware)
 * **Storage:** `LocalStorage` persistence with optional cloud sync via Google Apps Script API.
-* **Notifications:** Service Worker-based daily summary with Weather API integration.
+* **Notifications:** Service Worker-based daily summary with Weather API integration. **Notifications are currently unstable due to web environment limitations!**
 
 ---
 
