@@ -1046,6 +1046,20 @@
         <button class="popup-btn" onclick="document.getElementById('sync-file-input').click()" style="margin-top: 0px; display: flex; align-items: center; justify-content: center; gap: 8px;">
         Sync from File (Merge)
         </button>
+
+        <button class="popup-btn" onclick="handleGoogleImport()" style="margin-bottom: 5px; display: flex; align-items: center; justify-content: flex-start; gap: 12px; border: 1px solid var(--border-color); background: transparent; color: var(--text-color);">
+            <span class="material-icons-outlined">login</span>
+            Import from Google Calendar
+        </button>
+        <div id="last-import-time" style="font-size: 0.8em; opacity: 0.6; margin-bottom: 15px; font-family: var(--font-mono); text-align: left; padding-left: 10px;">
+            </div>
+
+        <button class="popup-btn" onclick="handleGoogleExport()" style="margin-bottom: 5px; display: flex; align-items: center; justify-content: flex-start; gap: 12px; border: 1px solid var(--border-color); background: transparent; color: var(--text-color);">
+            <span class="material-icons-outlined">logout</span>
+            Export to Google Calendar
+        </button>
+        <div id="last-export-time" style="font-size: 0.8em; opacity: 0.6; margin-bottom: 15px; font-family: var(--font-mono); text-align: left; padding-left: 10px;">
+            </div>
         
         <h3 style="margin-top: 20px;">Theme</h3>
         <div style="display: flex; flex-wrap: wrap; gap: 5px;">
@@ -1076,6 +1090,8 @@
             <button id="popup-later-btn" class="popup-btn" style="background:transparent; color:var(--text-color);">Later</button>
         </div>
     </div>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://apis.google.com/js/api.js" async defer></script>
     <script>
       if (typeof navigator.serviceWorker !== 'undefined') {
         navigator.serviceWorker.register('sw.js')
