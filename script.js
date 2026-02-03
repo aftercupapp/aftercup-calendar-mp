@@ -1554,7 +1554,9 @@ function deleteEvent(eventId, e) {
 
 function toggleTask(eventId, e) {
     e.stopPropagation();
-    const eventIndex = events.findIndex(ev => ev.id === eventId);
+    
+    const eventIndex = events.findIndex(ev => String(ev.id) === String(eventId));
+    
     if (eventIndex > -1) {
         events[eventIndex].completed = !events[eventIndex].completed;
         events[eventIndex].lastModified = Date.now();
