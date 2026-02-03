@@ -154,6 +154,15 @@ function hideStartupLoader() {
     }
 }
 
+const GOOGLE_CLIENT_ID = '527094061235-43h8vsp98slnsc8asfqlhc8c8j10e65e.apps.googleusercontent.com';
+const GOOGLE_API_KEY = 'AIzaSyAyQjKsyuwTUw5xU_84-Cor-Sr_FpMpCMQ';
+const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
+const SCOPES = 'https://www.googleapis.com/auth/calendar';
+
+let tokenClient;
+let gapiInited = false;
+let gisInited = false;
+
 document.addEventListener('DOMContentLoaded', async () => {
 
     const todayStr = getLocalDateString(new Date());
@@ -425,6 +434,40 @@ document.addEventListener('DOMContentLoaded', async () => {
                 break;
         }
     });
+
+    const lastImport = localStorage.getItem('lastGoogleImport');
+    const lastExport = localStorage.getItem('lastGoogleExport');
+    if (lastImport) {
+        const el = document.getElementById('last-import-time');
+        if (el) el.innerText = 'Last Import: ' + lastImport;
+    }
+    if (lastExport) {
+        const el = document.getElementById('last-export-time');
+        if (el) el.innerText = 'Last Export: ' + lastExport;
+    }
+
+    if (typeof gapi !== 'undefined') {
+        gapi.load('client', async () => {
+            await gapi.client.init({
+                apiKey: GOOGLE_API_KEY,
+                discoveryDocs: [DISCOVERY_DOC],
+            });
+            gapiInited = true;
+        });
+    }
+    
+    const checkGoogle = setInterval(() => {
+        if (typeof google !== 'undefined' && google.accounts) {
+            clearInterval(checkGoogle);
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: GOOGLE_CLIENT_ID,
+                scope: SCOPES,
+                callback: '', 
+            });
+            gisInited = true;
+        }
+    }, 100);
+    
 });
 
 function handleQuickJumpInput(digit) {
@@ -946,13 +989,17 @@ function renderEvents() {
     const importanceRank = { 'high': 1, 'average': 2, 'low': 3 };
 
     const sortedEvents = visibleEvents
-        .filter(event => event.date === currentDateString)
+        .filter(event => {
+            if (event.date === currentDateString) return true;
+            if (event.type === 'event' && event.endDate) {
+                return currentDateString >= event.date && currentDateString <= event.endDate;
+            }
+            return false;
+        })
         .sort((a, b) => {
             const rankA = importanceRank[a.importance] || 2;
             const rankB = importanceRank[b.importance] || 2;
-            if (rankA !== rankB) {
-                return rankA - rankB;
-            }
+            if (rankA !== rankB) return rankA - rankB;
             return (a.time || "23:59").localeCompare(b.time || "23:59");
         });
 
@@ -971,9 +1018,8 @@ function renderEvents() {
     sortedEvents.forEach(event => {
         const eventItem = document.createElement('div');
         eventItem.className = 'event-item item-glassy';
-        if (event.completed) {
-            eventItem.classList.add('completed');
-        }
+        if (event.completed) eventItem.classList.add('completed');
+        
         if (event.color && event.color !== '#FFFFFF' && event.color !== '#000000') {
             if (!event.completed) {
                 eventItem.style.setProperty('background-color', event.color, 'important');
@@ -983,7 +1029,7 @@ function renderEvents() {
         }
 
         let deleteButtonHTML = event.preAdded ? '' : `
-                <button class="delete-btn" onclick="deleteEvent(${event.id}, event)">
+                <button class="delete-btn" onclick="deleteEvent('${event.id}', event)">
                     <span class="material-icons-outlined">delete_outline</span>
                 </button>`;
 
@@ -992,11 +1038,13 @@ function renderEvents() {
             tempDiv.innerHTML = event.text;
             const textContent = tempDiv.textContent || tempDiv.innerText || "";
             const isLong = textContent.length > 10 || (textContent.match(/\n/g) || []).length > 2;
+            
+            const timeString = event.time ? ` • ${event.time}` : '';
 
             eventItem.innerHTML = `
                     <div class="event-item-content-wrapper" style="align-items: flex-start; flex-direction: column; width: calc(100% - 40px);">
                         <div style="font-size: 12px; opacity: 0.7; margin-bottom: 4px; display: flex; align-items: center;">
-                            <span class="material-icons-outlined" style="font-size: 14px; margin-right: 4px;">sticky_note_2</span> Note
+                            <span class="material-icons-outlined" style="font-size: 14px; margin-right: 4px;">sticky_note_2</span> Note${timeString}
                         </div>
                         <div class="event-note-preview">
                             ${event.text}
@@ -1010,6 +1058,9 @@ function renderEvents() {
         }
         else {
             let textDisplay = event.text;
+            if (event.shared && textDisplay.startsWith("[Shared] ")) {
+                textDisplay = textDisplay.substring(9);
+            }
             const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
             textDisplay = textDisplay.replace(urlRegex, url => `<a href="${url}" target="_blank" style="color: inherit; text-decoration: underline;" onclick="event.stopPropagation();">${url}</a>`);
 
@@ -1020,7 +1071,7 @@ function renderEvents() {
                 if (event.completed) textSpanClass += " completed-text";
                 taskMarkerHTML = `
                         <label class="task-checkbox-label" onclick="event.stopPropagation();">
-                            <input type="checkbox" class="hidden-task-checkbox" ${event.completed ? 'checked' : ''} onchange="toggleTask(${event.id}, event)">
+                            <input type="checkbox" class="hidden-task-checkbox" ${event.completed ? 'checked' : ''} onchange="toggleTask('${event.id}', event)">
                             <span class="custom-checkbox">
                                 <span class="material-icons-outlined check-icon">check_small</span>
                             </span>
@@ -1028,9 +1079,15 @@ function renderEvents() {
                     `;
             }
 
-            let routineIcon = '';
+            let iconHTML = '';
+            if (event.isGoogleEvent) {
+                iconHTML += '<span class="material-symbols-outlined" style="font-size: 16px; margin-right: 5px; opacity: 0.7; vertical-align: middle;">cloud</span>';
+            }
             if (event.type === 'routine' || event.routineId) {
-                routineIcon = '<span class="material-symbols-outlined" style="font-size: 16px; margin-right: 5px; opacity: 0.7; vertical-align: middle;">sync</span>';
+                iconHTML += '<span class="material-symbols-outlined" style="font-size: 16px; margin-right: 5px; opacity: 0.7; vertical-align: middle;">sync</span>';
+            }
+            if (event.shared) {
+                iconHTML += '<span class="material-icons-outlined" style="font-size: 16px; margin-right: 5px; opacity: 0.7; vertical-align: middle;">share</span>';
             }
 
             let placeHTML = '';
@@ -1053,14 +1110,21 @@ function renderEvents() {
                             </a>`;
                 }
             }
+            
+            let timeDisplay = event.time || '';
+            if (event.time && event.endTime) {
+                timeDisplay = `${event.time} - ${event.endTime}`;
+            } else if (!event.time && event.endTime) {
+                 timeDisplay = `Ends at ${event.endTime}`;
+            }
 
             eventItem.innerHTML = `
                     <div class="event-item-content-wrapper">
                         ${taskMarkerHTML}
-                        <span class="${textSpanClass}">${routineIcon}${textDisplay}</span>
+                        <span class="${textSpanClass}">${iconHTML}${textDisplay}</span>
                     </div>
                     <div class="event-footer">
-                        <div class="event-date">${event.time || ''}</div>
+                        <div class="event-date">${timeDisplay}</div>
                         ${placeHTML}
                     </div>
                     ${deleteButtonHTML}
@@ -1459,7 +1523,7 @@ function handleRoutineDelete(eventId, scope) {
 function deleteEvent(eventId, e) {
     if (e) e.stopPropagation();
 
-    const eventToDelete = events.find(event => event.id === eventId);
+    const eventToDelete = events.find(event => String(event.id) === String(eventId));
     
     if (eventToDelete && eventToDelete.routineId) {
         promptForRoutineDelete(eventToDelete);
@@ -1484,7 +1548,6 @@ function deleteEvent(eventId, e) {
                 }).catch(err => console.error(err));
              });
         }
-        
         scheduleAutomaticNotifications();
     }
 }
@@ -2559,6 +2622,253 @@ function printCurrentWeek() {
     printWindow.document.close();
     printWindow.print();
     closePopupAndGoBack();
+}
+
+async function handleGoogleImport() {
+    if (!gapiInited || !gisInited) {
+        alert("Google Services are still loading. Please try again in a moment.");
+        return;
+    }
+
+    const btn = document.querySelector('button[onclick="handleGoogleImport()"]');
+    const originalText = btn ? btn.innerHTML : '';
+    if (btn) btn.textContent = "Connecting...";
+
+    try {
+        tokenClient.callback = async (resp) => {
+            if (resp.error !== undefined) throw (resp);
+            if (btn) btn.textContent = "Fetching Events...";
+            await fetchAndMergeGoogleEvents();
+            if (btn) btn.innerHTML = originalText;
+            alert("Google Calendar events imported successfully!");
+        };
+
+        if (gapi.client.getToken() === null) {
+            tokenClient.requestAccessToken({prompt: 'consent'});
+        } else {
+            tokenClient.requestAccessToken({prompt: ''});
+        }
+    } catch (err) {
+        console.error("Google Auth Error:", err);
+        alert("Failed to connect to Google.");
+        if (btn) btn.innerHTML = originalText;
+    }
+}
+
+async function fetchAndMergeGoogleEvents() {
+    try {
+        const minDate = new Date();
+        minDate.setMonth(minDate.getMonth() - 1);
+        const maxDate = new Date();
+        maxDate.setFullYear(maxDate.getFullYear() + 1);
+
+        const request = {
+            'calendarId': 'primary',
+            'timeMin': minDate.toISOString(),
+            'timeMax': maxDate.toISOString(),
+            'showDeleted': false,
+            'singleEvents': true,
+            'maxResults': 250,
+            'orderBy': 'startTime',
+        };
+
+        const response = await gapi.client.calendar.events.list(request);
+        const googleEvents = response.result.items;
+
+        if (!googleEvents || googleEvents.length === 0) {
+            alert("No upcoming events found in Google Calendar.");
+            return;
+        }
+
+        let newCount = 0;
+        let updateCount = 0;
+
+        googleEvents.forEach(gEvent => {
+            let dateStr, timeStr = "", endTimeStr = "";
+            let startDateObj;
+
+            if (gEvent.start.date) {
+                dateStr = gEvent.start.date;
+            } else {
+                startDateObj = new Date(gEvent.start.dateTime);
+                dateStr = getLocalDateString(startDateObj);
+                
+                const hours = startDateObj.getHours().toString().padStart(2, '0');
+                const minutes = startDateObj.getMinutes().toString().padStart(2, '0');
+                timeStr = `${hours}:${minutes}`;
+
+                if (gEvent.end.dateTime) {
+                    const endDateObj = new Date(gEvent.end.dateTime);
+                    const endH = endDateObj.getHours().toString().padStart(2, '0');
+                    const endM = endDateObj.getMinutes().toString().padStart(2, '0');
+                    endTimeStr = `${endH}:${endM}`;
+                }
+            }
+
+            const mappedEvent = {
+                id: 'gcal_' + gEvent.id,
+                googleEventId: gEvent.id,
+                type: 'event',
+                date: dateStr,
+                time: timeStr,
+                endTime: endTimeStr,
+                text: gEvent.summary || '(No Title)',
+                color: '#000000', // Default for epaper
+                importance: 'average',
+                place: gEvent.location ? { type: 'physical', value: gEvent.location } : null,
+                preAdded: false,
+                lastModified: Date.now(),
+                isGoogleEvent: true
+            };
+
+            if (gEvent.end.date && gEvent.end.date !== gEvent.start.date) {
+                const endDateObj = new Date(gEvent.end.date);
+                endDateObj.setDate(endDateObj.getDate() - 1);
+                mappedEvent.endDate = getLocalDateString(endDateObj);
+            }
+
+            let existingIndex = events.findIndex(e => String(e.id) === String(mappedEvent.id));
+            if (existingIndex === -1) {
+                existingIndex = events.findIndex(e => e.googleEventId === gEvent.id);
+            }
+            
+            if (existingIndex > -1) {
+                const localId = events[existingIndex].id;
+                events[existingIndex] = { ...events[existingIndex], ...mappedEvent, id: localId };
+                updateCount++;
+            } else {
+                events.push(mappedEvent);
+                newCount++;
+            }
+        });
+
+        saveEvents();
+        updateCalendar();
+        
+        const timeString = new Date().toLocaleString();
+        localStorage.setItem('lastGoogleImport', timeString);
+        const tsEl = document.getElementById('last-import-time');
+        if (tsEl) tsEl.innerText = 'Last Import: ' + timeString;
+
+        if (currentUser) triggerAutoSync();
+
+    } catch (err) {
+        console.error('Error fetching Google events:', err);
+        alert('Error fetching events.');
+    }
+}
+
+async function handleGoogleExport() {
+    if (!gapiInited || !gisInited) {
+        alert("Services loading...");
+        return;
+    }
+
+    const eventsToExport = events.filter(e => 
+        !e.deleted && 
+        !e.isGoogleEvent && 
+        !e.googleEventId && 
+        e.type !== 'note'
+    );
+
+    if (eventsToExport.length === 0) {
+        alert("No new local events to export.");
+        return;
+    }
+
+    if (!confirm(`Export ${eventsToExport.length} items to Google Calendar?`)) return;
+
+    const btn = document.querySelector('button[onclick="handleGoogleExport()"]');
+    const originalText = btn ? btn.innerHTML : '';
+    if (btn) btn.textContent = "Exporting...";
+
+    try {
+        tokenClient.callback = async (resp) => {
+            if (resp.error !== undefined) throw (resp);
+            await performBatchExport(eventsToExport);
+            if (btn) btn.innerHTML = originalText;
+            saveEvents();
+            
+            const timeString = new Date().toLocaleString();
+            localStorage.setItem('lastGoogleExport', timeString);
+            const tsEl = document.getElementById('last-export-time');
+            if (tsEl) tsEl.innerText = 'Last Export: ' + timeString;
+
+            alert("Export complete!");
+        };
+
+        if (gapi.client.getToken() === null) {
+            tokenClient.requestAccessToken({prompt: 'consent'});
+        } else {
+            tokenClient.requestAccessToken({prompt: ''});
+        }
+    } catch (err) {
+        console.error("Export Auth Error:", err);
+        if (btn) btn.innerHTML = originalText;
+    }
+}
+
+async function performBatchExport(exportList) {
+    let successCount = 0;
+    for (const localEvent of exportList) {
+        try {
+            const resource = createGoogleEventResource(localEvent);
+            const response = await gapi.client.calendar.events.insert({
+                'calendarId': 'primary',
+                'resource': resource
+            });
+            localEvent.googleEventId = response.result.id;
+            successCount++;
+        } catch (error) {
+            console.error(`Failed to export: ${localEvent.text}`, error);
+        }
+    }
+}
+
+function createGoogleEventResource(localEvent) {
+    const resource = {
+        summary: localEvent.text,
+        description: 'Created via Aftercup Epaper Calendar',
+    };
+
+    if (localEvent.place && localEvent.place.value) {
+        resource.location = localEvent.place.value;
+    }
+
+    if (localEvent.time) {
+        const [year, month, day] = localEvent.date.split('-').map(Number);
+        const [hour, minute] = localEvent.time.split(':').map(Number);
+        const startDt = new Date(year, month - 1, day, hour, minute);
+        
+        let endDt;
+        if (localEvent.endTime) {
+            const [endH, endM] = localEvent.endTime.split(':').map(Number);
+            if (localEvent.endDate && localEvent.endDate !== localEvent.date) {
+                 const [eY, eM, eD] = localEvent.endDate.split('-').map(Number);
+                 endDt = new Date(eY, eM - 1, eD, endH, endM);
+            } else {
+                 endDt = new Date(year, month - 1, day, endH, endM);
+            }
+        } else {
+            endDt = new Date(startDt);
+            endDt.setHours(startDt.getHours() + 1);
+        }
+
+        resource.start = { dateTime: startDt.toISOString() };
+        resource.end = { dateTime: endDt.toISOString() };
+    } else {
+        resource.start = { date: localEvent.date };
+        if (localEvent.endDate) {
+            const endD = new Date(localEvent.endDate);
+            endD.setDate(endD.getDate() + 1);
+            resource.end = { date: getLocalDateString(endD) };
+        } else {
+            const endD = new Date(localEvent.date);
+            endD.setDate(endD.getDate() + 1);
+            resource.end = { date: getLocalDateString(endD) };
+        }
+    }
+    return resource;
 }
 
 async function apiRequest(payload) {
