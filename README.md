@@ -63,7 +63,7 @@ Designed for devices with physical keyboards. Control the entire app without tou
 
 ---
 
-## 🚀 Technical Details
+## 🚀 Technical details
 
 * **Version:** `v0.1.2` (MP01 build)
 * **Platform:** Optimized for Android/Web (Minimal Phone hardware)
