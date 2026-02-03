@@ -1750,18 +1750,13 @@ async function handleSyncFromFile(event) {
     reader.onload = async function(e) {
         try {
             const importedData = JSON.parse(e.target.result);
-
-            // 1. Use existing logic to merge file data into current state
             await applyBackupData(importedData);
-
-            // 2. Save explicitly to LocalStorage
-            saveEvents(true); // Save Events (skip auto-sync trigger for a moment)
+            saveEvents(true); 
             
             if (importedData.dreams) {
                 localStorage.setItem('dreams', JSON.stringify(dreams));
             }
 
-            // 3. Force Push to Google Sheets
             if (currentUser) {
                 updateSyncStatus('Uploading merged data...');
                 await performSync('push');
@@ -1774,7 +1769,7 @@ async function handleSyncFromFile(event) {
             console.error(error);
             alert("Failed to sync file.");
         } finally {
-            event.target.value = ''; // Reset input
+            event.target.value = ''; 
         }
     };
     reader.readAsText(file);
@@ -2713,7 +2708,7 @@ async function fetchAndMergeGoogleEvents() {
                 time: timeStr,
                 endTime: endTimeStr,
                 text: gEvent.summary || '(No Title)',
-                color: '#000000', // Default for epaper
+                color: '#000000', 
                 importance: 'average',
                 place: gEvent.location ? { type: 'physical', value: gEvent.location } : null,
                 preAdded: false,
