@@ -1,4 +1,5 @@
 [
+   { "id": 66, "type": "event", "date": "2026-02-18", "time": "11:00", "text": "📰 Hétköznapi french press", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/317", "importance": "average" },
    { "id": 65, "type": "event", "date": "2026-02-08", "time": "16:00", "text": "📰 Az anyag válasza + Designikonok kiállítás", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/316", "importance": "average" },
    { "id": 64, "type": "event", "date": "2026-02-02", "time": "12:00", "text": "📰 DeLonghi Nespresso CitiZ kávéfőző teszt", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/315", "importance": "average" },
    { "id": 63, "type": "event", "date": "2026-01-24", "time": "15:00", "text": "📰 Connect Specialty Kávézó", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/314", "importance": "average" },
