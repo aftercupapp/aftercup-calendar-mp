@@ -1,4 +1,8 @@
 [
+   { "id": 70, "type": "event", "date": "2026-03-08", "time": "11:00", "text": "📰 🌷🌷🌷", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/321", "importance": "average" },
+   { "id": 69, "type": "event", "date": "2026-03-02", "time": "11:00", "text": "📰 Három fejezet kiállításmegnyitó", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/320", "importance": "average" },
+   { "id": 68, "type": "event", "date": "2026-03-01", "time": "11:00", "text": "📰 9 éves az Aftercup", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/319", "importance": "average" },
+   { "id": 67, "type": "event", "date": "2026-02-28", "time": "11:00", "text": "📰 Habit", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/318", "importance": "average" },
    { "id": 66, "type": "event", "date": "2026-02-18", "time": "11:00", "text": "📰 Hétköznapi french press", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/317", "importance": "average" },
    { "id": 65, "type": "event", "date": "2026-02-08", "time": "16:00", "text": "📰 Az anyag válasza + Designikonok kiállítás", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/316", "importance": "average" },
    { "id": 64, "type": "event", "date": "2026-02-02", "time": "12:00", "text": "📰 DeLonghi Nespresso CitiZ kávéfőző teszt", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/315", "importance": "average" },
@@ -68,6 +72,7 @@
   { "id": 1, "type": "event", "date": "2025-05-23", "time": "10:00", "text": "📰 A meghajlított kő - Kigyós Sándor emlékkiállítás", "color": "#FFFFFF", "link": "https://aftercup.neocities.org/Posts/233", "importance": "average" }
 
 ]
+
 
 
 
