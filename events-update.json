@@ -1,4 +1,5 @@
 [
+   { "id": 71, "type": "event", "date": "2026-03-09", "time": "20:00", "text": "📰 Kipróbáltuk az italt, amiért mostanában odavan az internet", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/322", "importance": "average" },
    { "id": 70, "type": "event", "date": "2026-03-08", "time": "11:00", "text": "📰 🌷🌷🌷", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/321", "importance": "average" },
    { "id": 69, "type": "event", "date": "2026-03-02", "time": "11:00", "text": "📰 Három fejezet kiállításmegnyitó", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/320", "importance": "average" },
    { "id": 68, "type": "event", "date": "2026-03-01", "time": "11:00", "text": "📰 9 éves az Aftercup", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/319", "importance": "average" },
