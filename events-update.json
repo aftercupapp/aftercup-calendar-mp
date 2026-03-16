@@ -1,4 +1,6 @@
 [
+   { "id": 73, "type": "event", "date": "2026-03-16", "time": "16:00", "text": "📰 Tavaszi séta a naplementében", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/324", "importance": "average" },      
+   { "id": 72, "type": "event", "date": "2026-03-15", "time": "10:00", "text": "📰 Március 15-ei utazás", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/323", "importance": "average" },   
    { "id": 71, "type": "event", "date": "2026-03-09", "time": "20:00", "text": "📰 Kipróbáltuk az italt, amiért mostanában odavan az internet", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/322", "importance": "average" },
    { "id": 70, "type": "event", "date": "2026-03-08", "time": "11:00", "text": "📰 🌷🌷🌷", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/321", "importance": "average" },
    { "id": 69, "type": "event", "date": "2026-03-02", "time": "11:00", "text": "📰 Három fejezet kiállításmegnyitó", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/320", "importance": "average" },
