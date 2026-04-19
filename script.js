@@ -1758,8 +1758,8 @@ async function handleRestoreFile(event) {
                     dreams = restoredObject.dreams;
                     localStorage.setItem('dreams', JSON.stringify(dreams));
                 }
-                if (restoredObject.shiftPlannerData) {
-                    localStorage.setItem("shifts", JSON.stringify(restoredObject.shiftPlannerData));
+                if (restoredObject.shifts) {
+                    localStorage.setItem("shifts", JSON.stringify(restoredObject.shifts));
                 }
                 updateCalendar();
             }
@@ -1983,7 +1983,7 @@ function spShowShiftPopup(year, month, day) {
             if (className && className !== "delete") {
                 savedShifts[shiftKey] = className;
             } else {
-                delete savedShifts[shiftKey];
+                savedShifts[shiftKey] = "";
             }
             localStorage.setItem("shifts", JSON.stringify(savedShifts));
             closeSpSelectPopup();
@@ -2479,7 +2479,7 @@ async function applyBackupData(backup) {
 
     if (syncPrefs.shifts && backup.shifts) {
         const localShifts = JSON.parse(localStorage.getItem("shifts")) || {};
-        const mergedShifts = { ...backup.shifts, ...localShifts };
+        const mergedShifts = { ...localShifts, ...backup.shifts };
         localStorage.setItem('shifts', JSON.stringify(mergedShifts));
         if (typeof spRenderCalendar === 'function') spRenderCalendar();
     }
