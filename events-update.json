@@ -1,4 +1,5 @@
 [
+   { "id": 75, "type": "event", "date": "2026-04-20", "time": "08:00", "text": "📰 Doboz Coffee Shop", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/326", "importance": "average" },  
    { "id": 74, "type": "event", "date": "2026-04-14", "time": "11:00", "text": "📰 Pécsi Bagel", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/325", "importance": "average" },   
    { "id": 73, "type": "event", "date": "2026-03-16", "time": "16:00", "text": "📰 Tavaszi séta a naplementében", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/324", "importance": "average" },      
    { "id": 72, "type": "event", "date": "2026-03-15", "time": "10:00", "text": "📰 Március 15-ei utazás", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/323", "importance": "average" },   
