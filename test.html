@@ -276,12 +276,18 @@
             max-width: 800px;
             margin: 0 auto;
             width: 100%;
+            flex: 1;
         }
         
         .no-events-message {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            margin-top: 40px;
+            flex: 1;
             font-family: var(--font-mono);
+            margin: 0;
         }
 
         .event-item {
@@ -664,8 +670,26 @@
             margin-top: 15px;
         }
 
-        /* E-INK: Fullscreen Popups on Mobile */
+        /* E-INK: Fullscreen Popups on Mobile & Dashboard Header */
         @media (max-width: 768px) {
+            .app-header {
+                height: 100px;
+                padding: 15px 20px;
+                align-items: center;
+            }
+            .header-left {
+                gap: 5px;
+            }
+            .header-day {
+                font-size: 2rem;
+            }
+            .header-date {
+                font-size: 1.1rem;
+            }
+            #main-menu-btn .material-icons-outlined {
+                font-size: 38px !important;
+            }
+
             .popup, .search-popup, .sp-select-popup {
                 top: 0 !important;
                 left: 0 !important;
