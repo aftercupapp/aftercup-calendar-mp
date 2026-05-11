@@ -18,7 +18,7 @@
             --text-color: #000000;
             --border-color: #000000;
             --accent-color: #000000;
-            --secondary-bg: #e0e0e0; /* Slightly darker for better e-ink contrast if needed */
+            --secondary-bg: #ffffff; /* E-INK: Pure white for maximum contrast */
             --line-width: 2px;
             --font-main: 'Inter', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
@@ -29,7 +29,7 @@
             --text-color: #ffffff;
             --border-color: #ffffff;
             --accent-color: #ffffff;
-            --secondary-bg: #222222;
+            --secondary-bg: #000000;
         }
 
         /* E-INK OPTIMIZATION: KILL ALL ANIMATIONS AND SHADOWS globally */
@@ -51,48 +51,16 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            font-weight: 400;
-        }
-
-        /* Startup Loader Styles */
-        #startup-loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--bg-color);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #startup-loader h1 {
-            font-size: 2.5rem;
-            margin: 0 0 15px 0;
-            font-weight: 700;
-            letter-spacing: -1px;
-            color: var(--text-color);
-        }
-
-        .loader-text {
-            font-family: var(--font-mono);
-            font-size: 1rem;
-            color: var(--text-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-weight: 600; /* E-INK: Bolder base font for legibility */
         }
 
         .app-header {
             border-bottom: var(--line-width) solid var(--border-color);
-            padding: 5px 10px; /* E-INK: Tighter header */
+            padding: 5px 15px; 
             display: flex;
             justify-content: space-between;
             align-items: center;
-            height: 50px;
+            height: 60px;
             flex-shrink: 0;
             background: var(--bg-color);
             z-index: 100;
@@ -109,20 +77,16 @@
             align-items: flex-start;
             gap: 0;
         }
-        
-        @media (max-width: 380px) {
-            .header-right { gap: 2px; }
-        }
 
         .header-day {
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 700;
             text-transform: uppercase;
-            line-height: 1.1;
+            line-height: 1.2;
         }
 
         .header-date {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-family: var(--font-mono);
         }
 
@@ -131,7 +95,7 @@
             border: 2px solid transparent;
             cursor: pointer;
             color: var(--text-color);
-            padding: 4px;
+            padding: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -177,7 +141,7 @@
             grid-template-columns: repeat(7, 1fr);
             gap: 1px;
             text-align: center;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
         }
 
         .day-header-cell {
@@ -186,7 +150,7 @@
         }
 
         .day-cell {
-            padding: 4px 0;
+            padding: 6px 0;
             cursor: pointer;
             border: 1px solid transparent;
         }
@@ -215,7 +179,7 @@
         .has-event::after {
             content: '';
             position: absolute;
-            bottom: 1px;
+            bottom: 2px;
             left: 50%;
             transform: translateX(-50%);
             width: 4px;
@@ -224,7 +188,7 @@
         }
         
         .day-other-month {
-            color: transparent; /* E-ink: Hide other month days entirely for cleaner look */
+            color: transparent; 
         }
 
         .sidebar-menu {
@@ -252,6 +216,30 @@
             color: var(--bg-color);
         }
 
+        .tiled-btn {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 15px 5px;
+            text-align: center;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-color);
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .tiled-btn:active {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        .tiled-btn .material-icons-outlined {
+            font-size: 28px;
+        }
+
         .content-area {
             flex: 1;
             padding: 10px;
@@ -264,10 +252,10 @@
         .date-navigation {
             display: flex;
             justify-content: center;
-            gap: 15px;
+            gap: 20px;
             margin-bottom: 15px;
             font-family: var(--font-mono);
-            font-size: 0.85rem;
+            font-size: 0.9rem;
         }
         
         .nav-day {
@@ -284,7 +272,7 @@
         #events {
             display: flex;
             flex-direction: column;
-            gap: 8px; /* E-ink: tighter gaps */
+            gap: 10px;
             max-width: 800px;
             margin: 0 auto;
             width: 100%;
@@ -292,13 +280,13 @@
         
         .no-events-message {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 40px;
             font-family: var(--font-mono);
         }
 
         .event-item {
             border: var(--line-width) solid var(--border-color);
-            padding: 8px 10px; /* E-ink: Tighter padding */
+            padding: 12px; 
             position: relative;
             background: var(--bg-color);
         }
@@ -328,7 +316,7 @@
             overflow-wrap: break-word;
             flex-grow: 1;
             padding-top: 0px; 
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .event-note-preview {
@@ -348,7 +336,7 @@
             border: none;
             color: var(--text-color);
             text-decoration: underline;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             cursor: pointer;
             padding: 5px 0;
             margin-top: 5px;
@@ -359,10 +347,10 @@
         }
 
         .event-footer {
-            margin-top: 4px;
+            margin-top: 6px;
             display: flex;
             justify-content: space-between;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-family: var(--font-mono);
         }
         
@@ -370,7 +358,7 @@
             display: inline-flex;
             align-items: center;
             cursor: pointer;
-            margin-right: 10px;
+            margin-right: 12px;
             position: relative;
             user-select: none;
         }
@@ -383,8 +371,8 @@
         }
 
         .custom-checkbox {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             border: 2px solid var(--border-color);
             display: inline-flex;
             align-items: center;
@@ -393,7 +381,7 @@
         }
 
         .custom-checkbox .check-icon {
-            font-size: 16px !important;
+            font-size: 18px !important;
             color: var(--text-color);
             display: none !important;
         }
@@ -446,7 +434,7 @@
             max-height: 95vh;
             overflow-y: auto;
             z-index: 1010;
-            padding: 15px;
+            padding: 20px;
             display: none;
         }
 
@@ -463,25 +451,26 @@
             border-bottom: 2px solid var(--border-color);
             padding-bottom: 5px;
             margin-bottom: 15px;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
         }
 
         .popup-input-style, select, textarea {
             width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
+            padding: 10px;
+            margin-bottom: 15px;
             border: 2px solid var(--border-color);
             background: var(--bg-color);
             color: var(--text-color);
             font-family: var(--font-main);
             border-radius: 0;
+            font-weight: 600;
         }
 
         .popup-btn {
             background: var(--text-color);
             color: var(--bg-color);
             border: none;
-            padding: 10px 15px;
+            padding: 12px 15px;
             cursor: pointer;
             font-weight: bold;
             width: 100%;
@@ -496,14 +485,14 @@
 
         .color-picker {
             display: flex;
-            gap: 5px;
-            margin-bottom: 10px;
+            gap: 8px;
+            margin-bottom: 15px;
             flex-wrap: wrap;
         }
 
         .color-option {
-            width: 30px;
-            height: 30px;
+            width: 35px;
+            height: 35px;
             border: 2px solid var(--border-color);
             cursor: pointer;
             display: flex;
@@ -525,7 +514,7 @@
 
         .sp-day {
             background: var(--bg-color);
-            min-height: 40px;
+            min-height: 45px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -542,7 +531,7 @@
         }
 
         .sp-day-number {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             position: absolute;
             top: 2px;
             left: 4px;
@@ -550,7 +539,7 @@
         }
 
         .sp-shift-icon {
-            font-size: 20px;
+            font-size: 22px;
             color: var(--text-color);
         }
 
@@ -558,10 +547,10 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 5px;
+            padding: 8px;
             border: 2px solid transparent;
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .sp-radio-label:active {
@@ -574,7 +563,7 @@
         }
 
         .dream-item {
-            padding: 8px;
+            padding: 10px;
             border-bottom: 2px solid var(--border-color);
             display: flex;
             justify-content: space-between;
@@ -582,7 +571,7 @@
         
         #note-input-container {
             border: 2px solid var(--border-color);
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             background: var(--bg-color);
         }
 
@@ -595,8 +584,8 @@
         }
 
         .format-btn {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             padding: 0;
             display: flex;
             align-items: center;
@@ -613,13 +602,13 @@
         }
 
         .format-btn .material-icons-outlined {
-            font-size: 20px;
+            font-size: 22px;
         }
 
         #new-note-content {
             border: none;
-            min-height: 80px;
-            padding: 8px;
+            min-height: 90px;
+            padding: 10px;
             margin-bottom: 0;
             outline: none;
             background: var(--bg-color);
@@ -639,17 +628,17 @@
             transform: translate(-50%, -50%);
             background: var(--bg-color);
             border: 4px solid var(--border-color);
-            padding: 15px;
+            padding: 20px;
             z-index: 1051;
             width: 90%;
-            max-width: 300px;
+            max-width: 320px;
         }
         
         .info-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 5px;
-            font-size: 0.9rem;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
             font-weight: 700;
         }
 
@@ -657,7 +646,7 @@
             display: inline-block;
             padding: 2px 6px;
             font-family: var(--font-mono);
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             background: var(--bg-color);
             border: 2px solid var(--border-color);
             margin-right: 8px;
@@ -669,19 +658,14 @@
         .kbd-grid {
             display: grid; 
             grid-template-columns: 1fr 1fr; 
-            gap: 3px; 
-            font-size: 0.85rem; 
+            gap: 5px; 
+            font-size: 0.9rem; 
             line-height: 1.8;
-            margin-top: 10px;
+            margin-top: 15px;
         }
     </style>
 </head>
 <body class="light-theme">
-
-    <div id="startup-loader">
-        <h1>Calendar</h1>
-        <div class="loader-text">Organizing...</div>
-    </div>
 
     <div id="overlay"></div>
 
@@ -692,18 +676,9 @@
         </div>
 
         <div class="header-right" id="header-right-section">
-            <button class="icon-btn" id="search-button" onclick="showSearchPopup()" aria-label="Search">
-                <span class="material-icons-outlined">search</span>
-            </button>
-            <button class="icon-btn" id="add-button" onclick="showAddPopup()" aria-label="Add New">
-                <span class="material-icons-outlined">add</span>
-            </button>
-            <button class="icon-btn" onclick="showTodaySummaryPopup()" id="today-summary-bell" aria-label="Notifications">
-                <span class="material-icons-outlined">notifications</span>
-            </button>
-            <button class="icon-btn" onclick="showDatePopup()" aria-label="Select Date">
-                <span class="material-icons-outlined">calendar_month</span>
-                <span id="current-day-number" style="font-weight: bold; margin-left: 5px;">1</span>
+            <!-- E-INK: Consolidated Tiled Menu Button -->
+            <button class="icon-btn" id="main-menu-btn" onclick="showMainMenuPopup()" aria-label="Menu">
+                <span class="material-icons-outlined" style="font-size: 28px;">grid_view</span>
             </button>
         </div>
     </header>
@@ -751,6 +726,52 @@
         </main>
     </div>
 
+    <!-- MAIN GRID MENU POPUP -->
+    <div id="main-menu-popup" class="popup">
+        <h2 style="border-bottom: 2px solid var(--border-color); margin-bottom: 15px;">Menu</h2>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+            <button class="tiled-btn" onclick="showAddPopup()">
+                <span class="material-icons-outlined">add</span>
+                <span style="font-size: 0.75rem;">New</span>
+            </button>
+            <button class="tiled-btn" onclick="showSearchPopup()">
+                <span class="material-icons-outlined">search</span>
+                <span style="font-size: 0.75rem;">Search</span>
+            </button>
+            <button class="tiled-btn" onclick="showDatePopup()">
+                <span class="material-icons-outlined">calendar_month</span>
+                <span style="font-size: 0.75rem;">Dates</span>
+            </button>
+            <button class="tiled-btn" onclick="showTodaySummaryPopup()">
+                <span class="material-icons-outlined">notifications</span>
+                <span style="font-size: 0.75rem;">Brief</span>
+            </button>
+            <button class="tiled-btn" onclick="showUpcomingPopup()">
+                <span class="material-icons-outlined">timeline</span>
+                <span style="font-size: 0.75rem;">Upcoming</span>
+            </button>
+            <button class="tiled-btn" onclick="showDreamsPopup()">
+                <span class="material-icons-outlined">cloud</span>
+                <span style="font-size: 0.75rem;">Dreams</span>
+            </button>
+            <button class="tiled-btn" onclick="openShiftPlanner()">
+                <span class="material-icons-outlined">work</span>
+                <span style="font-size: 0.75rem;">Shifts</span>
+            </button>
+            <button class="tiled-btn" onclick="showPocketPopup()">
+                <span class="material-icons-outlined">archive</span>
+                <span style="font-size: 0.75rem;">Pocket</span>
+            </button>
+            <button class="tiled-btn" onclick="showPastEventsPopup()">
+                <span class="material-icons-outlined">history</span>
+                <span style="font-size: 0.75rem;">History</span>
+            </button>
+        </div>
+        <button class="popup-btn" style="margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="showAccountPopup()">
+            <span class="material-icons-outlined">settings</span> Settings
+        </button>
+    </div>
+
     <!-- POPUPS -->
     <div id="add-popup" class="popup">
         <h2>New entry</h2>
@@ -790,7 +811,7 @@
         <input type="text" id="place-url" class="popup-input-style" placeholder="https://..." style="display:none;">
         <input type="text" id="place-physical" class="popup-input-style" placeholder="123 Street..." style="display:none;">
 
-        <div id="routine-options" style="display:none; border: 2px dashed var(--border-color); padding: 8px; margin-bottom: 10px;">
+        <div id="routine-options" style="display:none; border: 2px dashed var(--border-color); padding: 10px; margin-bottom: 15px;">
             <label>Repeat every:</label>
             <div style="display:flex; gap:10px;">
                 <input type="number" id="routine-frequency" class="popup-input-style" value="1" min="1" style="margin-bottom:0;">
@@ -819,20 +840,11 @@
             <button class="icon-btn" id="popup-next-month-btn"><span class="material-icons-outlined">chevron_right</span></button>
         </div>
         
-        <div id="popup-calendar-grid" class="calendar-grid" style="margin-bottom: 15px;"></div>
+        <div id="popup-calendar-grid" class="calendar-grid" style="margin-bottom: 20px;"></div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px;">
-             <button class="menu-item" style="justify-content:center;" onclick="showUpcomingPopup()">Upcoming</button>
-             <button class="menu-item" style="justify-content:center;" onclick="showDreamsPopup()">Dreams</button>
-             <button class="menu-item" style="justify-content:center;" onclick="openShiftPlanner()">Shifts</button>
-             <button class="menu-item" style="justify-content:center;" onclick="showPocketPopup()">Pocket</button>
-             <button class="menu-item" style="justify-content:center;" onclick="showPastEventsPopup()">History</button>
-             <button class="menu-item" style="justify-content:center;" onclick="showAccountPopup()">Settings</button>
-        </div>
-
-        <hr style="border: 1px solid var(--border-color); margin-bottom: 10px;">
+        <hr style="border: 2px solid var(--border-color); margin-bottom: 15px;">
         
-        <div style="margin-bottom: 10px;">
+        <div style="margin-bottom: 15px;">
             <label style="display:block; margin-bottom:5px; font-size:0.9rem; font-weight:bold;">Jump to specific date:</label>
             <div style="display: flex; gap: 10px;">
                 <input type="date" id="popup-date" class="popup-input-style" style="margin-bottom:0;">
@@ -840,7 +852,7 @@
             </div>
         </div>
 
-        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
             <button class="popup-btn" style="flex: 1; border-style: dashed; background: transparent; color: var(--text-color);" onclick="printCurrentWeek()">
                 <span class="material-icons-outlined" style="vertical-align: middle; margin-right: 5px;">print</span> Print Week
             </button>
@@ -861,7 +873,7 @@
 
     <div id="today-summary-popup" class="popup">
         <h2>Aftercup Brief</h2>
-        <div id="weather-info" style="margin-bottom: 10px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;"></div>
+        <div id="weather-info" style="margin-bottom: 15px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;"></div>
         <div id="today-summary-stats" style="font-weight: bold; margin-bottom: 10px;"></div>
         <div id="today-summary-content-container">
             <div id="today-summary-content"></div>
@@ -871,15 +883,15 @@
             <div id="aftercup-posts-content"></div>
         </div>
         
-        <h3 style="margin-top: 15px;">Notification Times</h3>
+        <h3 style="margin-top: 20px;">Notification Times</h3>
         <div id="summary-notification-times-container"></div>
-        <button class="icon-btn" style="width:100%; border: 2px dashed var(--border-color); margin-bottom: 10px; font-weight:bold;" onclick="addSummaryNotificationTimeInput()">+ Add Time</button>
+        <button class="icon-btn" style="width:100%; border: 2px dashed var(--border-color); margin-bottom: 15px; font-weight:bold;" onclick="addSummaryNotificationTimeInput()">+ Add Time</button>
         <button class="popup-btn" onclick="saveSummaryNotificationSettings()">Save Settings</button>
     </div>
 
     <div id="dreams-popup" class="popup">
         <h2>Dreams</h2>
-        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
             <input type="text" id="new-dream-input" class="popup-input-style" placeholder="I dreamt of..." style="flex:2; margin-bottom:0;">
             <input type="number" id="new-dream-year" class="popup-input-style" placeholder="Year" style="flex:1; margin-bottom:0;">
             <button class="icon-btn" style="border: 2px solid var(--border-color);" onclick="addDream()"><span class="material-icons-outlined">add</span></button>
@@ -895,13 +907,13 @@
     </div>
 
     <div id="shift-planner-popup-main" class="popup" style="flex-direction: column;">
-        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <button class="icon-btn" id="sp-prev-month"><span class="material-icons-outlined">chevron_left</span></button>
             <h2 id="sp-month-title" style="margin:0; border:none;">Month</h2>
             <button class="icon-btn" id="sp-next-month"><span class="material-icons-outlined">chevron_right</span></button>
         </div>
         <div id="sp-calendar-grid"></div>
-        <button id="sp-back-button" class="popup-btn" style="margin-top: 15px;">Back</button>
+        <button id="sp-back-button" class="popup-btn" style="margin-top: 20px;">Back</button>
     </div>
 
     <div id="quick-jump-popup" class="popup" style="width: 150px; text-align: center; padding: 15px;">
@@ -957,7 +969,7 @@
             <button class="popup-btn" style="margin-top: 10px; background: transparent; color: var(--text-color);" onclick="handleLogout()">Logout</button>
         </div>
 
-        <h3 style="margin-top: 15px;">Shortcuts</h3>
+        <h3 style="margin-top: 20px;">Shortcuts</h3>
         <div class="kbd-grid">
             <div><span class="kbd-shortcut">↵</span> New</div>
             <div><span class="kbd-shortcut">F</span> Search</div>
@@ -976,32 +988,32 @@
             <div><span class="kbd-shortcut">⌫</span> Back</div>
         </div>
 
-        <h3 style="margin-top: 15px;">Data</h3>
-        <button class="popup-btn" style="margin-bottom: 8px;" onclick="backupEventsData()">Download Backup</button>
-        <button class="popup-btn" style="margin-bottom: 8px; border-style: dashed;" onclick="triggerRestore()">Restore from File</button>
+        <h3 style="margin-top: 20px;">Data</h3>
+        <button class="popup-btn" style="margin-bottom: 10px;" onclick="backupEventsData()">Download Backup</button>
+        <button class="popup-btn" style="margin-bottom: 10px; border-style: dashed;" onclick="triggerRestore()">Restore from File</button>
         <input type="file" id="restore-file-input" style="display:none;" accept=".json">
         <input type="file" id="sync-file-input" accept=".json" style="display: none;">
 
-        <button class="popup-btn" onclick="document.getElementById('sync-file-input').click()" style="margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <button class="popup-btn" onclick="document.getElementById('sync-file-input').click()" style="margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;">
             Sync File (Merge)
         </button>
 
-        <button class="popup-btn" onclick="handleGoogleImport()" style="margin-bottom: 5px; display: flex; align-items: center; justify-content: flex-start; gap: 8px; border: 2px solid var(--border-color); background: transparent; color: var(--text-color);">
+        <button class="popup-btn" onclick="handleGoogleImport()" style="margin-bottom: 5px; display: flex; align-items: center; justify-content: flex-start; gap: 10px; border: 2px solid var(--border-color); background: transparent; color: var(--text-color);">
             <span class="material-icons-outlined">login</span>
             Import GCal
         </button>
         <div id="last-import-time" style="font-size: 0.8em; font-weight:bold; margin-bottom: 10px; font-family: var(--font-mono); text-align: left; padding-left: 5px;"></div>
 
-        <button class="popup-btn" onclick="handleGoogleExport()" style="margin-bottom: 5px; display: flex; align-items: center; justify-content: flex-start; gap: 8px; border: 2px solid var(--border-color); background: transparent; color: var(--text-color);">
+        <button class="popup-btn" onclick="handleGoogleExport()" style="margin-bottom: 5px; display: flex; align-items: center; justify-content: flex-start; gap: 10px; border: 2px solid var(--border-color); background: transparent; color: var(--text-color);">
             <span class="material-icons-outlined">logout</span>
             Export GCal
         </button>
-        <div id="last-export-time" style="font-size: 0.8em; font-weight:bold; margin-bottom: 10px; font-family: var(--font-mono); text-align: left; padding-left: 5px;"></div>
+        <div id="last-export-time" style="font-size: 0.8em; font-weight:bold; margin-bottom: 15px; font-family: var(--font-mono); text-align: left; padding-left: 5px;"></div>
         
-        <h3 style="margin-top: 15px;">Theme</h3>
-        <div style="display: flex; flex-wrap: wrap; gap: 5px;">
-            <button onclick="changeTheme('light')" style="padding: 8px 15px; border: 2px solid #000; font-weight:bold;">Light</button>
-            <button onclick="changeTheme('dark')" style="padding: 8px 15px; border: 2px solid #fff; background: #000; color: #fff; font-weight:bold;">Dark</button>
+        <h3 style="margin-top: 20px;">Theme</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+            <button onclick="changeTheme('light')" style="padding: 10px 20px; border: 2px solid #000; font-weight:bold;">Light</button>
+            <button onclick="changeTheme('dark')" style="padding: 10px 20px; border: 2px solid #fff; background: #000; color: #fff; font-weight:bold;">Dark</button>
         </div>
     </div>
 
@@ -1019,10 +1031,10 @@
         <div id="past-events-container"></div>
     </div>
 
-    <div id="install-popup-overlay" style="position:fixed; bottom:0; left:0; width:100%; background:var(--bg-color); border-top:4px solid var(--border-color); padding:15px; z-index:2000; display:none;">
+    <div id="install-popup-overlay" style="position:fixed; bottom:0; left:0; width:100%; background:var(--bg-color); border-top:4px solid var(--border-color); padding:20px; z-index:2000; display:none;">
         <h3 style="margin-top:0;">Install App</h3>
         <p style="font-weight:bold;">Install for offline access.</p>
-        <div style="display:flex; gap:10px; margin-top:10px;">
+        <div style="display:flex; gap:10px; margin-top:15px;">
             <button id="popup-install-btn" class="popup-btn">Install</button>
             <button id="popup-later-btn" class="popup-btn" style="background:transparent; color:var(--text-color);">Later</button>
         </div>
@@ -1032,12 +1044,20 @@
     <script src="https://apis.google.com/js/api.js" async defer></script>
     <script>
       if (typeof navigator.serviceWorker !== 'undefined') {
-        navigator.serviceWorker.register('sw.js')
+        navigator.serviceWorker.register('sw.js').catch(()=>{}); // Ignore SW errors safely
       }
 
-      // ----------------------------------------------------
-      // JAVASCRIPT CONSOLIDATION (script.js integration)
-      // ----------------------------------------------------
+      // Safe JSON parse to prevent crashes on bad local data
+      function safeParseJSON(key, fallback) {
+          try {
+              const val = localStorage.getItem(key);
+              return val ? JSON.parse(val) : fallback;
+          } catch (e) {
+              console.error(`Error parsing ${key} from localStorage`, e);
+              return fallback;
+          }
+      }
+
       let events = [];
       let dreams = [];
       let currentDate = new Date();
@@ -1050,7 +1070,7 @@
       let showPreAddedEvents = true;
       let deferredPrompt;
       let installPopupOverlay;
-      let autoSyncEnabled = JSON.parse(localStorage.getItem('autoSyncEnabled')) ?? true;
+      let autoSyncEnabled = safeParseJSON('autoSyncEnabled', true);
 
       let quickJumpValue = "";
       let quickJumpTimeout = null;
@@ -1059,10 +1079,10 @@
       function toggleMobileMiniCalendar() {}
 
       let syncPrefs = {
-          events: JSON.parse(localStorage.getItem('syncPrefs_events')) ?? true,
-          dreams: JSON.parse(localStorage.getItem('syncPrefs_dreams')) ?? true,
-          shifts: JSON.parse(localStorage.getItem('syncPrefs_shifts')) ?? true,
-          settings: JSON.parse(localStorage.getItem('syncPrefs_settings')) ?? true
+          events: safeParseJSON('syncPrefs_events', true),
+          dreams: safeParseJSON('syncPrefs_dreams', true),
+          shifts: safeParseJSON('syncPrefs_shifts', true),
+          settings: safeParseJSON('syncPrefs_settings', true)
       };
 
       const monthNamesFull = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -1080,7 +1100,7 @@
           syncInput.addEventListener('change', handleSyncFromFile);
       }
 
-      let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+      let currentUser = safeParseJSON('currentUser', null);
       let isSyncing = false;
       let syncDebounceTimer = null;
 
@@ -1176,11 +1196,6 @@
           return [...preAddedEvents, ...userOnlyEvents];
       }
 
-      function hideStartupLoader() {
-          const loader = document.getElementById('startup-loader');
-          if (loader) loader.style.display = 'none'; // E-ink Optimization: Instant hide
-      }
-
       const GOOGLE_CLIENT_ID = '527094061235-43h8vsp98slnsc8asfqlhc8c8j10e65e.apps.googleusercontent.com';
       const GOOGLE_API_KEY = 'AIzaSyAyQjKsyuwTUw5xU_84-Cor-Sr_FpMpCMQ';
       const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
@@ -1216,7 +1231,7 @@
           document.body.className = savedTheme + '-theme';
 
           const preAddedToggle = document.getElementById('pre-added-toggle');
-          showPreAddedEvents = JSON.parse(localStorage.getItem('showPreAddedEvents')) ?? true;
+          showPreAddedEvents = safeParseJSON('showPreAddedEvents', true);
           if (preAddedToggle) {
               preAddedToggle.checked = showPreAddedEvents;
               preAddedToggle.addEventListener('change', function () {
@@ -1237,7 +1252,7 @@
 
           document.getElementById('event-type').addEventListener('change', toggleAddPopupFields);
 
-          const userEvents = JSON.parse(localStorage.getItem('events')) || [];
+          const userEvents = safeParseJSON('events', []);
           let fetchedEvents = [];
 
           try {
@@ -1246,11 +1261,11 @@
           } catch (error) {}
 
           events = mergeEvents(fetchedEvents, userEvents);
-          dreams = JSON.parse(localStorage.getItem('dreams')) || [];
+          dreams = safeParseJSON('dreams', []);
 
           saveEvents(true);
 
-          dailyNotificationTimes = JSON.parse(localStorage.getItem(DAILY_SUMMARY_TIMES_KEY)) || [];
+          dailyNotificationTimes = safeParseJSON(DAILY_SUMMARY_TIMES_KEY, []);
           await scheduleAutomaticNotifications();
 
           updateCalendar();
@@ -1268,8 +1283,6 @@
               if (autoSyncEnabled) await performSync('pull');
           } 
           
-          hideStartupLoader();
-
           window.addEventListener('popstate', (event) => {
               const activePopupId = getActivePopupId();
               if (activePopupId) {
@@ -1357,6 +1370,7 @@
 
               const lowerKey = key.toLowerCase();
               switch (lowerKey) {
+                  case 'm': e.preventDefault(); showMainMenuPopup(); break;
                   case 'f': e.preventDefault(); showSearchPopup(); setTimeout(() => document.getElementById('search-input')?.focus(), 100); break;
                   case 't': e.preventDefault(); switchToRelativeDay(1); break;
                   case 'y': e.preventDefault(); switchToRelativeDay(-1); break;
@@ -1423,7 +1437,7 @@
               }
               quickJumpValue = "";
               hidePopups();
-          }, 1500); // reduced timeout for e-ink feel
+          }, 1500); 
       }
 
       function showQuickJumpPopup(val) {
@@ -1536,58 +1550,18 @@
           }
       }
 
-      function renderPopupCalendar() {
-          const grid = document.getElementById('popup-calendar-grid');
-          const monthYearEl = document.getElementById('popup-month-year');
-          if (!grid || !monthYearEl) return;
-          const visibleEvents = getVisibleEvents();
-          grid.innerHTML = '';
-          monthYearEl.textContent = `${monthNamesFull[currentPopupCalDate.getMonth()]} ${currentPopupCalDate.getFullYear()}`;
-          dayNamesShort.forEach(dayName => {
-              const cell = document.createElement('div');
-              cell.classList.add('day-header-cell');
-              cell.textContent = dayName.slice(0, 3);
-              grid.appendChild(cell);
-          });
-          const year = currentPopupCalDate.getFullYear();
-          const month = currentPopupCalDate.getMonth();
-          const firstDayOfMonth = new Date(year, month, 1);
-          const daysInMonth = new Date(year, month + 1, 0).getDate();
-          let firstDayOfWeek = (firstDayOfMonth.getDay() + 6) % 7;
-          for (let i = 0; i < firstDayOfWeek; i++) {
-              const cell = document.createElement('div');
-              cell.classList.add('day-cell', 'day-other-month');
-              grid.appendChild(cell);
-          }
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-          const normalizedMainCalendarDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
-          for (let day = 1; day <= daysInMonth; day++) {
-              const dayCell = document.createElement('div');
-              dayCell.classList.add('day-cell');
-              dayCell.textContent = day;
-              const cellDate = new Date(year, month, day);
-              const dateString = getLocalDateString(cellDate);
-              dayCell.dataset.date = dateString;
-              if (cellDate.getTime() === today.getTime()) dayCell.classList.add('today-mini');
-              if (cellDate.getTime() === normalizedMainCalendarDate.getTime()) {
-                  dayCell.classList.add('current-day-mini');
-              }
-              if (visibleEvents.some(event => event.date === dateString)) dayCell.classList.add('has-event');
-              dayCell.addEventListener('click', () => {
-                  currentDate = new Date(cellDate);
-                  updateCalendar();
-                  closePopupAndGoBack();
-              });
-              grid.appendChild(dayCell);
-          }
-          const totalCells = firstDayOfWeek + daysInMonth;
-          const remainingCells = (7 - (totalCells % 7)) % 7;
-          for (let i = 0; i < remainingCells; i++) {
-              const cell = document.createElement('div');
-              cell.classList.add('day-cell', 'day-other-month');
-              grid.appendChild(cell);
-          }
+      function showMainMenuPopup() {
+          hidePopups(true);
+          const overlay = document.getElementById('overlay');
+          overlay.style.zIndex = '1005';
+          overlay.style.display = 'block';
+
+          const popup = document.getElementById('main-menu-popup');
+          popup.classList.add('active');
+          popup.scrollTop = 0;
+
+          history.pushState({ popup: 'main-menu-popup' }, '', null);
+          hideActionButtons();
       }
 
       function showDatePopup() {
@@ -1774,13 +1748,13 @@
       }
 
       function hideActionButtons() {
-          document.getElementById('add-button').style.display = 'none';
-          document.getElementById('search-button').style.display = 'none';
+          const btn = document.getElementById('main-menu-btn');
+          if (btn) btn.style.display = 'none';
       }
 
       function showActionButtons() {
-          document.getElementById('add-button').style.display = 'flex';
-          document.getElementById('search-button').style.display = 'flex';
+          const btn = document.getElementById('main-menu-btn');
+          if (btn) btn.style.display = 'flex';
       }
 
       function switchToRelativeDay(offset) {
@@ -1796,7 +1770,7 @@
           currentDate.setHours(0, 0, 0, 0);
           document.getElementById('header-day-name').textContent = dayNamesFull[currentDate.getDay()];
           document.getElementById('header-full-date').textContent = `${monthNamesFull[currentDate.getMonth()]} ${currentDate.getDate()}, ${currentDate.getFullYear()}`;
-          document.getElementById('current-day-number').textContent = new Date().getDate();
+          
 
           const dateInfoElDesktop = document.getElementById('desktop-date-info');
           if (dateInfoElDesktop) updateDateInfo(dateInfoElDesktop, currentDate);
@@ -1818,9 +1792,6 @@
           }
           renderMiniMonthCalendar();
           renderEvents();
-
-          const summaryBell = document.getElementById('today-summary-bell');
-          summaryBell.style.display = (currentDate.getTime() === todayForLabels.getTime()) ? 'flex' : 'none';
       }
 
       function updateDateInfo(element, date) {
@@ -2905,7 +2876,7 @@
 
       function updateSyncStatus(msg, isError = false) {
           const el = document.getElementById('sync-status');
-          if (el) el.textContent = msg; // Colors omitted intentionally for e-ink (no #ff6b6b)
+          if (el) el.textContent = msg; 
       }
 
       async function handleLogin() {
@@ -2972,7 +2943,7 @@
           if (!backup || Object.keys(backup).length === 0) return;
 
           if (syncPrefs.events && backup.events && Array.isArray(backup.events)) {
-              const localUserEvents = JSON.parse(localStorage.getItem('events')) || [];
+              const localUserEvents = safeParseJSON('events', []);
               let mergedEvents = [...localUserEvents];
               backup.events.forEach(cloudEvt => {
                   let matchIndex = mergedEvents.findIndex(e => e.sharedEventId === cloudEvt.sharedEventId || e.id === cloudEvt.id);
@@ -2992,7 +2963,7 @@
           }
           
           if (syncPrefs.dreams && backup.dreams && Array.isArray(backup.dreams)) {
-              const localDreams = JSON.parse(localStorage.getItem('dreams')) || [];
+              const localDreams = safeParseJSON('dreams', []);
               const dreamMap = new Map();
               backup.dreams.forEach(d => dreamMap.set(d.id, d));
               localDreams.forEach(d => dreamMap.set(d.id, d));
@@ -3002,7 +2973,7 @@
           }
 
           if (syncPrefs.shifts && backup.shifts) {
-              const mergedShifts = { ...(JSON.parse(localStorage.getItem("shifts")) || {}), ...backup.shifts };
+              const mergedShifts = { ...(safeParseJSON("shifts", {})), ...backup.shifts };
               localStorage.setItem('shifts', JSON.stringify(mergedShifts));
               if (typeof spRenderCalendar === 'function') spRenderCalendar();
           }
