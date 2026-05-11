@@ -18,7 +18,8 @@
             --text-color: #000000;
             --border-color: #000000;
             --accent-color: #000000;
-            --pattern-color: rgba(0, 0, 0, 0.5); /* 50% visibility for patterns */
+            --pattern-opacity: 0.5;
+            --pattern-color: rgba(0, 0, 0, var(--pattern-opacity));
             --secondary-bg: #ffffff; /* E-INK: Pure white for maximum contrast */
             --line-width: 2px;
             --font-main: 'Inter', sans-serif;
@@ -30,7 +31,7 @@
             --text-color: #ffffff;
             --border-color: #ffffff;
             --accent-color: #ffffff;
-            --pattern-color: rgba(255, 255, 255, 0.5); /* 50% visibility for patterns */
+            --pattern-color: rgba(255, 255, 255, var(--pattern-opacity));
             --secondary-bg: #000000;
         }
 
@@ -119,7 +120,7 @@
             background-size: 256px 256px;
             background-repeat: repeat;
             background-position: center;
-            opacity: 0.5;
+            opacity: var(--pattern-opacity);
             mix-blend-mode: multiply;
             z-index: -1; pointer-events: none;
         }
@@ -140,8 +141,7 @@
             z-index: -1; pointer-events: none;
         }
 
-        body.pattern-none .date-navigation,
-        body.pattern-none .no-events-message {
+        body.pattern-none .date-navigation {
             border-color: transparent;
             background-color: transparent;
         }
@@ -419,11 +419,22 @@
             text-align: center;
             flex: 0;
             font-family: var(--font-mono);
-            margin: 0 auto;
-            background: var(--bg-color);
+            margin: auto;
+            background: transparent;
             padding: 30px;
-            border: var(--line-width) solid var(--border-color);
+            border: none;
             width: fit-content;
+            color: var(--text-color);
+            /* Intense outline using the background color */
+            text-shadow: 
+                -2px -2px 0 var(--bg-color),  
+                 2px -2px 0 var(--bg-color),
+                -2px  2px 0 var(--bg-color),
+                 2px  2px 0 var(--bg-color),
+                -3px  0   0 var(--bg-color),
+                 3px  0   0 var(--bg-color),
+                 0    3px 0 var(--bg-color),
+                 0   -3px 0 var(--bg-color);
         }
 
         .event-item {
@@ -1237,6 +1248,15 @@
             <button class="pattern-btn" data-pattern="snowflakes" onclick="changePattern('snowflakes')">Snow</button>
         </div>
 
+        <h3 style="margin-top: 20px;">Pattern Transparency</h3>
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;">
+            <button class="pattern-btn opacity-btn" data-opacity="0.05" onclick="changePatternOpacity('0.05')">5%</button>
+            <button class="pattern-btn opacity-btn" data-opacity="0.1" onclick="changePatternOpacity('0.1')">10%</button>
+            <button class="pattern-btn opacity-btn" data-opacity="0.25" onclick="changePatternOpacity('0.25')">25%</button>
+            <button class="pattern-btn opacity-btn" data-opacity="0.5" onclick="changePatternOpacity('0.5')">50%</button>
+            <button class="pattern-btn opacity-btn" data-opacity="0.75" onclick="changePatternOpacity('0.75')">75%</button>
+        </div>
+
         <h3 style="margin-top: 30px;">About</h3>
         <div style="text-align: center; margin-bottom: 15px;">
             <div style="font-family: var(--font-mono); font-size: 0.9rem; font-weight: bold; margin-bottom: 15px;">Version 1.0 for MP01</div>
@@ -1459,6 +1479,9 @@
 
           const savedTheme = localStorage.getItem('theme') || 'light';
           document.body.className = savedTheme + '-theme';
+
+          const savedPatternOpacity = localStorage.getItem('patternOpacity') || '0.5';
+          changePatternOpacity(savedPatternOpacity);
 
           const savedPattern = localStorage.getItem('pattern') || 'none';
           changePattern(savedPattern);
@@ -2615,8 +2638,21 @@
           document.body.classList.add('pattern-' + patternName);
           localStorage.setItem('pattern', patternName);
 
-          document.querySelectorAll('.pattern-btn').forEach(btn => {
+          document.querySelectorAll('.pattern-btn:not(.opacity-btn)').forEach(btn => {
               if (btn.getAttribute('data-pattern') === patternName) {
+                  btn.classList.add('selected');
+              } else {
+                  btn.classList.remove('selected');
+              }
+          });
+      }
+
+      function changePatternOpacity(opacityValue) {
+          document.documentElement.style.setProperty('--pattern-opacity', opacityValue);
+          localStorage.setItem('patternOpacity', opacityValue);
+
+          document.querySelectorAll('.opacity-btn').forEach(btn => {
+              if (btn.getAttribute('data-opacity') === opacityValue) {
                   btn.classList.add('selected');
               } else {
                   btn.classList.remove('selected');
@@ -3188,7 +3224,13 @@
           if (syncPrefs.events) backup.events = events.filter(e => !e.preAdded);
           if (syncPrefs.dreams) backup.dreams = dreams;
           if (syncPrefs.shifts) backup.shifts = JSON.parse(localStorage.getItem("shifts") || "{}");
-          if (syncPrefs.settings) backup.settings = { theme: localStorage.getItem('theme'), pattern: localStorage.getItem('pattern') || 'none', showPreAdded: showPreAddedEvents, notifications: dailyNotificationTimes };
+          if (syncPrefs.settings) backup.settings = { 
+              theme: localStorage.getItem('theme'), 
+              pattern: localStorage.getItem('pattern') || 'none', 
+              opacity: localStorage.getItem('patternOpacity') || '0.5', 
+              showPreAdded: showPreAddedEvents, 
+              notifications: dailyNotificationTimes 
+          };
           return backup;
       }
 
@@ -3233,6 +3275,7 @@
 
           if (syncPrefs.settings && backup.settings) {
               if (backup.settings.theme) changeTheme(backup.settings.theme);
+              if (backup.settings.opacity) changePatternOpacity(backup.settings.opacity);
               if (backup.settings.pattern) changePattern(backup.settings.pattern);
               if (backup.settings.showPreAdded !== undefined) {
                   showPreAddedEvents = backup.settings.showPreAdded;
