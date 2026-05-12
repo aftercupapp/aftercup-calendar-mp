@@ -1853,6 +1853,67 @@
           document.getElementById('popup-next-month-btn').addEventListener('click', () => { currentPopupCalDate.setMonth(currentPopupCalDate.getMonth() + 1); renderPopupCalendar(); });
       }
 
+      function renderPopupCalendar() {
+          const grid = document.getElementById('popup-calendar-grid');
+          const monthYearEl = document.getElementById('popup-month-year');
+          if (!grid || !monthYearEl) return;
+          
+          const visibleEvents = getVisibleEvents();
+          grid.innerHTML = '';
+          monthYearEl.textContent = `${monthNamesFull[currentPopupCalDate.getMonth()]} ${currentPopupCalDate.getFullYear()}`;
+          
+          dayNamesShort.forEach(dayName => {
+              const cell = document.createElement('div');
+              cell.classList.add('day-header-cell');
+              cell.textContent = dayName.slice(0, 3);
+              grid.appendChild(cell);
+          });
+          
+          const year = currentPopupCalDate.getFullYear();
+          const month = currentPopupCalDate.getMonth();
+          const firstDayOfMonth = new Date(year, month, 1);
+          const daysInMonth = new Date(year, month + 1, 0).getDate();
+          let firstDayOfWeek = (firstDayOfMonth.getDay() + 6) % 7;
+          
+          for (let i = 0; i < firstDayOfWeek; i++) {
+              const cell = document.createElement('div');
+              cell.classList.add('day-cell', 'day-other-month');
+              grid.appendChild(cell);
+          }
+          
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const normalizedCurrentCalendarDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+          
+          for (let day = 1; day <= daysInMonth; day++) {
+              const dayCell = document.createElement('div');
+              dayCell.classList.add('day-cell');
+              dayCell.textContent = day;
+              const cellDate = new Date(year, month, day);
+              const dateString = getLocalDateString(cellDate);
+              dayCell.dataset.date = dateString;
+              
+              if (cellDate.getTime() === today.getTime()) dayCell.classList.add('today-mini');
+              if (cellDate.getTime() === normalizedCurrentCalendarDate.getTime()) dayCell.classList.add('current-day-mini');
+              if (visibleEvents.some(event => event.date === dateString)) dayCell.classList.add('has-event');
+              
+              dayCell.addEventListener('click', () => {
+                  currentDate = new Date(cellDate);
+                  updateCalendar();
+                  closePopupAndGoBack();
+              });
+              grid.appendChild(dayCell);
+          }
+          
+          const totalCells = firstDayOfWeek + daysInMonth;
+          const remainingCells = (7 - (totalCells % 7)) % 7;
+          for (let i = 0; i < remainingCells; i++) {
+              const cell = document.createElement('div');
+              cell.classList.add('day-cell', 'day-other-month');
+              grid.appendChild(cell);
+          }
+      }
+
       function renderMiniMonthCalendar() {
           const grid = document.getElementById('mini-month-calendar-grid');
           const monthYearEl = document.getElementById('mini-month-year');
