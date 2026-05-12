@@ -2592,11 +2592,12 @@
       }
 
       function toggleTask(eventId, e) {
-          e.stopPropagation();
+          if (e) e.stopPropagation();
           const eventIndex = events.findIndex(ev => String(ev.id) === String(eventId));
           if (eventIndex > -1) {
               const evt = events[eventIndex];
-              evt.completed = !evt.completed;
+              // Ensure we use the actual checked state if available, to prevent desync
+              evt.completed = (e && e.target && e.target.type === 'checkbox') ? e.target.checked : !evt.completed;
               evt.lastModified = Date.now();
               saveEvents();
 
@@ -3291,7 +3292,10 @@
               const localUserEvents = safeParseJSON('events', []);
               let mergedEvents = [...localUserEvents];
               backup.events.forEach(cloudEvt => {
-                  let matchIndex = mergedEvents.findIndex(e => e.sharedEventId === cloudEvt.sharedEventId || e.id === cloudEvt.id);
+                  let matchIndex = mergedEvents.findIndex(e => 
+                      (e.id === cloudEvt.id) || 
+                      (e.sharedEventId && cloudEvt.sharedEventId && e.sharedEventId === cloudEvt.sharedEventId)
+                  );
                   if (matchIndex > -1) {
                       const localTime = mergedEvents[matchIndex].lastModified || 0;
                       const cloudTime = cloudEvt.lastModified || 0;
