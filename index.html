@@ -17,6 +17,7 @@
             --bg-color: #ffffff;
             --text-color: #000000;
             --border-color: #000000;
+            --divider-color: rgba(0, 0, 0, 0.15); /* Softer divider */
             --accent-color: #000000;
             --pattern-opacity: 0.5;
             --pattern-color: rgba(0, 0, 0, var(--pattern-opacity));
@@ -30,6 +31,7 @@
             --bg-color: #000000;
             --text-color: #ffffff;
             --border-color: #ffffff;
+            --divider-color: rgba(255, 255, 255, 0.2);
             --accent-color: #ffffff;
             --pattern-color: rgba(255, 255, 255, var(--pattern-opacity));
             --secondary-bg: #000000;
@@ -55,6 +57,19 @@
             flex-direction: column;
             overflow: hidden;
             font-weight: 600; /* E-INK: Bolder base font for legibility */
+            user-select: none; /* Disable selection globally */
+            -webkit-user-select: none;
+        }
+
+        /* Re-enable selection for specific areas */
+        .event-text, 
+        .event-note-preview, 
+        .popup input, 
+        .popup textarea, 
+        .popup select,
+        #new-note-content {
+            user-select: text;
+            -webkit-user-select: text;
         }
 
         /* --- PATTERN DEFINITIONS --- */
@@ -161,7 +176,7 @@
         }
 
         .app-header {
-            border-bottom: var(--line-width) solid var(--border-color);
+            border-bottom: var(--line-width) solid var(--divider-color);
             padding: 5px 15px; 
             display: flex;
             justify-content: space-between;
@@ -221,7 +236,7 @@
 
         .sidebar {
             width: 280px;
-            border-right: var(--line-width) solid var(--border-color);
+            border-right: var(--line-width) solid var(--divider-color);
             padding: 15px;
             display: flex;
             flex-direction: column;
@@ -827,7 +842,7 @@
                 height: 100px;
                 padding: 15px 20px;
                 align-items: center;
-                border-bottom: 1px solid var(--border-color);
+                border-bottom: 1px solid var(--divider-color);
             }
             .header-left {
                 gap: 5px;
@@ -863,12 +878,12 @@
                 border-top: none;
                 border-left: none;
                 border-right: none;
-                border-bottom: var(--line-width) solid var(--border-color);
+                border-bottom: 1px solid var(--divider-color);
                 padding: 12px 20px;
             }
             body.pattern-none .date-navigation {
                 background-color: var(--bg-color);
-                border-bottom: var(--line-width) solid var(--border-color);
+                border-bottom: 1px solid var(--divider-color);
             }
             #events {
                 padding: 15px 15px 40px 15px;
@@ -918,6 +933,7 @@
         }
     </style>
 </head>
+<!-- ... remaining body, header, script content stays identical ... -->
 <body class="light-theme">
 
     <div id="overlay"></div>
