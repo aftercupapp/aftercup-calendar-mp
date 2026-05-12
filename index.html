@@ -895,6 +895,38 @@
             }
             /* -------------------------------------------------------- */
 
+            /* --- Mobile Inline Month View --- */
+            .sidebar { display: none; }
+            
+            body.mobile-cal-open .sidebar {
+                display: flex;
+                width: 100%;
+                border-right: none;
+                padding: 20px;
+            }
+            body.mobile-cal-open .content-area,
+            body.mobile-cal-open .sidebar-menu,
+            body.mobile-cal-open #desktop-date-info {
+                display: none;
+            }
+            body.mobile-cal-open .mini-calendar-container {
+                margin-top: 10px;
+            }
+            body.mobile-cal-open .mini-calendar-header {
+                font-size: 1.3rem;
+                margin-bottom: 20px;
+            }
+            body.mobile-cal-open .calendar-grid {
+                font-size: 1.1rem;
+                gap: 5px;
+            }
+            body.mobile-cal-open .day-cell {
+                padding: 12px 0;
+            }
+            body.mobile-cal-open .day-header-cell {
+                padding-bottom: 10px;
+            }
+
             .popup, .search-popup, .sp-select-popup {
                 top: 0 !important;
                 left: 0 !important;
@@ -943,7 +975,7 @@
     <div id="overlay"></div>
 
     <header class="app-header">
-        <div class="header-left" id="header-left-section" onclick="showDatePopup()">
+        <div class="header-left" id="header-left-section" onclick="toggleMobileMiniCalendar()">
             <div class="header-day" id="header-day-name">MONDAY</div>
             <div class="header-date" id="header-full-date">January 1, 2024</div>
         </div>
@@ -1381,7 +1413,20 @@
       let quickJumpTimeout = null;
 
       let isMobileMiniCalVisible = false;
-      function toggleMobileMiniCalendar() {}
+      function toggleMobileMiniCalendar() {
+          if (window.innerWidth > 768) {
+              showDatePopup(); // On desktop, keep normal behavior
+              return;
+          }
+          isMobileMiniCalVisible = !isMobileMiniCalVisible;
+          if (isMobileMiniCalVisible) {
+              document.body.classList.add('mobile-cal-open');
+              currentMiniCalDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+              renderMiniMonthCalendar();
+          } else {
+              document.body.classList.remove('mobile-cal-open');
+          }
+      }
 
       let syncPrefs = {
           events: safeParseJSON('syncPrefs_events', true),
@@ -1811,9 +1856,8 @@
       function renderMiniMonthCalendar() {
           const grid = document.getElementById('mini-month-calendar-grid');
           const monthYearEl = document.getElementById('mini-month-year');
-          if (!grid || !monthYearEl || window.innerWidth < 769) {
-              if (grid && window.innerWidth < 769) grid.innerHTML = '';
-          }
+          if (!grid || !monthYearEl) return;
+          
           const visibleEvents = getVisibleEvents();
           grid.innerHTML = '';
           monthYearEl.textContent = `${monthNamesFull[currentMiniCalDate.getMonth()]} ${currentMiniCalDate.getFullYear()}`;
@@ -1849,6 +1893,9 @@
               dayCell.addEventListener('click', () => {
                   currentDate = new Date(cellDate);
                   updateCalendar();
+                  if (window.innerWidth <= 768 && isMobileMiniCalVisible) {
+                      toggleMobileMiniCalendar();
+                  }
               });
               grid.appendChild(dayCell);
           }
