@@ -359,6 +359,10 @@
         .menu-day-square {
             width: 32px;
             height: 32px;
+            min-width: 32px;
+            min-height: 32px;
+            aspect-ratio: 1 / 1;
+            flex-shrink: 0;
             border: 2px solid var(--border-color);
             display: flex;
             align-items: center;
@@ -823,6 +827,7 @@
                 height: 100px;
                 padding: 15px 20px;
                 align-items: center;
+                border-bottom: 1px solid var(--border-color);
             }
             .header-left {
                 gap: 5px;
@@ -836,6 +841,10 @@
             .menu-day-square {
                 width: 46px;
                 height: 46px;
+                min-width: 46px;
+                min-height: 46px;
+                aspect-ratio: 1 / 1;
+                flex-shrink: 0;
                 font-size: 1.6rem;
                 border-width: 3px;
             }
