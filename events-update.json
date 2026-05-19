@@ -1,4 +1,5 @@
 [
+   { "id": 81, "type": "event", "date": "2026-05-19", "time": "20:00", "text": "📰 Reed Cafe", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/332", "importance": "average" },  
    { "id": 80, "type": "event", "date": "2026-05-17", "time": "17:00", "text": "📰 Jaguár Álma specialty kávé a Vivi Édesszalonban", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/331", "importance": "average" },  
    { "id": 79, "type": "event", "date": "2026-05-11", "time": "10:00", "text": "📰 Színek és formák univerzuma kiállításmegnyitó", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/330", "importance": "average" },  
    { "id": 78, "type": "event", "date": "2026-05-06", "time": "15:00", "text": "📰 A Manila utcái ihlette Magic Water", "color": "#FFFFFF", "link": "https://aftercup.space/Posts/329", "importance": "average" },  
@@ -82,4 +83,3 @@
   { "id": 1, "type": "event", "date": "2025-05-23", "time": "10:00", "text": "📰 A meghajlított kő - Kigyós Sándor emlékkiállítás", "color": "#FFFFFF", "link": "https://aftercup.neocities.org/Posts/233", "importance": "average" }
 
 ]
-
